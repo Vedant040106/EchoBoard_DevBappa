@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: devbappa-feedback-api
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm install && npm run build --workspace=@devbappa/shared && npm run build --workspace=@devbappa/api
+    startCommand: npm run start --workspace=@devbappa/api
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        sync: false
+      - key: APP_ORIGIN
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: ADMIN_INITIAL_ID
+        value: admin
+      - key: ADMIN_INITIAL_PASSWORD
+        sync: false
+      - key: RATE_LIMIT_WINDOW_MS
+        value: 900000
+      - key: RATE_LIMIT_MAX_SUBMISSIONS
+        value: 30
+      - key: RATE_LIMIT_MAX_LOGIN_ATTEMPTS
+        value: 10

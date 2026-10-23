@@ -1,0 +1,249 @@
+:root {
+  /* Surface & Background */
+  --bg-outer: #0d0e15;
+  --bg-surface: #13141f;
+  --bg-surface-elevated: #1b1c2b;
+  --bg-surface-glass: rgba(19, 20, 31, 0.85);
+
+  /* Pinboard Canvas */
+  --pinboard-bg: #1c1a36;
+  --pinboard-border: #2e2a56;
+
+  /* Brand Accents */
+  --accent-orange: #f97316;
+  --accent-orange-hover: #ea580c;
+  --accent-yellow: #fbbf24;
+  --accent-glow: rgba(249, 115, 22, 0.35);
+
+  /* Status Colors */
+  --status-live: #10b981;
+  --status-reconnecting: #f59e0b;
+  --status-offline: #ef4444;
+  --status-syncing: #3b82f6;
+
+  /* Text & Ink */
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-note-dark: #1e293b;
+
+  /* Typography */
+  --font-brand: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-handwriting: 'Caveat', cursive, sans-serif;
+
+  /* Sticky Note Palettes */
+  --note-yellow-bg: #fef08a;
+  --note-yellow-border: #fde047;
+  --note-amber-bg: #fde68a;
+  --note-amber-border: #fcd34d;
+  --note-orange-bg: #fed7aa;
+  --note-orange-border: #fdba74;
+  --note-pink-bg: #fbcfe8;
+  --note-pink-border: #f472b6;
+  --note-lavender-bg: #e9d5ff;
+  --note-lavender-border: #c084fc;
+  --note-blue-bg: #bae6fd;
+  --note-blue-border: #7dd3fc;
+  --note-mint-bg: #a7f3d0;
+  --note-mint-border: #6ee7b7;
+
+  /* Shadows */
+  --shadow-paper: 0 10px 25px -5px rgba(0, 0, 0, 0.45), 0 8px 10px -6px rgba(0, 0, 0, 0.35);
+  --shadow-paper-hover: 0 20px 35px -5px rgba(0, 0, 0, 0.6), 0 12px 16px -6px rgba(0, 0, 0, 0.45);
+  --shadow-pin: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+
+  /* Radii */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}
+
+/* Reset and Base */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-outer);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-surface);
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Accessibility Focus Ring */
+:focus-visible {
+  outline: 2px solid var(--accent-orange);
+  outline-offset: 2px;
+}
+
+/* Physical Sticky Note Paper Grain and Depth */
+.sticky-note {
+  position: absolute;
+  user-select: none;
+  cursor: pointer;
+  padding: 24px 20px 20px 20px;
+  border-radius: 2px 2px 8px 2px;
+  box-shadow: var(--shadow-paper);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transform-origin: center top;
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease;
+  will-change: transform, box-shadow;
+  border-top: 1px solid rgba(255, 255, 255, 0.6);
+  border-left: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.sticky-note:hover {
+  transform: scale(1.05) translateY(-4px) !important;
+  box-shadow: var(--shadow-paper-hover) !important;
+  z-index: 9999 !important;
+}
+
+/* Curled Bottom-Right Corner Simulation */
+.sticky-note::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, transparent 50%, rgba(0, 0, 0, 0.12) 50%);
+  border-bottom-right-radius: 6px;
+  pointer-events: none;
+}
+
+/* Realistic Pushpin */
+.pushpin {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  box-shadow: var(--shadow-pin);
+  z-index: 5;
+}
+
+.pushpin::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.pushpin-brass {
+  background: radial-gradient(circle at 35% 35%, #fef08a, #ca8a04 70%, #78350f 100%);
+  border: 1px solid #a16207;
+}
+
+.pushpin-copper {
+  background: radial-gradient(circle at 35% 35%, #fdba74, #ea580c 70%, #7c2d12 100%);
+  border: 1px solid #c2410c;
+}
+
+.pushpin-silver {
+  background: radial-gradient(circle at 35% 35%, #f8fafc, #94a3b8 70%, #334155 100%);
+  border: 1px solid #64748b;
+}
+
+/* Note Color Variants */
+.note-yellow {
+  background-color: var(--note-yellow-bg);
+  color: var(--text-note-dark);
+}
+.note-amber {
+  background-color: var(--note-amber-bg);
+  color: var(--text-note-dark);
+}
+.note-orange {
+  background-color: var(--note-orange-bg);
+  color: #381204;
+}
+.note-pink {
+  background-color: var(--note-pink-bg);
+  color: #4a044e;
+}
+.note-lavender {
+  background-color: var(--note-lavender-bg);
+  color: #3b0764;
+}
+.note-blue {
+  background-color: var(--note-blue-bg);
+  color: #0c4a6e;
+}
+.note-mint {
+  background-color: var(--note-mint-bg);
+  color: #064e3b;
+}
+
+/* Pinboard Tactile Canvas Texture */
+.pinboard-surface {
+  background-color: var(--pinboard-bg);
+  background-image: 
+    radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    radial-gradient(rgba(249, 115, 22, 0.05) 1px, transparent 1px);
+  background-size: 32px 32px, 64px 64px;
+  background-position: 0 0, 16px 16px;
+}
+
+/* New Note Arrival Animation */
+@keyframes noteSettle {
+  0% {
+    opacity: 0;
+    transform: scale(1.6) translateY(-80px) rotate(15deg);
+  }
+  60% {
+    transform: scale(0.96) translateY(4px) rotate(-2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0) rotate(var(--target-rotation, 0deg));
+  }
+}
+
+.animate-settle {
+  animation: noteSettle 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Reduced Motion Override */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .sticky-note:hover {
+    transform: none !important;
+  }
+}
