@@ -20,7 +20,7 @@ This guide covers step-by-step production deployment to **Vercel** (Frontend), *
 ## 2. Render Backend Deployment
 
 1. Sign in to [Render](https://render.com) and create a **New Web Service**.
-2. Connect the GitHub repository `Vedant040106/devbappa-live-feedback-wall`.
+2. Connect the GitHub repository `Vedant040106/EchoBoard_DevBappa`.
 3. Configure service settings:
    - **Environment**: Node
    - **Build Command**:
@@ -48,7 +48,7 @@ This guide covers step-by-step production deployment to **Vercel** (Frontend), *
 ## 3. Vercel Frontend Deployment
 
 1. Sign in to [Vercel](https://vercel.com) and click **Add New Project**.
-2. Import `Vedant040106/devbappa-live-feedback-wall`.
+2. Import `Vedant040106/EchoBoard_DevBappa`.
 3. Configure project settings:
    - **Framework Preset**: Vite
    - **Root Directory**: `apps/web`

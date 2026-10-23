@@ -100,8 +100,8 @@ devbappa-live-feedback-wall/
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/Vedant040106/devbappa-live-feedback-wall.git
-   cd devbappa-live-feedback-wall
+   git clone https://github.com/Vedant040106/EchoBoard_DevBappa.git
+   cd live_feedback
    ```
 
 2. **Install all monorepo dependencies**:
