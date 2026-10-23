@@ -66,27 +66,29 @@ export const StickyNote: React.FC<StickyNoteProps> = React.memo(({ note, isNew =
       <div className={`pushpin ${pinClass}`} />
 
       {/* Note Header / Meta */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginBottom: '12px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', marginBottom: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
           <span
             style={{
               fontFamily: 'var(--font-brand)',
-              fontSize: '15px',
+              fontSize: 'var(--text-body)',
               fontWeight: 700,
-              lineHeight: 1.2,
+              lineHeight: 'var(--lh-tight)',
+              color: 'var(--note-ink-primary)',
             }}
           >
             {publicDisplayName}
           </span>
           <span
             style={{
-              fontSize: '10px',
-              fontWeight: 700,
+              fontSize: 'var(--text-micro)',
+              fontWeight: 800,
               textTransform: 'uppercase',
-              letterSpacing: '0.04em',
-              padding: '2px 6px',
-              borderRadius: '999px',
+              letterSpacing: '0.05em',
+              padding: '2px 7px',
+              borderRadius: 'var(--radius-full)',
               backgroundColor: 'rgba(0, 0, 0, 0.08)',
+              color: 'var(--note-ink-secondary)',
             }}
           >
             {role}
@@ -95,12 +97,12 @@ export const StickyNote: React.FC<StickyNoteProps> = React.memo(({ note, isNew =
         {subtitle && (
           <span
             style={{
-              fontSize: '11px',
-              opacity: 0.8,
+              fontSize: 'var(--text-caption)',
+              fontWeight: 600,
+              color: 'var(--note-ink-secondary)',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
-              fontWeight: 500,
             }}
           >
             {subtitle}
@@ -108,12 +110,12 @@ export const StickyNote: React.FC<StickyNoteProps> = React.memo(({ note, isNew =
         )}
       </div>
 
-      {/* Note Feedback Message */}
+      {/* Note Feedback Message (Handwritten & Physical Ink) */}
       <div
         style={{
           fontFamily: 'var(--font-handwriting)',
-          fontSize: '20px',
-          lineHeight: '1.3',
+          fontSize: 'clamp(19px, 1.35vw, 23px)',
+          lineHeight: '1.25',
           fontWeight: 700,
           flex: 1,
           wordBreak: 'break-word',
@@ -122,6 +124,8 @@ export const StickyNote: React.FC<StickyNoteProps> = React.memo(({ note, isNew =
           WebkitBoxOrient: 'vertical',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
+          color: 'var(--note-ink-primary)',
+          letterSpacing: '0.01em',
         }}
       >
         "{message}"
@@ -133,9 +137,10 @@ export const StickyNote: React.FC<StickyNoteProps> = React.memo(({ note, isNew =
           marginTop: '10px',
           display: 'flex',
           justifyContent: 'flex-end',
-          fontSize: '11px',
-          fontWeight: 600,
-          opacity: 0.65,
+          fontSize: 'var(--text-micro)',
+          fontWeight: 700,
+          letterSpacing: '0.03em',
+          color: 'var(--note-ink-meta)',
         }}
       >
         {formattedDate}

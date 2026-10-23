@@ -281,39 +281,113 @@ export const PinboardCanvas: React.FC<PinboardCanvasProps> = ({
         ))}
       </div>
 
-      {/* Empty State when no notes exist */}
+      {/* Tactile Physical Empty State: Master Expo Announcement Note */}
       {notes.length === 0 && (
         <div
           style={{
             position: 'absolute',
             top: '50%',
             left: '50%',
-            transform: 'translate(-50%, -50%)',
+            transform: 'translate(-50%, -50%) rotate(-1deg)',
+            zIndex: 10,
+            width: '90%',
+            maxWidth: '440px',
+            background: 'linear-gradient(175deg, #fef9c3 0%, #fef08a 100%)',
+            color: 'var(--note-ink-primary)',
+            padding: '36px 32px 30px 32px',
+            borderRadius: '2px 2px 10px 2px',
+            boxShadow: 'var(--shadow-paper-hover)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.8)',
+            borderLeft: '1px solid rgba(255, 255, 255, 0.5)',
             textAlign: 'center',
-            padding: '32px',
-            backgroundColor: 'rgba(19, 20, 31, 0.85)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            borderRadius: 'var(--radius-lg)',
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5)',
-            maxWidth: '380px',
           }}
         >
-          <div style={{ fontSize: '36px', marginBottom: '12px' }}>📌</div>
+          {/* Realistic Brass Pushpin */}
+          <div className="pushpin pushpin-brass" style={{ top: '-11px' }} />
+
+          {/* Curled corner */}
+          <div
+            style={{
+              position: 'absolute',
+              right: 0,
+              bottom: 0,
+              width: '28px',
+              height: '28px',
+              background: 'linear-gradient(135deg, transparent 52%, rgba(0, 0, 0, 0.16) 52%)',
+              borderBottomRightRadius: '8px',
+              pointerEvents: 'none',
+            }}
+          />
+
+          <div
+            style={{
+              display: 'inline-block',
+              padding: '3px 10px',
+              backgroundColor: 'rgba(0, 0, 0, 0.08)',
+              borderRadius: 'var(--radius-full)',
+              fontSize: 'var(--text-micro)',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              marginBottom: '14px',
+            }}
+          >
+            DevBappa Tech Expo 2026
+          </div>
+
           <h3
             style={{
               fontFamily: 'var(--font-brand)',
-              fontSize: '18px',
-              fontWeight: 700,
-              color: 'var(--text-primary)',
-              marginBottom: '8px',
+              fontSize: 'var(--text-title-md)',
+              fontWeight: 800,
+              lineHeight: 'var(--lh-tight)',
+              letterSpacing: '-0.02em',
+              color: 'var(--note-ink-primary)',
+              marginBottom: '10px',
             }}
           >
             The pinboard is waiting for your voice!
           </h3>
-          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-            Be the first visitor at the Tech Expo to pin your thoughts and feedback onto the live
+
+          <p
+            style={{
+              fontSize: 'var(--text-body-sm)',
+              color: 'var(--note-ink-secondary)',
+              lineHeight: 'var(--lh-snug)',
+              marginBottom: '22px',
+            }}
+          >
+            Be the first visitor to pin your thoughts, feedback, or cheers onto the big screen live
             wall.
           </p>
+
+          <a
+            href="/submit"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '10px 22px',
+              backgroundColor: 'var(--accent-orange)',
+              borderRadius: 'var(--radius-sm)',
+              color: '#ffffff',
+              fontSize: 'var(--text-body-sm)',
+              fontWeight: 700,
+              textDecoration: 'none',
+              boxShadow: '0 4px 12px var(--accent-glow)',
+              transition: 'background-color 0.2s ease, transform 0.15s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--accent-orange-hover)';
+              e.currentTarget.style.transform = 'translateY(-1px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--accent-orange)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            <span>+</span> Pin Your Feedback
+          </a>
         </div>
       )}
 
@@ -324,27 +398,33 @@ export const PinboardCanvas: React.FC<PinboardCanvasProps> = ({
           bottom: '24px',
           right: '24px',
           display: 'flex',
-          gap: '8px',
+          gap: '10px',
           zIndex: 40,
         }}
       >
         <button
           onClick={handleResetView}
           style={{
-            padding: '8px 14px',
-            backgroundColor: 'rgba(19, 20, 31, 0.9)',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
+            padding: '10px 16px',
+            backgroundColor: 'var(--bg-surface-glass)',
+            border: '1px solid rgba(255, 255, 255, 0.14)',
             borderRadius: 'var(--radius-sm)',
             color: 'var(--text-primary)',
-            fontSize: '12px',
+            fontSize: 'var(--text-caption)',
             fontWeight: 600,
             cursor: 'pointer',
-            backdropFilter: 'blur(8px)',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-            transition: 'all 0.2s',
+            backdropFilter: 'blur(12px)',
+            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.4)',
+            transition: 'all 0.2s ease',
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(30, 32, 48, 0.95)')}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'rgba(19, 20, 31, 0.9)')}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(25, 27, 43, 0.95)';
+            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.25)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--bg-surface-glass)';
+            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.14)';
+          }}
           title="Zoom out and fit all notes in view"
         >
           Reset View
@@ -354,21 +434,27 @@ export const PinboardCanvas: React.FC<PinboardCanvasProps> = ({
           onClick={handlePanToLatest}
           disabled={notes.length === 0}
           style={{
-            padding: '8px 14px',
+            padding: '10px 16px',
             backgroundColor: 'var(--accent-orange)',
             border: 'none',
             borderRadius: 'var(--radius-sm)',
-            color: '#fff',
-            fontSize: '12px',
+            color: '#ffffff',
+            fontSize: 'var(--text-caption)',
             fontWeight: 700,
             cursor: notes.length === 0 ? 'not-allowed' : 'pointer',
-            opacity: notes.length === 0 ? 0.5 : 1,
-            boxShadow: '0 4px 12px var(--accent-glow)',
-            transition: 'all 0.2s',
+            opacity: notes.length === 0 ? 0.45 : 1,
+            boxShadow: '0 4px 14px var(--accent-glow)',
+            transition: 'background-color 0.2s ease, opacity 0.2s ease',
+          }}
+          onMouseEnter={(e) => {
+            if (notes.length > 0) e.currentTarget.style.backgroundColor = 'var(--accent-orange-hover)';
+          }}
+          onMouseLeave={(e) => {
+            if (notes.length > 0) e.currentTarget.style.backgroundColor = 'var(--accent-orange)';
           }}
           title="Pan to latest pinned feedback"
         >
-          Latest
+          Latest Activity
         </button>
       </div>
 
@@ -378,16 +464,19 @@ export const PinboardCanvas: React.FC<PinboardCanvasProps> = ({
           position: 'absolute',
           bottom: '24px',
           left: '24px',
-          padding: '4px 8px',
-          borderRadius: '4px',
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          color: 'var(--text-muted)',
-          fontSize: '11px',
-          fontWeight: 600,
+          padding: '6px 12px',
+          borderRadius: 'var(--radius-sm)',
+          backgroundColor: 'var(--bg-surface-glass)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          color: 'var(--text-secondary)',
+          fontSize: 'var(--text-micro)',
+          fontWeight: 700,
+          letterSpacing: '0.04em',
+          backdropFilter: 'blur(10px)',
           pointerEvents: 'none',
         }}
       >
-        {Math.round(zoom * 100)}%
+        ZOOM: {Math.round(zoom * 100)}%
       </div>
     </div>
   );

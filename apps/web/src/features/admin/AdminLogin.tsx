@@ -30,7 +30,9 @@ export const AdminLogin: React.FC = () => {
   return (
     <div
       style={{
-        minHeight: 'calc(100vh - 60px)',
+        height: '100%',
+        minHeight: 'calc(100vh - 64px)',
+        overflowY: 'auto',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -46,7 +48,7 @@ export const AdminLogin: React.FC = () => {
           borderRadius: 'var(--radius-lg)',
           border: '1px solid rgba(255, 255, 255, 0.08)',
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
-          padding: '36px 32px',
+          padding: '40px 32px',
         }}
       >
         <div style={{ textAlign: 'center', marginBottom: '28px' }}>
@@ -55,12 +57,12 @@ export const AdminLogin: React.FC = () => {
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: '48px',
-              height: '48px',
+              width: '52px',
+              height: '52px',
               borderRadius: '50%',
-              backgroundColor: 'rgba(249, 115, 22, 0.15)',
+              backgroundColor: 'var(--accent-orange-subtle)',
               color: 'var(--accent-orange)',
-              fontSize: '22px',
+              fontSize: '24px',
               marginBottom: '14px',
             }}
           >
@@ -69,16 +71,16 @@ export const AdminLogin: React.FC = () => {
           <h1
             style={{
               fontFamily: 'var(--font-brand)',
-              fontSize: '24px',
+              fontSize: 'var(--text-title-lg)',
               fontWeight: 800,
               color: 'var(--text-primary)',
-              letterSpacing: '-0.01em',
+              letterSpacing: '-0.02em',
               marginBottom: '6px',
             }}
           >
             Admin Access
           </h1>
-          <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+          <p style={{ fontSize: 'var(--text-body-sm)', color: 'var(--text-secondary)', lineHeight: 'var(--lh-normal)' }}>
             Sign in to moderate submissions and view live event analytics.
           </p>
         </div>
@@ -86,12 +88,12 @@ export const AdminLogin: React.FC = () => {
         {error && (
           <div
             style={{
-              padding: '10px 14px',
-              backgroundColor: 'rgba(239, 68, 68, 0.15)',
-              border: '1px solid #ef4444',
+              padding: '12px 14px',
+              backgroundColor: 'var(--status-offline-subtle)',
+              border: '1px solid var(--status-offline)',
               borderRadius: 'var(--radius-sm)',
               color: '#fca5a5',
-              fontSize: '13px',
+              fontSize: 'var(--text-body-sm)',
               marginBottom: '20px',
             }}
           >
@@ -99,11 +101,17 @@ export const AdminLogin: React.FC = () => {
           </div>
         )}
 
-        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <div>
             <label
               htmlFor="admin-id"
-              style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}
+              style={{
+                display: 'block',
+                fontSize: 'var(--text-caption)',
+                fontWeight: 700,
+                color: 'var(--text-secondary)',
+                marginBottom: '6px',
+              }}
             >
               Admin ID
             </label>
@@ -117,12 +125,14 @@ export const AdminLogin: React.FC = () => {
               autoFocus
               style={{
                 width: '100%',
-                padding: '10px 14px',
+                height: '46px',
+                padding: '0 14px',
                 backgroundColor: 'var(--bg-surface-elevated)',
                 border: '1px solid rgba(255, 255, 255, 0.12)',
                 borderRadius: 'var(--radius-sm)',
-                color: '#fff',
-                fontSize: '14px',
+                color: '#ffffff',
+                fontSize: 'var(--text-body)',
+                outline: 'none',
               }}
             />
           </div>
@@ -130,7 +140,13 @@ export const AdminLogin: React.FC = () => {
           <div>
             <label
               htmlFor="admin-password"
-              style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}
+              style={{
+                display: 'block',
+                fontSize: 'var(--text-caption)',
+                fontWeight: 700,
+                color: 'var(--text-secondary)',
+                marginBottom: '6px',
+              }}
             >
               Password
             </label>
@@ -143,12 +159,14 @@ export const AdminLogin: React.FC = () => {
               required
               style={{
                 width: '100%',
-                padding: '10px 14px',
+                height: '46px',
+                padding: '0 14px',
                 backgroundColor: 'var(--bg-surface-elevated)',
                 border: '1px solid rgba(255, 255, 255, 0.12)',
                 borderRadius: 'var(--radius-sm)',
-                color: '#fff',
-                fontSize: '14px',
+                color: '#ffffff',
+                fontSize: 'var(--text-body)',
+                outline: 'none',
               }}
             />
           </div>
@@ -158,16 +176,18 @@ export const AdminLogin: React.FC = () => {
             disabled={isLoading}
             style={{
               marginTop: '8px',
-              padding: '12px 18px',
+              height: '46px',
+              padding: '0 20px',
               backgroundColor: 'var(--accent-orange)',
               border: 'none',
               borderRadius: 'var(--radius-sm)',
-              color: '#fff',
-              fontSize: '14px',
-              fontWeight: 700,
+              color: '#ffffff',
+              fontSize: 'var(--text-body)',
+              fontWeight: 800,
               cursor: isLoading ? 'not-allowed' : 'pointer',
               opacity: isLoading ? 0.7 : 1,
               boxShadow: '0 4px 14px var(--accent-glow)',
+              transition: 'background-color 0.2s',
             }}
           >
             {isLoading ? 'Verifying...' : 'Sign In'}

@@ -21,7 +21,7 @@ export const WallPage: React.FC<WallPageProps> = ({ notes, newNoteId }) => {
   }, []);
 
   return (
-    <main style={{ position: 'relative', width: '100%', height: 'calc(100vh - 60px)' }}>
+    <main style={{ position: 'relative', width: '100%', height: 'calc(100vh - 64px)', overflow: 'hidden' }}>
       <PinboardCanvas
         notes={notes}
         newNoteId={newNoteId}

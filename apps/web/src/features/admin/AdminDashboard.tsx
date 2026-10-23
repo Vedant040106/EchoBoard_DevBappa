@@ -169,10 +169,11 @@ export const AdminDashboard: React.FC = () => {
   return (
     <div
       style={{
-        minHeight: 'calc(100vh - 60px)',
+        height: '100%',
+        minHeight: 'calc(100vh - 64px)',
         overflowY: 'auto',
         backgroundColor: 'var(--bg-outer)',
-        padding: '28px 24px',
+        padding: '32px 24px 64px 24px',
       }}
     >
       <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
@@ -182,31 +183,34 @@ export const AdminDashboard: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginBottom: '24px',
+            marginBottom: '28px',
             borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-            paddingBottom: '16px',
+            paddingBottom: '20px',
           }}
         >
           <div>
             <h1
               style={{
                 fontFamily: 'var(--font-brand)',
-                fontSize: '24px',
+                fontSize: 'var(--text-title-lg)',
                 fontWeight: 800,
-                color: '#fff',
+                color: 'var(--text-primary)',
+                letterSpacing: '-0.02em',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px',
+                gap: '12px',
               }}
             >
               <span>🛡️ Moderation & Analytics</span>
               <span
                 style={{
-                  fontSize: '11px',
-                  fontWeight: 600,
-                  padding: '2px 8px',
-                  borderRadius: '999px',
-                  backgroundColor: 'rgba(249, 115, 22, 0.2)',
+                  fontSize: 'var(--text-micro)',
+                  fontWeight: 800,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
+                  padding: '3px 10px',
+                  borderRadius: 'var(--radius-full)',
+                  backgroundColor: 'var(--accent-orange-subtle)',
                   color: 'var(--accent-orange)',
                 }}
               >
@@ -219,14 +223,16 @@ export const AdminDashboard: React.FC = () => {
             <button
               onClick={handleLogout}
               style={{
-                padding: '8px 16px',
-                backgroundColor: 'rgba(239, 68, 68, 0.15)',
-                border: '1px solid rgba(239, 68, 68, 0.3)',
+                height: '38px',
+                padding: '0 16px',
+                backgroundColor: 'var(--status-offline-subtle)',
+                border: '1px solid rgba(239, 68, 68, 0.35)',
                 borderRadius: 'var(--radius-sm)',
                 color: '#f87171',
-                fontSize: '13px',
-                fontWeight: 600,
+                fontSize: 'var(--text-body-sm)',
+                fontWeight: 700,
                 cursor: 'pointer',
+                transition: 'background-color 0.15s ease',
               }}
             >
               Sign Out
@@ -235,7 +241,7 @@ export const AdminDashboard: React.FC = () => {
         </div>
 
         {/* Tab Navigation */}
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', flexWrap: 'wrap' }}>
           {(
             [
               { id: 'feedback', label: 'Feedback Management' },
@@ -247,16 +253,17 @@ export const AdminDashboard: React.FC = () => {
               key={t.id}
               onClick={() => setActiveTab(t.id)}
               style={{
-                padding: '10px 18px',
+                height: '42px',
+                padding: '0 20px',
                 borderRadius: 'var(--radius-sm)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
+                border: `1px solid ${activeTab === t.id ? 'var(--accent-orange)' : 'rgba(255, 255, 255, 0.1)'}`,
                 backgroundColor:
                   activeTab === t.id ? 'var(--accent-orange)' : 'var(--bg-surface)',
-                color: activeTab === t.id ? '#fff' : 'var(--text-secondary)',
-                fontSize: '13px',
-                fontWeight: activeTab === t.id ? 700 : 500,
+                color: activeTab === t.id ? '#ffffff' : 'var(--text-secondary)',
+                fontSize: 'var(--text-body-sm)',
+                fontWeight: activeTab === t.id ? 800 : 600,
                 cursor: 'pointer',
-                transition: 'all 0.2s',
+                transition: 'all 0.15s ease',
               }}
             >
               {t.label}
@@ -280,15 +287,15 @@ export const AdminDashboard: React.FC = () => {
                 <div
                   style={{
                     backgroundColor: 'var(--bg-surface)',
-                    padding: '14px 18px',
+                    padding: '16px 20px',
                     borderRadius: 'var(--radius-md)',
-                    border: '1px solid rgba(255, 255, 255, 0.06)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
                   }}
                 >
-                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                  <div style={{ fontSize: 'var(--text-micro)', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>
                     Total Accepted
                   </div>
-                  <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--accent-yellow)' }}>
+                  <div style={{ fontSize: 'var(--text-title-xl)', fontWeight: 800, color: 'var(--accent-yellow)' }}>
                     {analytics.totalAccepted}
                   </div>
                 </div>
@@ -296,15 +303,15 @@ export const AdminDashboard: React.FC = () => {
                 <div
                   style={{
                     backgroundColor: 'var(--bg-surface)',
-                    padding: '14px 18px',
+                    padding: '16px 20px',
                     borderRadius: 'var(--radius-md)',
-                    border: '1px solid rgba(255, 255, 255, 0.06)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
                   }}
                 >
-                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                  <div style={{ fontSize: 'var(--text-micro)', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>
                     Currently Visible
                   </div>
-                  <div style={{ fontSize: '22px', fontWeight: 800, color: '#34d399' }}>
+                  <div style={{ fontSize: 'var(--text-title-xl)', fontWeight: 800, color: '#34d399' }}>
                     {analytics.totalVisible}
                   </div>
                 </div>
@@ -312,15 +319,15 @@ export const AdminDashboard: React.FC = () => {
                 <div
                   style={{
                     backgroundColor: 'var(--bg-surface)',
-                    padding: '14px 18px',
+                    padding: '16px 20px',
                     borderRadius: 'var(--radius-md)',
-                    border: '1px solid rgba(255, 255, 255, 0.06)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
                   }}
                 >
-                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                  <div style={{ fontSize: 'var(--text-micro)', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>
                     Hidden by Admin
                   </div>
-                  <div style={{ fontSize: '22px', fontWeight: 800, color: '#f59e0b' }}>
+                  <div style={{ fontSize: 'var(--text-title-xl)', fontWeight: 800, color: '#f59e0b' }}>
                     {analytics.totalHidden}
                   </div>
                 </div>
@@ -328,15 +335,15 @@ export const AdminDashboard: React.FC = () => {
                 <div
                   style={{
                     backgroundColor: 'var(--bg-surface)',
-                    padding: '14px 18px',
+                    padding: '16px 20px',
                     borderRadius: 'var(--radius-md)',
-                    border: '1px solid rgba(255, 255, 255, 0.06)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
                   }}
                 >
-                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                  <div style={{ fontSize: 'var(--text-micro)', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>
                     Soft-Deleted
                   </div>
-                  <div style={{ fontSize: '22px', fontWeight: 800, color: '#f87171' }}>
+                  <div style={{ fontSize: 'var(--text-title-xl)', fontWeight: 800, color: '#f87171' }}>
                     {analytics.totalDeleted}
                   </div>
                 </div>
@@ -366,13 +373,15 @@ export const AdminDashboard: React.FC = () => {
                 }}
                 placeholder="Search by full name, display name, message, or department..."
                 style={{
-                  flex: '1 1 240px',
-                  padding: '8px 12px',
+                  flex: '1 1 260px',
+                  height: '42px',
+                  padding: '0 14px',
                   backgroundColor: 'var(--bg-surface-elevated)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
                   borderRadius: 'var(--radius-sm)',
-                  color: '#fff',
-                  fontSize: '13px',
+                  color: '#ffffff',
+                  fontSize: 'var(--text-body-sm)',
+                  outline: 'none',
                 }}
               />
 
@@ -383,12 +392,14 @@ export const AdminDashboard: React.FC = () => {
                   setPage(1);
                 }}
                 style={{
-                  padding: '8px 12px',
+                  height: '42px',
+                  padding: '0 14px',
                   backgroundColor: 'var(--bg-surface-elevated)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
                   borderRadius: 'var(--radius-sm)',
-                  color: '#fff',
-                  fontSize: '13px',
+                  color: '#ffffff',
+                  fontSize: 'var(--text-body-sm)',
+                  outline: 'none',
                 }}
               >
                 <option value="all">Status: All</option>
@@ -404,12 +415,14 @@ export const AdminDashboard: React.FC = () => {
                   setPage(1);
                 }}
                 style={{
-                  padding: '8px 12px',
+                  height: '42px',
+                  padding: '0 14px',
                   backgroundColor: 'var(--bg-surface-elevated)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
                   borderRadius: 'var(--radius-sm)',
-                  color: '#fff',
-                  fontSize: '13px',
+                  color: '#ffffff',
+                  fontSize: 'var(--text-body-sm)',
+                  outline: 'none',
                 }}
               >
                 <option value="All">Role: All</option>
@@ -428,9 +441,9 @@ export const AdminDashboard: React.FC = () => {
                 overflowX: 'auto',
               }}
             >
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13px' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: 'var(--text-body-sm)' }}>
                 <thead>
-                  <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.08)', color: 'var(--text-muted)' }}>
+                  <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.08)', color: 'var(--text-muted)', fontSize: 'var(--text-caption)' }}>
                     <th style={{ padding: '12px 16px' }}>Private Full Name</th>
                     <th style={{ padding: '12px 16px' }}>Public First Name</th>
                     <th style={{ padding: '12px 16px' }}>Role</th>
@@ -525,13 +538,14 @@ export const AdminDashboard: React.FC = () => {
                                     })
                                   }
                                   style={{
-                                    padding: '4px 8px',
+                                    height: '32px',
+                                    padding: '0 12px',
                                     backgroundColor: 'rgba(245, 158, 11, 0.2)',
                                     border: '1px solid #f59e0b',
-                                    borderRadius: '4px',
+                                    borderRadius: 'var(--radius-xs)',
                                     color: '#f59e0b',
-                                    fontSize: '11px',
-                                    fontWeight: 600,
+                                    fontSize: 'var(--text-caption)',
+                                    fontWeight: 700,
                                     cursor: 'pointer',
                                   }}
                                 >
@@ -549,13 +563,14 @@ export const AdminDashboard: React.FC = () => {
                                     })
                                   }
                                   style={{
-                                    padding: '4px 8px',
+                                    height: '32px',
+                                    padding: '0 12px',
                                     backgroundColor: 'rgba(16, 185, 129, 0.2)',
                                     border: '1px solid #10b981',
-                                    borderRadius: '4px',
+                                    borderRadius: 'var(--radius-xs)',
                                     color: '#34d399',
-                                    fontSize: '11px',
-                                    fontWeight: 600,
+                                    fontSize: 'var(--text-caption)',
+                                    fontWeight: 700,
                                     cursor: 'pointer',
                                   }}
                                 >
@@ -573,13 +588,14 @@ export const AdminDashboard: React.FC = () => {
                                     })
                                   }
                                   style={{
-                                    padding: '4px 8px',
-                                    backgroundColor: 'rgba(239, 68, 68, 0.15)',
-                                    border: '1px solid #ef4444',
-                                    borderRadius: '4px',
+                                    height: '32px',
+                                    padding: '0 12px',
+                                    backgroundColor: 'var(--status-offline-subtle)',
+                                    border: '1px solid rgba(239, 68, 68, 0.4)',
+                                    borderRadius: 'var(--radius-xs)',
                                     color: '#f87171',
-                                    fontSize: '11px',
-                                    fontWeight: 600,
+                                    fontSize: 'var(--text-caption)',
+                                    fontWeight: 700,
                                     cursor: 'pointer',
                                   }}
                                 >
@@ -597,13 +613,14 @@ export const AdminDashboard: React.FC = () => {
                                     })
                                   }
                                   style={{
-                                    padding: '4px 8px',
+                                    height: '32px',
+                                    padding: '0 12px',
                                     backgroundColor: 'rgba(59, 130, 246, 0.2)',
                                     border: '1px solid #3b82f6',
-                                    borderRadius: '4px',
+                                    borderRadius: 'var(--radius-xs)',
                                     color: '#60a5fa',
-                                    fontSize: '11px',
-                                    fontWeight: 600,
+                                    fontSize: 'var(--text-caption)',
+                                    fontWeight: 700,
                                     cursor: 'pointer',
                                   }}
                                 >
@@ -623,12 +640,12 @@ export const AdminDashboard: React.FC = () => {
               {totalPages > 1 && (
                 <div
                   style={{
-                    padding: '12px 16px',
+                    padding: '14px 18px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-                    fontSize: '12px',
+                    fontSize: 'var(--text-caption)',
                   }}
                 >
                   <span style={{ color: 'var(--text-muted)' }}>
@@ -639,11 +656,14 @@ export const AdminDashboard: React.FC = () => {
                       onClick={() => setPage((p) => Math.max(p - 1, 1))}
                       disabled={page <= 1}
                       style={{
-                        padding: '4px 10px',
+                        height: '34px',
+                        padding: '0 14px',
                         backgroundColor: 'var(--bg-surface-elevated)',
                         border: '1px solid rgba(255, 255, 255, 0.1)',
-                        borderRadius: '4px',
-                        color: page <= 1 ? 'var(--text-muted)' : '#fff',
+                        borderRadius: 'var(--radius-xs)',
+                        color: page <= 1 ? 'var(--text-muted)' : '#ffffff',
+                        fontSize: 'var(--text-caption)',
+                        fontWeight: 700,
                         cursor: page <= 1 ? 'not-allowed' : 'pointer',
                       }}
                     >
@@ -653,11 +673,14 @@ export const AdminDashboard: React.FC = () => {
                       onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
                       disabled={page >= totalPages}
                       style={{
-                        padding: '4px 10px',
+                        height: '34px',
+                        padding: '0 14px',
                         backgroundColor: 'var(--bg-surface-elevated)',
                         border: '1px solid rgba(255, 255, 255, 0.1)',
-                        borderRadius: '4px',
-                        color: page >= totalPages ? 'var(--text-muted)' : '#fff',
+                        borderRadius: 'var(--radius-xs)',
+                        color: page >= totalPages ? 'var(--text-muted)' : '#ffffff',
+                        fontSize: 'var(--text-caption)',
+                        fontWeight: 700,
                         cursor: page >= totalPages ? 'not-allowed' : 'pointer',
                       }}
                     >
@@ -682,25 +705,25 @@ export const AdminDashboard: React.FC = () => {
                 border: '1px solid rgba(255, 255, 255, 0.08)',
               }}
             >
-              <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#fff', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: 'var(--text-title-sm)', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '16px' }}>
                 Role Engagement Breakdown
               </h3>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-                <div style={{ backgroundColor: 'var(--bg-surface-elevated)', padding: '16px', borderRadius: 'var(--radius-sm)' }}>
-                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Students</div>
-                  <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--accent-orange)' }}>
+                <div style={{ backgroundColor: 'var(--bg-surface-elevated)', padding: '16px 20px', borderRadius: 'var(--radius-sm)' }}>
+                  <div style={{ fontSize: 'var(--text-caption)', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '4px' }}>Students</div>
+                  <div style={{ fontSize: 'var(--text-title-xl)', fontWeight: 800, color: 'var(--accent-orange)' }}>
                     {analytics.roleBreakdown.Student}
                   </div>
                 </div>
-                <div style={{ backgroundColor: 'var(--bg-surface-elevated)', padding: '16px', borderRadius: 'var(--radius-sm)' }}>
-                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Faculty Members</div>
-                  <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--accent-yellow)' }}>
+                <div style={{ backgroundColor: 'var(--bg-surface-elevated)', padding: '16px 20px', borderRadius: 'var(--radius-sm)' }}>
+                  <div style={{ fontSize: 'var(--text-caption)', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '4px' }}>Faculty Members</div>
+                  <div style={{ fontSize: 'var(--text-title-xl)', fontWeight: 800, color: 'var(--accent-yellow)' }}>
                     {analytics.roleBreakdown.Faculty}
                   </div>
                 </div>
-                <div style={{ backgroundColor: 'var(--bg-surface-elevated)', padding: '16px', borderRadius: 'var(--radius-sm)' }}>
-                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Other Visitors</div>
-                  <div style={{ fontSize: '24px', fontWeight: 800, color: '#38bdf8' }}>
+                <div style={{ backgroundColor: 'var(--bg-surface-elevated)', padding: '16px 20px', borderRadius: 'var(--radius-sm)' }}>
+                  <div style={{ fontSize: 'var(--text-caption)', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '4px' }}>Other Visitors</div>
+                  <div style={{ fontSize: 'var(--text-title-xl)', fontWeight: 800, color: '#38bdf8' }}>
                     {analytics.roleBreakdown['Other Visitor']}
                   </div>
                 </div>
@@ -716,21 +739,21 @@ export const AdminDashboard: React.FC = () => {
                 border: '1px solid rgba(255, 255, 255, 0.08)',
               }}
             >
-              <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#fff', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: 'var(--text-title-sm)', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '16px' }}>
                 Department Distribution
               </h3>
               {Object.keys(analytics.departmentBreakdown).length === 0 ? (
-                <div style={{ color: 'var(--text-muted)', fontSize: '13px' }}>
+                <div style={{ color: 'var(--text-muted)', fontSize: 'var(--text-body-sm)' }}>
                   No department data submitted yet.
                 </div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {Object.entries(analytics.departmentBreakdown).map(([dept, count]) => {
                     const percentage = Math.round((count / (analytics.totalAccepted || 1)) * 100);
                     return (
                       <div key={dept}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '4px' }}>
-                          <span style={{ color: '#fff', fontWeight: 500 }}>{dept}</span>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--text-body-sm)', marginBottom: '6px' }}>
+                          <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{dept}</span>
                           <span style={{ color: 'var(--accent-yellow)', fontWeight: 700 }}>
                             {count} ({percentage}%)
                           </span>
@@ -884,8 +907,8 @@ export const AdminDashboard: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: 'rgba(0, 0, 0, 0.75)',
-            backdropFilter: 'blur(4px)',
+            backgroundColor: 'rgba(5, 6, 12, 0.78)',
+            backdropFilter: 'blur(6px)',
           }}
         >
           <div
@@ -893,28 +916,31 @@ export const AdminDashboard: React.FC = () => {
               backgroundColor: 'var(--bg-surface)',
               border: '1px solid rgba(255, 255, 255, 0.12)',
               borderRadius: 'var(--radius-lg)',
-              padding: '28px',
-              maxWidth: '420px',
+              padding: '32px 28px',
+              maxWidth: '440px',
               width: '90%',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.75)',
             }}
           >
-            <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#fff', marginBottom: '8px' }}>
+            <h3 style={{ fontSize: 'var(--text-title-sm)', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '10px' }}>
               Confirm Moderation Action
             </h3>
-            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '20px' }}>
+            <p style={{ fontSize: 'var(--text-body)', color: 'var(--text-secondary)', lineHeight: 'var(--lh-normal)', marginBottom: '24px' }}>
               Are you sure you want to <strong>{actionConfirm.action.toUpperCase()}</strong> feedback from{' '}
               <strong style={{ color: 'var(--accent-yellow)' }}>{actionConfirm.displayName}</strong>?
             </p>
-            <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
               <button
                 onClick={() => setActionConfirm(null)}
                 style={{
-                  padding: '8px 14px',
+                  height: '40px',
+                  padding: '0 18px',
                   backgroundColor: 'var(--bg-surface-elevated)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
                   borderRadius: 'var(--radius-sm)',
-                  color: '#fff',
-                  fontSize: '13px',
+                  color: 'var(--text-primary)',
+                  fontSize: 'var(--text-body-sm)',
+                  fontWeight: 600,
                   cursor: 'pointer',
                 }}
               >
@@ -923,15 +949,17 @@ export const AdminDashboard: React.FC = () => {
               <button
                 onClick={handleExecuteAction}
                 style={{
-                  padding: '8px 14px',
+                  height: '40px',
+                  padding: '0 20px',
                   backgroundColor:
-                    actionConfirm.action === 'soft-delete' ? '#ef4444' : 'var(--accent-orange)',
+                    actionConfirm.action === 'soft-delete' ? 'var(--status-offline)' : 'var(--accent-orange)',
                   border: 'none',
                   borderRadius: 'var(--radius-sm)',
-                  color: '#fff',
-                  fontSize: '13px',
-                  fontWeight: 700,
+                  color: '#ffffff',
+                  fontSize: 'var(--text-body-sm)',
+                  fontWeight: 800,
                   cursor: 'pointer',
+                  boxShadow: actionConfirm.action === 'soft-delete' ? '0 4px 12px rgba(239, 68, 68, 0.35)' : '0 4px 12px var(--accent-glow)',
                 }}
               >
                 Confirm

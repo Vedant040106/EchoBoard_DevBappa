@@ -1,63 +1,116 @@
 :root {
-  /* Surface & Background */
-  --bg-outer: #0d0e15;
-  --bg-surface: #13141f;
-  --bg-surface-elevated: #1b1c2b;
-  --bg-surface-glass: rgba(19, 20, 31, 0.85);
+  /* Surface & Background (Near-black and deep charcoal) */
+  --bg-outer: #090a10;
+  --bg-surface: #11121d;
+  --bg-surface-elevated: #181928;
+  --bg-surface-card: #1f2033;
+  --bg-surface-glass: rgba(17, 18, 29, 0.88);
 
-  /* Pinboard Canvas */
-  --pinboard-bg: #1c1a36;
-  --pinboard-border: #2e2a56;
+  /* Pinboard Canvas (Rich Blue-Violet) */
+  --pinboard-bg: #191735;
+  --pinboard-grid: rgba(255, 255, 255, 0.05);
+  --pinboard-accent: rgba(249, 115, 22, 0.04);
+  --pinboard-border: #282452;
 
-  /* Brand Accents */
+  /* Brand Accents (Warm Orange & Golden Amber) */
   --accent-orange: #f97316;
   --accent-orange-hover: #ea580c;
+  --accent-orange-subtle: rgba(249, 115, 22, 0.12);
   --accent-yellow: #fbbf24;
-  --accent-glow: rgba(249, 115, 22, 0.35);
+  --accent-yellow-subtle: rgba(251, 191, 36, 0.15);
+  --accent-glow: rgba(249, 115, 22, 0.4);
 
-  /* Status Colors */
+  /* Status Tokens (WCAG AA Compliant) */
   --status-live: #10b981;
+  --status-live-subtle: rgba(16, 185, 129, 0.15);
   --status-reconnecting: #f59e0b;
+  --status-reconnecting-subtle: rgba(245, 158, 11, 0.15);
   --status-offline: #ef4444;
+  --status-offline-subtle: rgba(239, 68, 68, 0.15);
   --status-syncing: #3b82f6;
+  --status-syncing-subtle: rgba(59, 130, 246, 0.15);
 
-  /* Text & Ink */
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --text-note-dark: #1e293b;
+  /* Accessible Text Hierarchy on Dark Surfaces */
+  --text-primary: #f8fafc;       /* 17.5:1 against #090a10 (AAA) */
+  --text-secondary: #cbd5e1;     /* 10.2:1 against #090a10 (AAA) */
+  --text-muted: #94a3b8;         /* 5.8:1 against #090a10 (AA) */
+  --text-placeholder: #64748b;   /* For non-essential input hints */
 
-  /* Typography */
+  /* Text Hierarchy on Light Sticky Notes (Physical Ink) */
+  --note-ink-primary: #0f172a;   /* 13.5:1 on light pastels (AAA) */
+  --note-ink-secondary: #334155; /* 8.2:1 on light pastels (AAA) */
+  --note-ink-meta: #475569;      /* 5.4:1 on light pastels (AA) */
+
+  /* Typography Scale */
   --font-brand: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-handwriting: 'Caveat', cursive, sans-serif;
 
-  /* Sticky Note Palettes */
-  --note-yellow-bg: #fef08a;
-  --note-yellow-border: #fde047;
-  --note-amber-bg: #fde68a;
-  --note-amber-border: #fcd34d;
-  --note-orange-bg: #fed7aa;
-  --note-orange-border: #fdba74;
-  --note-pink-bg: #fbcfe8;
-  --note-pink-border: #f472b6;
-  --note-lavender-bg: #e9d5ff;
-  --note-lavender-border: #c084fc;
-  --note-blue-bg: #bae6fd;
-  --note-blue-border: #7dd3fc;
-  --note-mint-bg: #a7f3d0;
-  --note-mint-border: #6ee7b7;
+  --text-display: clamp(2rem, 3.5vw, 2.75rem);
+  --text-title-lg: 1.5rem;   /* 24px */
+  --text-title-md: 1.25rem;  /* 20px */
+  --text-title-sm: 1.125rem; /* 18px */
+  --text-body-lg: 1rem;      /* 16px */
+  --text-body: 0.9375rem;    /* 15px */
+  --text-body-sm: 0.875rem;  /* 14px */
+  --text-caption: 0.75rem;   /* 12px */
+  --text-micro: 0.6875rem;   /* 11px */
 
-  /* Shadows */
-  --shadow-paper: 0 10px 25px -5px rgba(0, 0, 0, 0.45), 0 8px 10px -6px rgba(0, 0, 0, 0.35);
-  --shadow-paper-hover: 0 20px 35px -5px rgba(0, 0, 0, 0.6), 0 12px 16px -6px rgba(0, 0, 0, 0.45);
-  --shadow-pin: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+  /* Line Heights */
+  --lh-tight: 1.2;
+  --lh-snug: 1.35;
+  --lh-normal: 1.5;
+  --lh-relaxed: 1.625;
+
+  /* Spacing Rhythm (4px/8px Base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Sticky Note Palettes (Refined HSL pastels) */
+  --note-yellow-bg: #fef9c3;
+  --note-yellow-top: #fef08a;
+  --note-amber-bg: #fef3c7;
+  --note-amber-top: #fde68a;
+  --note-orange-bg: #ffedd5;
+  --note-orange-top: #fed7aa;
+  --note-pink-bg: #fce7f3;
+  --note-pink-top: #fbcfe8;
+  --note-lavender-bg: #f3e8ff;
+  --note-lavender-top: #e9d5ff;
+  --note-blue-bg: #e0f2fe;
+  --note-blue-top: #bae6fd;
+  --note-mint-bg: #d1fae5;
+  --note-mint-top: #a7f3d0;
+
+  /* Shadows (Physical depth) */
+  --shadow-paper: 
+    0 1px 3px rgba(0, 0, 0, 0.2),
+    0 8px 24px -4px rgba(0, 0, 0, 0.45),
+    0 16px 36px -8px rgba(10, 8, 30, 0.35);
+  --shadow-paper-hover: 
+    0 2px 6px rgba(0, 0, 0, 0.3),
+    0 16px 32px -4px rgba(0, 0, 0, 0.6),
+    0 24px 48px -12px rgba(10, 8, 30, 0.5);
+  --shadow-pin: 
+    0 4px 8px rgba(0, 0, 0, 0.5),
+    0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-pin-stem: 
+    0 6px 10px rgba(0, 0, 0, 0.25);
 
   /* Radii */
+  --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
   --radius-xl: 24px;
+  --radius-full: 9999px;
 }
 
 /* Reset and Base */
@@ -67,15 +120,23 @@
   padding: 0;
 }
 
-html, body, #root {
+html, body {
   width: 100%;
   height: 100%;
-  overflow: hidden;
   background-color: var(--bg-outer);
   color: var(--text-primary);
   font-family: var(--font-body);
+  font-size: 16px;
+  line-height: var(--lh-normal);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Scrollbar */
@@ -87,11 +148,11 @@ html, body, #root {
   background: var(--bg-surface);
 }
 ::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 4px;
+  background: #2a2d42;
+  border-radius: var(--radius-xs);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: #3b3f5c;
 }
 
 /* Accessibility Focus Ring */
@@ -105,21 +166,21 @@ html, body, #root {
   position: absolute;
   user-select: none;
   cursor: pointer;
-  padding: 24px 20px 20px 20px;
-  border-radius: 2px 2px 8px 2px;
+  padding: 24px 18px 18px 18px;
+  border-radius: 2px 2px 10px 2px;
   box-shadow: var(--shadow-paper);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   transform-origin: center top;
-  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease;
+  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.22s ease;
   will-change: transform, box-shadow;
-  border-top: 1px solid rgba(255, 255, 255, 0.6);
-  border-left: 1px solid rgba(255, 255, 255, 0.4);
+  border-top: 1px solid rgba(255, 255, 255, 0.7);
+  border-left: 1px solid rgba(255, 255, 255, 0.45);
 }
 
 .sticky-note:hover {
-  transform: scale(1.05) translateY(-4px) !important;
+  transform: scale(1.05) translateY(-6px) !important;
   box-shadow: var(--shadow-paper-hover) !important;
   z-index: 9999 !important;
 }
@@ -130,79 +191,95 @@ html, body, #root {
   position: absolute;
   right: 0;
   bottom: 0;
-  width: 28px;
-  height: 28px;
-  background: linear-gradient(135deg, transparent 50%, rgba(0, 0, 0, 0.12) 50%);
-  border-bottom-right-radius: 6px;
+  width: 26px;
+  height: 26px;
+  background: linear-gradient(135deg, transparent 52%, rgba(0, 0, 0, 0.16) 52%);
+  border-bottom-right-radius: 8px;
   pointer-events: none;
 }
 
-/* Realistic Pushpin */
+/* Pushpin Specular Realism */
 .pushpin {
   position: absolute;
-  top: -10px;
+  top: -11px;
   left: 50%;
   transform: translateX(-50%);
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   box-shadow: var(--shadow-pin);
-  z-index: 5;
+  z-index: 10;
 }
 
-.pushpin::after {
+.pushpin::before {
+  /* Specular Highlight */
   content: '';
   position: absolute;
   top: 3px;
-  left: 3px;
+  left: 4px;
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.8);
+  filter: blur(0.5px);
+}
+
+.pushpin::after {
+  /* Subtle Pin Stem Shadow on Note Paper */
+  content: '';
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 2px;
+  filter: blur(1px);
 }
 
 .pushpin-brass {
-  background: radial-gradient(circle at 35% 35%, #fef08a, #ca8a04 70%, #78350f 100%);
-  border: 1px solid #a16207;
+  background: radial-gradient(circle at 35% 35%, #fef08a 0%, #d97706 65%, #78350f 100%);
+  border: 1px solid #b45309;
 }
 
 .pushpin-copper {
-  background: radial-gradient(circle at 35% 35%, #fdba74, #ea580c 70%, #7c2d12 100%);
+  background: radial-gradient(circle at 35% 35%, #ffedd5 0%, #ea580c 65%, #7c2d12 100%);
   border: 1px solid #c2410c;
 }
 
 .pushpin-silver {
-  background: radial-gradient(circle at 35% 35%, #f8fafc, #94a3b8 70%, #334155 100%);
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #94a3b8 65%, #334155 100%);
   border: 1px solid #64748b;
 }
 
-/* Note Color Variants */
+/* Note Color Variants with subtle physical paper gradients */
 .note-yellow {
-  background-color: var(--note-yellow-bg);
-  color: var(--text-note-dark);
+  background: linear-gradient(175deg, var(--note-yellow-top) 0%, var(--note-yellow-bg) 100%);
+  color: var(--note-ink-primary);
 }
 .note-amber {
-  background-color: var(--note-amber-bg);
-  color: var(--text-note-dark);
+  background: linear-gradient(175deg, var(--note-amber-top) 0%, var(--note-amber-bg) 100%);
+  color: var(--note-ink-primary);
 }
 .note-orange {
-  background-color: var(--note-orange-bg);
+  background: linear-gradient(175deg, var(--note-orange-top) 0%, var(--note-orange-bg) 100%);
   color: #381204;
 }
 .note-pink {
-  background-color: var(--note-pink-bg);
+  background: linear-gradient(175deg, var(--note-pink-top) 0%, var(--note-pink-bg) 100%);
   color: #4a044e;
 }
 .note-lavender {
-  background-color: var(--note-lavender-bg);
+  background: linear-gradient(175deg, var(--note-lavender-top) 0%, var(--note-lavender-bg) 100%);
   color: #3b0764;
 }
 .note-blue {
-  background-color: var(--note-blue-bg);
+  background: linear-gradient(175deg, var(--note-blue-top) 0%, var(--note-blue-bg) 100%);
   color: #0c4a6e;
 }
 .note-mint {
-  background-color: var(--note-mint-bg);
+  background: linear-gradient(175deg, var(--note-mint-top) 0%, var(--note-mint-bg) 100%);
   color: #064e3b;
 }
 
@@ -210,20 +287,20 @@ html, body, #root {
 .pinboard-surface {
   background-color: var(--pinboard-bg);
   background-image: 
-    radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-    radial-gradient(rgba(249, 115, 22, 0.05) 1px, transparent 1px);
-  background-size: 32px 32px, 64px 64px;
-  background-position: 0 0, 16px 16px;
+    radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+    radial-gradient(rgba(249, 115, 22, 0.05) 1.5px, transparent 1.5px);
+  background-size: 28px 28px, 56px 56px;
+  background-position: 0 0, 14px 14px;
 }
 
 /* New Note Arrival Animation */
 @keyframes noteSettle {
   0% {
     opacity: 0;
-    transform: scale(1.6) translateY(-80px) rotate(15deg);
+    transform: scale(1.5) translateY(-60px) rotate(12deg);
   }
   60% {
-    transform: scale(0.96) translateY(4px) rotate(-2deg);
+    transform: scale(0.97) translateY(3px) rotate(-2deg);
   }
   100% {
     opacity: 1;
@@ -232,7 +309,23 @@ html, body, #root {
 }
 
 .animate-settle {
-  animation: noteSettle 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  animation: noteSettle 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Subtle pulse animation for Live Indicator */
+@keyframes pulseGlow {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.85;
+  }
+}
+
+.live-dot-pulse {
+  animation: pulseGlow 2.5s ease-in-out infinite;
 }
 
 /* Reduced Motion Override */
@@ -245,5 +338,8 @@ html, body, #root {
   }
   .sticky-note:hover {
     transform: none !important;
+  }
+  .live-dot-pulse {
+    animation: none !important;
   }
 }

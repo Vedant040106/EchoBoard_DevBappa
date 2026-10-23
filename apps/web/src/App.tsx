@@ -95,7 +95,7 @@ export const App: React.FC = () => {
         queuedCount={queuedCount}
         totalSubmissions={totalSubmissions}
       />
-      <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+      <div style={{ flex: 1, position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         <Routes>
           <Route
             path="/"

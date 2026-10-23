@@ -57,10 +57,11 @@ export const PublicHistory: React.FC = () => {
   return (
     <div
       style={{
-        minHeight: 'calc(100vh - 60px)',
+        height: '100%',
+        minHeight: 'calc(100vh - 64px)',
         overflowY: 'auto',
         backgroundColor: 'var(--bg-outer)',
-        padding: '32px 20px',
+        padding: '36px 20px 64px 20px',
       }}
     >
       <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
@@ -69,7 +70,7 @@ export const PublicHistory: React.FC = () => {
           <h1
             style={{
               fontFamily: 'var(--font-brand)',
-              fontSize: '28px',
+              fontSize: 'var(--text-title-xl)',
               fontWeight: 800,
               color: 'var(--text-primary)',
               letterSpacing: '-0.02em',
@@ -78,7 +79,7 @@ export const PublicHistory: React.FC = () => {
           >
             Public Feedback History
           </h1>
-          <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
+          <p style={{ fontSize: 'var(--text-body)', color: 'var(--text-secondary)', lineHeight: 'var(--lh-normal)' }}>
             Search and explore all verified feedback shared by students, faculty, and expo guests.
           </p>
         </div>
@@ -107,12 +108,14 @@ export const PublicHistory: React.FC = () => {
               placeholder="Search by first name or message keyword..."
               style={{
                 width: '100%',
-                padding: '10px 14px',
+                height: '44px',
+                padding: '0 36px 0 14px',
                 backgroundColor: 'var(--bg-surface-elevated)',
                 border: '1px solid rgba(255, 255, 255, 0.12)',
                 borderRadius: 'var(--radius-sm)',
-                color: '#fff',
-                fontSize: '13px',
+                color: '#ffffff',
+                fontSize: 'var(--text-body)',
+                outline: 'none',
               }}
             />
             {search && (
@@ -120,14 +123,17 @@ export const PublicHistory: React.FC = () => {
                 onClick={() => setSearch('')}
                 style={{
                   position: 'absolute',
-                  right: '10px',
+                  right: '12px',
                   top: '50%',
                   transform: 'translateY(-50%)',
                   background: 'none',
                   border: 'none',
                   color: 'var(--text-muted)',
                   cursor: 'pointer',
-                  fontSize: '14px',
+                  fontSize: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}
               >
                 ✕
@@ -136,22 +142,23 @@ export const PublicHistory: React.FC = () => {
           </div>
 
           {/* Role Filter Buttons */}
-          <div style={{ display: 'flex', gap: '6px' }}>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             {(['All', 'Student', 'Faculty', 'Other Visitor'] as const).map((r) => (
               <button
                 key={r}
                 onClick={() => handleRoleFilter(r)}
                 style={{
-                  padding: '8px 12px',
+                  height: '40px',
+                  padding: '0 16px',
                   borderRadius: 'var(--radius-sm)',
-                  fontSize: '12px',
-                  fontWeight: selectedRole === r ? 700 : 500,
+                  fontSize: 'var(--text-caption)',
+                  fontWeight: selectedRole === r ? 800 : 600,
                   backgroundColor:
                     selectedRole === r ? 'var(--accent-orange)' : 'var(--bg-surface-elevated)',
-                  color: selectedRole === r ? '#fff' : 'var(--text-secondary)',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  color: selectedRole === r ? '#ffffff' : 'var(--text-secondary)',
+                  border: `1px solid ${selectedRole === r ? 'var(--accent-orange)' : 'rgba(255, 255, 255, 0.1)'}`,
                   cursor: 'pointer',
-                  transition: 'all 0.2s',
+                  transition: 'all 0.15s ease',
                 }}
               >
                 {r}
@@ -161,7 +168,7 @@ export const PublicHistory: React.FC = () => {
         </div>
 
         {/* Total results info */}
-        <div style={{ marginBottom: '16px', fontSize: '13px', color: 'var(--text-muted)' }}>
+        <div style={{ marginBottom: '16px', fontSize: 'var(--text-caption)', color: 'var(--text-muted)' }}>
           Showing {notes.length} of {totalCount} public feedback notes
         </div>
 
@@ -180,7 +187,7 @@ export const PublicHistory: React.FC = () => {
                 marginBottom: '12px',
               }}
             />
-            <div>Loading verified feedback...</div>
+            <div style={{ fontSize: 'var(--text-body)' }}>Loading verified feedback...</div>
           </div>
         )}
 
@@ -189,24 +196,25 @@ export const PublicHistory: React.FC = () => {
           <div
             style={{
               padding: '24px',
-              backgroundColor: 'rgba(239, 68, 68, 0.1)',
-              border: '1px solid #ef4444',
+              backgroundColor: 'var(--status-offline-subtle)',
+              border: '1px solid var(--status-offline)',
               borderRadius: 'var(--radius-md)',
               color: '#fca5a5',
               textAlign: 'center',
             }}
           >
-            <p style={{ marginBottom: '12px' }}>{error}</p>
+            <p style={{ marginBottom: '12px', fontSize: 'var(--text-body)' }}>{error}</p>
             <button
               onClick={fetchHistory}
               style={{
-                padding: '8px 16px',
+                height: '40px',
+                padding: '0 20px',
                 backgroundColor: 'var(--accent-orange)',
                 border: 'none',
                 borderRadius: 'var(--radius-sm)',
-                color: '#fff',
-                fontSize: '13px',
-                fontWeight: 600,
+                color: '#ffffff',
+                fontSize: 'var(--text-body-sm)',
+                fontWeight: 700,
                 cursor: 'pointer',
               }}
             >
@@ -227,10 +235,10 @@ export const PublicHistory: React.FC = () => {
             }}
           >
             <div style={{ fontSize: '32px', marginBottom: '8px' }}>🔍</div>
-            <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#fff', marginBottom: '6px' }}>
+            <h3 style={{ fontSize: 'var(--text-title-sm)', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '6px' }}>
               No feedback found
             </h3>
-            <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+            <p style={{ fontSize: 'var(--text-body)', color: 'var(--text-secondary)' }}>
               No notes match your current search query or filter.
             </p>
           </div>
@@ -269,6 +277,7 @@ export const PublicHistory: React.FC = () => {
                     transform: `rotate(${((note.layout.rotation || 0) * 0.4).toFixed(1)}deg)`,
                     transition: 'transform 0.2s, box-shadow 0.2s',
                     borderTop: '1px solid rgba(255, 255, 255, 0.6)',
+                    color: 'var(--note-ink-primary)',
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'scale(1.02) translateY(-2px)';
@@ -288,17 +297,19 @@ export const PublicHistory: React.FC = () => {
                         marginBottom: '8px',
                       }}
                     >
-                      <strong style={{ fontFamily: 'var(--font-brand)', fontSize: '16px' }}>
+                      <strong style={{ fontFamily: 'var(--font-brand)', fontSize: 'var(--text-title-sm)', fontWeight: 800, color: 'var(--note-ink-primary)' }}>
                         {note.publicDisplayName}
                       </strong>
                       <span
                         style={{
-                          fontSize: '10px',
-                          fontWeight: 700,
+                          fontSize: 'var(--text-micro)',
+                          fontWeight: 800,
                           textTransform: 'uppercase',
+                          letterSpacing: '0.04em',
                           padding: '2px 6px',
                           borderRadius: '999px',
                           backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                          color: 'var(--note-ink-secondary)',
                         }}
                       >
                         {note.role}
@@ -309,8 +320,9 @@ export const PublicHistory: React.FC = () => {
                       style={{
                         fontFamily: 'var(--font-handwriting)',
                         fontSize: '20px',
-                        lineHeight: 1.3,
+                        lineHeight: 'var(--lh-tight)',
                         fontWeight: 700,
+                        color: 'var(--note-ink-primary)',
                         wordBreak: 'break-word',
                         display: '-webkit-box',
                         WebkitLineClamp: 4,
@@ -328,9 +340,9 @@ export const PublicHistory: React.FC = () => {
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
-                      fontSize: '11px',
+                      fontSize: 'var(--text-caption)',
                       fontWeight: 600,
-                      opacity: 0.7,
+                      color: 'var(--note-ink-meta)',
                     }}
                   >
                     <span>{note.department || note.institutionName || ''}</span>
@@ -357,34 +369,36 @@ export const PublicHistory: React.FC = () => {
               onClick={() => setPage((p) => Math.max(p - 1, 1))}
               disabled={page <= 1}
               style={{
-                padding: '8px 16px',
+                height: '42px',
+                padding: '0 18px',
                 backgroundColor: 'var(--bg-surface-elevated)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
                 borderRadius: 'var(--radius-sm)',
-                color: page <= 1 ? 'var(--text-muted)' : '#fff',
-                fontSize: '13px',
-                fontWeight: 600,
+                color: page <= 1 ? 'var(--text-muted)' : '#ffffff',
+                fontSize: 'var(--text-body-sm)',
+                fontWeight: 700,
                 cursor: page <= 1 ? 'not-allowed' : 'pointer',
               }}
             >
               Previous
             </button>
 
-            <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-              Page <strong>{page}</strong> of <strong>{totalPages}</strong>
+            <span style={{ fontSize: 'var(--text-body-sm)', color: 'var(--text-secondary)' }}>
+              Page <strong style={{ color: 'var(--text-primary)' }}>{page}</strong> of <strong style={{ color: 'var(--text-primary)' }}>{totalPages}</strong>
             </span>
 
             <button
               onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
               disabled={page >= totalPages}
               style={{
-                padding: '8px 16px',
+                height: '42px',
+                padding: '0 18px',
                 backgroundColor: 'var(--bg-surface-elevated)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
                 borderRadius: 'var(--radius-sm)',
-                color: page >= totalPages ? 'var(--text-muted)' : '#fff',
-                fontSize: '13px',
-                fontWeight: 600,
+                color: page >= totalPages ? 'var(--text-muted)' : '#ffffff',
+                fontSize: 'var(--text-body-sm)',
+                fontWeight: 700,
                 cursor: page >= totalPages ? 'not-allowed' : 'pointer',
               }}
             >

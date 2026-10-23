@@ -133,7 +133,9 @@ export const FeedbackForm: React.FC = () => {
     return (
       <div
         style={{
-          minHeight: 'calc(100vh - 60px)',
+          height: '100%',
+          minHeight: 'calc(100vh - 64px)',
+          overflowY: 'auto',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -217,32 +219,35 @@ export const FeedbackForm: React.FC = () => {
             className={`note-${submittedNote.colorVariant || 'yellow'}`}
             style={{
               margin: '0 auto 28px auto',
-              padding: '20px',
+              padding: '22px 24px',
               borderRadius: '2px 2px 8px 2px',
               boxShadow: 'var(--shadow-paper)',
               transform: 'rotate(-1.5deg)',
               textAlign: 'left',
               borderTop: '1px solid rgba(255, 255, 255, 0.6)',
+              color: 'var(--note-ink-primary)',
             }}
           >
             <div
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
-                fontSize: '12px',
+                fontSize: 'var(--text-caption)',
                 fontWeight: 700,
-                marginBottom: '6px',
+                marginBottom: '8px',
+                color: 'var(--note-ink-secondary)',
               }}
             >
-              <span>{submittedNote.publicDisplayName}</span>
-              <span style={{ textTransform: 'uppercase', opacity: 0.7 }}>{submittedNote.role}</span>
+              <span style={{ color: 'var(--note-ink-primary)' }}>{submittedNote.publicDisplayName}</span>
+              <span style={{ textTransform: 'uppercase', letterSpacing: '0.04em' }}>{submittedNote.role}</span>
             </div>
             <div
               style={{
                 fontFamily: 'var(--font-handwriting)',
-                fontSize: '20px',
-                lineHeight: 1.3,
+                fontSize: '22px',
+                lineHeight: 'var(--lh-tight)',
                 fontWeight: 700,
+                color: 'var(--note-ink-primary)',
               }}
             >
               "{submittedNote.message}"
@@ -255,15 +260,17 @@ export const FeedbackForm: React.FC = () => {
               onClick={() => navigate('/')}
               style={{
                 flex: 1,
-                padding: '12px 18px',
+                height: '46px',
+                padding: '0 18px',
                 backgroundColor: 'var(--accent-orange)',
                 border: 'none',
                 borderRadius: 'var(--radius-sm)',
-                color: '#fff',
-                fontSize: '14px',
+                color: '#ffffff',
+                fontSize: 'var(--text-body)',
                 fontWeight: 700,
                 cursor: 'pointer',
                 boxShadow: '0 4px 12px var(--accent-glow)',
+                transition: 'opacity 0.2s',
               }}
             >
               View the Wall
@@ -272,14 +279,16 @@ export const FeedbackForm: React.FC = () => {
               onClick={handleResetForAnother}
               style={{
                 flex: 1,
-                padding: '12px 18px',
+                height: '46px',
+                padding: '0 18px',
                 backgroundColor: 'rgba(255, 255, 255, 0.08)',
                 border: '1px solid rgba(255, 255, 255, 0.15)',
                 borderRadius: 'var(--radius-sm)',
                 color: 'var(--text-primary)',
-                fontSize: '14px',
+                fontSize: 'var(--text-body)',
                 fontWeight: 600,
                 cursor: 'pointer',
+                transition: 'background-color 0.2s',
               }}
             >
               Submit Another
@@ -293,10 +302,11 @@ export const FeedbackForm: React.FC = () => {
   return (
     <div
       style={{
-        minHeight: 'calc(100vh - 60px)',
+        height: '100%',
+        minHeight: 'calc(100vh - 64px)',
         overflowY: 'auto',
         backgroundColor: 'var(--bg-outer)',
-        padding: '32px 16px',
+        padding: '36px 16px 60px 16px',
         display: 'flex',
         justifyContent: 'center',
       }}
@@ -304,19 +314,36 @@ export const FeedbackForm: React.FC = () => {
       <div
         style={{
           width: '100%',
-          maxWidth: '540px',
+          maxWidth: '520px',
           backgroundColor: 'var(--bg-surface)',
           borderRadius: 'var(--radius-lg)',
           border: '1px solid rgba(255, 255, 255, 0.08)',
-          boxShadow: '0 20px 40px -10px rgba(0, 0, 0, 0.6)',
-          padding: '32px 28px',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.65)',
+          padding: '36px 30px',
+          alignSelf: 'flex-start',
         }}
       >
         <div style={{ marginBottom: '24px' }}>
+          <div
+            style={{
+              display: 'inline-block',
+              padding: '3px 10px',
+              backgroundColor: 'var(--accent-orange-subtle)',
+              borderRadius: 'var(--radius-full)',
+              color: 'var(--accent-orange)',
+              fontSize: 'var(--text-micro)',
+              fontWeight: 800,
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              marginBottom: '10px',
+            }}
+          >
+            DevBappa Solutions Tech Expo
+          </div>
           <h1
             style={{
               fontFamily: 'var(--font-brand)',
-              fontSize: '26px',
+              fontSize: 'var(--text-title-lg)',
               fontWeight: 800,
               color: 'var(--text-primary)',
               letterSpacing: '-0.02em',
@@ -325,7 +352,7 @@ export const FeedbackForm: React.FC = () => {
           >
             Pin Your Feedback
           </h1>
-          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+          <p style={{ fontSize: 'var(--text-body-sm)', color: 'var(--text-secondary)', lineHeight: 'var(--lh-normal)' }}>
             Share your authentic impressions, questions, or cheers with DevBappa Solutions at the
             Tech Expo!
           </p>
@@ -335,11 +362,11 @@ export const FeedbackForm: React.FC = () => {
           <div
             style={{
               padding: '12px 16px',
-              backgroundColor: 'rgba(239, 68, 68, 0.15)',
-              border: '1px solid #ef4444',
+              backgroundColor: 'var(--status-offline-subtle)',
+              border: '1px solid var(--status-offline)',
               borderRadius: 'var(--radius-sm)',
               color: '#fca5a5',
-              fontSize: '13px',
+              fontSize: 'var(--text-body-sm)',
               marginBottom: '20px',
             }}
           >
@@ -347,12 +374,18 @@ export const FeedbackForm: React.FC = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
           {/* Full Name */}
           <div>
             <label
               htmlFor="field-name"
-              style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}
+              style={{
+                display: 'block',
+                fontSize: 'var(--text-caption)',
+                fontWeight: 700,
+                color: 'var(--text-secondary)',
+                marginBottom: '6px',
+              }}
             >
               Full Name <span style={{ color: 'var(--accent-orange)' }}>*</span>
             </label>
@@ -366,16 +399,19 @@ export const FeedbackForm: React.FC = () => {
               required
               style={{
                 width: '100%',
-                padding: '10px 14px',
+                height: '46px',
+                padding: '0 14px',
                 backgroundColor: 'var(--bg-surface-elevated)',
-                border: `1px solid ${errors.name ? '#ef4444' : 'rgba(255, 255, 255, 0.12)'}`,
+                border: `1px solid ${errors.name ? 'var(--status-offline)' : 'rgba(255, 255, 255, 0.12)'}`,
                 borderRadius: 'var(--radius-sm)',
-                color: '#fff',
-                fontSize: '14px',
+                color: '#ffffff',
+                fontSize: 'var(--text-body)',
+                outline: 'none',
+                transition: 'border-color 0.2s',
               }}
             />
             {errors.name && (
-              <span style={{ fontSize: '11px', color: '#ef4444', marginTop: '4px', display: 'block' }}>
+              <span style={{ fontSize: 'var(--text-caption)', color: 'var(--status-offline)', marginTop: '4px', display: 'block' }}>
                 {errors.name}
               </span>
             )}
@@ -384,12 +420,12 @@ export const FeedbackForm: React.FC = () => {
             {suggestedDisplayName && (
               <div
                 style={{
-                  marginTop: '8px',
-                  padding: '8px 12px',
+                  marginTop: '10px',
+                  padding: '10px 14px',
                   backgroundColor: 'rgba(255, 255, 255, 0.03)',
                   border: '1px solid rgba(255, 255, 255, 0.08)',
                   borderRadius: 'var(--radius-sm)',
-                  fontSize: '12px',
+                  fontSize: 'var(--text-caption)',
                   color: 'var(--text-secondary)',
                 }}
               >
@@ -406,7 +442,8 @@ export const FeedbackForm: React.FC = () => {
                         background: 'none',
                         border: 'none',
                         color: 'var(--accent-orange)',
-                        fontSize: '11px',
+                        fontSize: 'var(--text-caption)',
+                        fontWeight: 600,
                         cursor: 'pointer',
                         textDecoration: 'underline',
                       }}
@@ -415,7 +452,7 @@ export const FeedbackForm: React.FC = () => {
                     </button>
                   </div>
                 ) : (
-                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '4px' }}>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '6px' }}>
                     <input
                       type="text"
                       value={confirmedDisplayName}
@@ -423,25 +460,27 @@ export const FeedbackForm: React.FC = () => {
                       placeholder={suggestedDisplayName}
                       style={{
                         flex: 1,
-                        padding: '4px 8px',
+                        height: '34px',
+                        padding: '0 10px',
                         backgroundColor: 'var(--bg-outer)',
                         border: '1px solid rgba(255, 255, 255, 0.2)',
-                        borderRadius: '4px',
+                        borderRadius: 'var(--radius-xs)',
                         color: '#fff',
-                        fontSize: '12px',
+                        fontSize: 'var(--text-caption)',
                       }}
                     />
                     <button
                       type="button"
                       onClick={() => setIsEditingDisplayName(false)}
                       style={{
-                        padding: '4px 8px',
+                        height: '34px',
+                        padding: '0 12px',
                         backgroundColor: 'var(--accent-orange)',
                         border: 'none',
-                        borderRadius: '4px',
+                        borderRadius: 'var(--radius-xs)',
                         color: '#fff',
-                        fontSize: '11px',
-                        fontWeight: 600,
+                        fontSize: 'var(--text-caption)',
+                        fontWeight: 700,
                         cursor: 'pointer',
                       }}
                     >
@@ -455,7 +494,15 @@ export const FeedbackForm: React.FC = () => {
 
           {/* Role Selection */}
           <div>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '8px' }}>
+            <label
+              style={{
+                display: 'block',
+                fontSize: 'var(--text-caption)',
+                fontWeight: 700,
+                color: 'var(--text-secondary)',
+                marginBottom: '8px',
+              }}
+            >
               Your Role <span style={{ color: 'var(--accent-orange)' }}>*</span>
             </label>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
@@ -465,18 +512,19 @@ export const FeedbackForm: React.FC = () => {
                   type="button"
                   onClick={() => handleRoleChange(r)}
                   style={{
-                    padding: '10px 8px',
+                    height: '44px',
+                    padding: '0 8px',
                     borderRadius: 'var(--radius-sm)',
                     border: `1px solid ${
                       role === r ? 'var(--accent-orange)' : 'rgba(255, 255, 255, 0.1)'
                     }`,
                     backgroundColor:
-                      role === r ? 'rgba(249, 115, 22, 0.15)' : 'var(--bg-surface-elevated)',
-                    color: role === r ? '#fff' : 'var(--text-secondary)',
-                    fontWeight: role === r ? 700 : 500,
-                    fontSize: '13px',
+                      role === r ? 'var(--accent-orange-subtle)' : 'var(--bg-surface-elevated)',
+                    color: role === r ? '#ffffff' : 'var(--text-secondary)',
+                    fontWeight: role === r ? 800 : 500,
+                    fontSize: 'var(--text-caption)',
                     cursor: 'pointer',
-                    transition: 'all 0.2s',
+                    transition: 'all 0.15s ease',
                   }}
                 >
                   {r}
@@ -490,7 +538,13 @@ export const FeedbackForm: React.FC = () => {
             <div>
               <label
                 htmlFor="field-department"
-                style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}
+                style={{
+                  display: 'block',
+                  fontSize: 'var(--text-caption)',
+                  fontWeight: 700,
+                  color: 'var(--text-secondary)',
+                  marginBottom: '6px',
+                }}
               >
                 Department <span style={{ color: 'var(--accent-orange)' }}>*</span>
               </label>
@@ -500,12 +554,14 @@ export const FeedbackForm: React.FC = () => {
                 onChange={(e) => setDepartment(e.target.value)}
                 style={{
                   width: '100%',
-                  padding: '10px 14px',
+                  height: '46px',
+                  padding: '0 14px',
                   backgroundColor: 'var(--bg-surface-elevated)',
-                  border: `1px solid ${errors.department ? '#ef4444' : 'rgba(255, 255, 255, 0.12)'}`,
+                  border: `1px solid ${errors.department ? 'var(--status-offline)' : 'rgba(255, 255, 255, 0.12)'}`,
                   borderRadius: 'var(--radius-sm)',
-                  color: '#fff',
-                  fontSize: '14px',
+                  color: '#ffffff',
+                  fontSize: 'var(--text-body)',
+                  outline: 'none',
                 }}
               >
                 {PREDEFINED_DEPARTMENTS.map((dept) => (
@@ -526,18 +582,20 @@ export const FeedbackForm: React.FC = () => {
                     required
                     style={{
                       width: '100%',
-                      padding: '8px 12px',
+                      height: '42px',
+                      padding: '0 12px',
                       backgroundColor: 'var(--bg-surface-elevated)',
                       border: `1px solid ${
-                        errors.departmentOther ? '#ef4444' : 'rgba(255, 255, 255, 0.12)'
+                        errors.departmentOther ? 'var(--status-offline)' : 'rgba(255, 255, 255, 0.12)'
                       }`,
                       borderRadius: 'var(--radius-sm)',
-                      color: '#fff',
-                      fontSize: '13px',
+                      color: '#ffffff',
+                      fontSize: 'var(--text-body-sm)',
+                      outline: 'none',
                     }}
                   />
                   {errors.departmentOther && (
-                    <span style={{ fontSize: '11px', color: '#ef4444', marginTop: '4px', display: 'block' }}>
+                    <span style={{ fontSize: 'var(--text-caption)', color: 'var(--status-offline)', marginTop: '4px', display: 'block' }}>
                       {errors.departmentOther}
                     </span>
                   )}
@@ -551,7 +609,13 @@ export const FeedbackForm: React.FC = () => {
             <div>
               <label
                 htmlFor="field-designation"
-                style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}
+                style={{
+                  display: 'block',
+                  fontSize: 'var(--text-caption)',
+                  fontWeight: 700,
+                  color: 'var(--text-secondary)',
+                  marginBottom: '6px',
+                }}
               >
                 Designation <span style={{ color: 'var(--accent-orange)' }}>*</span>
               </label>
@@ -565,16 +629,18 @@ export const FeedbackForm: React.FC = () => {
                 required
                 style={{
                   width: '100%',
-                  padding: '10px 14px',
+                  height: '46px',
+                  padding: '0 14px',
                   backgroundColor: 'var(--bg-surface-elevated)',
-                  border: `1px solid ${errors.designation ? '#ef4444' : 'rgba(255, 255, 255, 0.12)'}`,
+                  border: `1px solid ${errors.designation ? 'var(--status-offline)' : 'rgba(255, 255, 255, 0.12)'}`,
                   borderRadius: 'var(--radius-sm)',
-                  color: '#fff',
-                  fontSize: '14px',
+                  color: '#ffffff',
+                  fontSize: 'var(--text-body)',
+                  outline: 'none',
                 }}
               />
               {errors.designation && (
-                <span style={{ fontSize: '11px', color: '#ef4444', marginTop: '4px', display: 'block' }}>
+                <span style={{ fontSize: 'var(--text-caption)', color: 'var(--status-offline)', marginTop: '4px', display: 'block' }}>
                   {errors.designation}
                 </span>
               )}
@@ -586,7 +652,13 @@ export const FeedbackForm: React.FC = () => {
             <div>
               <label
                 htmlFor="field-institution"
-                style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}
+                style={{
+                  display: 'block',
+                  fontSize: 'var(--text-caption)',
+                  fontWeight: 700,
+                  color: 'var(--text-secondary)',
+                  marginBottom: '6px',
+                }}
               >
                 Institution or Organization <span style={{ color: 'var(--accent-orange)' }}>*</span>
               </label>
@@ -600,18 +672,20 @@ export const FeedbackForm: React.FC = () => {
                 required
                 style={{
                   width: '100%',
-                  padding: '10px 14px',
+                  height: '46px',
+                  padding: '0 14px',
                   backgroundColor: 'var(--bg-surface-elevated)',
                   border: `1px solid ${
-                    errors.institutionName ? '#ef4444' : 'rgba(255, 255, 255, 0.12)'
+                    errors.institutionName ? 'var(--status-offline)' : 'rgba(255, 255, 255, 0.12)'
                   }`,
                   borderRadius: 'var(--radius-sm)',
-                  color: '#fff',
-                  fontSize: '14px',
+                  color: '#ffffff',
+                  fontSize: 'var(--text-body)',
+                  outline: 'none',
                 }}
               />
               {errors.institutionName && (
-                <span style={{ fontSize: '11px', color: '#ef4444', marginTop: '4px', display: 'block' }}>
+                <span style={{ fontSize: 'var(--text-caption)', color: 'var(--status-offline)', marginTop: '4px', display: 'block' }}>
                   {errors.institutionName}
                 </span>
               )}
@@ -620,10 +694,18 @@ export const FeedbackForm: React.FC = () => {
 
           {/* Note Color Choice */}
           <div>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '8px' }}>
+            <label
+              style={{
+                display: 'block',
+                fontSize: 'var(--text-caption)',
+                fontWeight: 700,
+                color: 'var(--text-secondary)',
+                marginBottom: '8px',
+              }}
+            >
               Note Color
             </label>
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               {NOTE_COLORS.map((c) => (
                 <button
                   key={c}
@@ -631,14 +713,14 @@ export const FeedbackForm: React.FC = () => {
                   onClick={() => setSelectedColor(c)}
                   className={`note-${c}`}
                   style={{
-                    width: '32px',
-                    height: '32px',
+                    width: '36px',
+                    height: '36px',
                     borderRadius: '50%',
-                    border: selectedColor === c ? '3px solid #fff' : '1px solid rgba(0, 0, 0, 0.2)',
-                    boxShadow: selectedColor === c ? '0 0 10px rgba(255, 255, 255, 0.5)' : 'none',
+                    border: selectedColor === c ? '3px solid #ffffff' : '1px solid rgba(0, 0, 0, 0.25)',
+                    boxShadow: selectedColor === c ? '0 0 12px rgba(255, 255, 255, 0.6)' : 'var(--shadow-subtle)',
                     cursor: 'pointer',
                     transform: selectedColor === c ? 'scale(1.15)' : 'scale(1)',
-                    transition: 'transform 0.2s',
+                    transition: 'transform 0.15s ease, box-shadow 0.15s ease',
                   }}
                   title={c}
                 />
@@ -649,10 +731,17 @@ export const FeedbackForm: React.FC = () => {
           {/* Feedback Message */}
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-              <label htmlFor="field-message" style={{ fontSize: '13px', fontWeight: 600 }}>
+              <label
+                htmlFor="field-message"
+                style={{
+                  fontSize: 'var(--text-caption)',
+                  fontWeight: 700,
+                  color: 'var(--text-secondary)',
+                }}
+              >
                 Feedback <span style={{ color: 'var(--accent-orange)' }}>*</span>
               </label>
-              <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+              <span style={{ fontSize: 'var(--text-caption)', color: 'var(--text-muted)' }}>
                 {message.length} / {FIELD_LIMITS.MESSAGE_MAX}
               </span>
             </div>
@@ -668,17 +757,19 @@ export const FeedbackForm: React.FC = () => {
               style={{
                 width: '100%',
                 padding: '12px 14px',
+                minHeight: '110px',
                 backgroundColor: 'var(--bg-surface-elevated)',
-                border: `1px solid ${errors.message ? '#ef4444' : 'rgba(255, 255, 255, 0.12)'}`,
+                border: `1px solid ${errors.message ? 'var(--status-offline)' : 'rgba(255, 255, 255, 0.12)'}`,
                 borderRadius: 'var(--radius-sm)',
-                color: '#fff',
-                fontSize: '14px',
-                lineHeight: 1.5,
+                color: '#ffffff',
+                fontSize: 'var(--text-body)',
+                lineHeight: 'var(--lh-normal)',
                 resize: 'vertical',
+                outline: 'none',
               }}
             />
             {errors.message && (
-              <span style={{ fontSize: '11px', color: '#ef4444', marginTop: '4px', display: 'block' }}>
+              <span style={{ fontSize: 'var(--text-caption)', color: 'var(--status-offline)', marginTop: '4px', display: 'block' }}>
                 {errors.message}
               </span>
             )}
@@ -687,18 +778,18 @@ export const FeedbackForm: React.FC = () => {
           {/* Privacy Notice */}
           <div
             style={{
-              padding: '10px 14px',
+              padding: '12px 16px',
               backgroundColor: 'rgba(255, 255, 255, 0.03)',
               border: '1px solid rgba(255, 255, 255, 0.08)',
               borderRadius: 'var(--radius-sm)',
-              fontSize: '12px',
+              fontSize: 'var(--text-caption)',
               color: 'var(--text-secondary)',
-              lineHeight: 1.4,
+              lineHeight: 'var(--lh-relaxed)',
             }}
           >
-            🔒 <strong>Privacy Notice:</strong> Your full name is stored privately for authorized
+            🔒 <strong style={{ color: 'var(--text-primary)' }}>Privacy Notice:</strong> Your full name is stored privately for authorized
             administration. Only your public first name (
-            <span style={{ color: 'var(--accent-yellow)' }}>{effectiveDisplayName || 'Visitor'}</span>)
+            <span style={{ color: 'var(--accent-yellow)', fontWeight: 700 }}>{effectiveDisplayName || 'Visitor'}</span>)
             and feedback will appear on the live Expo wall.
           </div>
 
@@ -707,17 +798,18 @@ export const FeedbackForm: React.FC = () => {
             type="submit"
             disabled={isSubmitting}
             style={{
-              padding: '14px 20px',
+              height: '48px',
+              padding: '0 24px',
               backgroundColor: 'var(--accent-orange)',
               border: 'none',
               borderRadius: 'var(--radius-sm)',
-              color: '#fff',
-              fontSize: '15px',
-              fontWeight: 700,
+              color: '#ffffff',
+              fontSize: 'var(--text-body)',
+              fontWeight: 800,
               cursor: isSubmitting ? 'not-allowed' : 'pointer',
               opacity: isSubmitting ? 0.7 : 1,
-              boxShadow: '0 4px 14px var(--accent-glow)',
-              transition: 'background-color 0.2s',
+              boxShadow: '0 4px 16px var(--accent-glow)',
+              transition: 'background-color 0.2s, transform 0.15s ease',
             }}
           >
             {isSubmitting ? 'Pinning Note...' : 'Pin to Wall'}

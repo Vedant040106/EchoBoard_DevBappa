@@ -84,6 +84,7 @@ export const NoteDetailModal: React.FC<NoteDetailModalProps> = ({ note, onClose 
           transform: 'rotate(-0.5deg)',
           borderTop: '1px solid rgba(255, 255, 255, 0.6)',
           borderLeft: '1px solid rgba(255, 255, 255, 0.4)',
+          color: 'var(--note-ink-primary)',
         }}
       >
         {/* Realistic Pushpin */}
@@ -98,12 +99,12 @@ export const NoteDetailModal: React.FC<NoteDetailModalProps> = ({ note, onClose 
             position: 'absolute',
             top: '14px',
             right: '16px',
-            width: '32px',
-            height: '32px',
+            width: '36px',
+            height: '36px',
             borderRadius: '50%',
             border: 'none',
             backgroundColor: 'rgba(0, 0, 0, 0.12)',
-            color: 'inherit',
+            color: 'var(--note-ink-primary)',
             fontSize: '18px',
             fontWeight: 700,
             cursor: 'pointer',
@@ -112,7 +113,7 @@ export const NoteDetailModal: React.FC<NoteDetailModalProps> = ({ note, onClose 
             justifyContent: 'center',
             transition: 'background-color 0.2s',
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.25)')}
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.22)')}
           onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.12)')}
         >
           ✕
@@ -125,22 +126,24 @@ export const NoteDetailModal: React.FC<NoteDetailModalProps> = ({ note, onClose 
               id="note-modal-title"
               style={{
                 fontFamily: 'var(--font-brand)',
-                fontSize: '22px',
-                fontWeight: 700,
+                fontSize: 'var(--text-title-md)',
+                fontWeight: 800,
                 letterSpacing: '-0.01em',
+                color: 'var(--note-ink-primary)',
               }}
             >
               {publicDisplayName}
             </h2>
             <span
               style={{
-                fontSize: '11px',
-                fontWeight: 700,
+                fontSize: 'var(--text-micro)',
+                fontWeight: 800,
                 textTransform: 'uppercase',
                 letterSpacing: '0.04em',
                 padding: '3px 8px',
                 borderRadius: '999px',
                 backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                color: 'var(--note-ink-secondary)',
               }}
             >
               {role}
@@ -149,9 +152,9 @@ export const NoteDetailModal: React.FC<NoteDetailModalProps> = ({ note, onClose 
 
           <div
             style={{
-              marginTop: '4px',
-              fontSize: '13px',
-              opacity: 0.85,
+              marginTop: '6px',
+              fontSize: 'var(--text-caption)',
+              color: 'var(--note-ink-secondary)',
               fontWeight: 600,
               display: 'flex',
               flexDirection: 'column',
@@ -169,8 +172,9 @@ export const NoteDetailModal: React.FC<NoteDetailModalProps> = ({ note, onClose 
           style={{
             fontFamily: 'var(--font-handwriting)',
             fontSize: '24px',
-            lineHeight: '1.4',
+            lineHeight: 'var(--lh-normal)',
             fontWeight: 700,
+            color: 'var(--note-ink-primary)',
             whiteSpace: 'pre-wrap',
             wordBreak: 'break-word',
             margin: '20px 0',
@@ -184,13 +188,13 @@ export const NoteDetailModal: React.FC<NoteDetailModalProps> = ({ note, onClose 
           style={{
             marginTop: '24px',
             paddingTop: '16px',
-            borderTop: '1px solid rgba(0, 0, 0, 0.1)',
+            borderTop: '1px solid rgba(0, 0, 0, 0.12)',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            fontSize: '12px',
+            fontSize: 'var(--text-caption)',
             fontWeight: 600,
-            opacity: 0.7,
+            color: 'var(--note-ink-meta)',
           }}
         >
           <span>DevBappa Expo Note</span>

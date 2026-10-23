@@ -5,7 +5,7 @@ export const NotFoundPage: React.FC = () => {
   return (
     <div
       style={{
-        minHeight: 'calc(100vh - 60px)',
+        minHeight: 'calc(100vh - 64px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -16,20 +16,21 @@ export const NotFoundPage: React.FC = () => {
     >
       <div
         style={{
-          maxWidth: '420px',
+          maxWidth: '440px',
           backgroundColor: 'var(--bg-surface)',
-          padding: '40px 32px',
+          padding: '44px 32px',
           borderRadius: 'var(--radius-lg)',
           border: '1px solid rgba(255, 255, 255, 0.08)',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.65)',
         }}
       >
-        <div style={{ fontSize: '48px', marginBottom: '12px' }}>📍</div>
+        <div style={{ fontSize: '48px', marginBottom: '16px' }}>📍</div>
         <h1
           style={{
             fontFamily: 'var(--font-brand)',
-            fontSize: '24px',
+            fontSize: 'var(--text-title-lg)',
             fontWeight: 800,
-            color: '#fff',
+            color: 'var(--text-primary)',
             marginBottom: '8px',
           }}
         >
@@ -37,10 +38,10 @@ export const NotFoundPage: React.FC = () => {
         </h1>
         <p
           style={{
-            fontSize: '14px',
+            fontSize: 'var(--text-body)',
             color: 'var(--text-secondary)',
-            lineHeight: 1.5,
-            marginBottom: '24px',
+            lineHeight: 'var(--lh-normal)',
+            marginBottom: '28px',
           }}
         >
           The page you are looking for does not exist on the DevBappa Live Feedback Wall.
@@ -48,15 +49,19 @@ export const NotFoundPage: React.FC = () => {
         <Link
           to="/"
           style={{
-            display: 'inline-block',
-            padding: '10px 20px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '46px',
+            padding: '0 24px',
             backgroundColor: 'var(--accent-orange)',
             borderRadius: 'var(--radius-sm)',
-            color: '#fff',
+            color: '#ffffff',
             textDecoration: 'none',
-            fontWeight: 700,
-            fontSize: '14px',
-            boxShadow: '0 4px 12px var(--accent-glow)',
+            fontWeight: 800,
+            fontSize: 'var(--text-body)',
+            boxShadow: '0 4px 14px var(--accent-glow)',
+            transition: 'opacity 0.2s',
           }}
         >
           Return to Wall
