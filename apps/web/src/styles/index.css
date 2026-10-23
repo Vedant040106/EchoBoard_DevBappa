@@ -343,3 +343,32 @@ html, body {
     animation: none !important;
   }
 }
+
+/* Responsive Layout Utilities */
+.hidden-on-mobile {
+  display: flex !important;
+}
+.visible-on-mobile-flex {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .hidden-on-mobile {
+    display: none !important;
+  }
+  .visible-on-mobile-flex {
+    display: flex !important;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
