@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    name: Lint, Typecheck & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Shared Package Typecheck & Build
+        run: npm run build --workspace=@devbappa/shared
+
+      - name: Linting
+        run: npm run lint
+
+      - name: Type checking
+        run: npm run typecheck
+
+      - name: Run Tests
+        run: npm run test
+
+      - name: Production Builds
+        run: npm run build
