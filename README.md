@@ -172,8 +172,9 @@ npm run build
 ## Deployment Summary
 
 - **Frontend (Vercel)**:
-  - Root Directory: `apps/web`
-  - Build Command: `npm run build`
+  - Root Directory: `./` (leave default)
+  - Build Command: `npm run vercel-build` (auto-detected via `vercel.json`)
+  - Output Directory: `apps/web/dist`
   - Environment variables: `VITE_API_BASE_URL`, `VITE_SOCKET_URL`
 - **Backend (Render)**:
   - Build Command: `npm install && npm run build --workspace=@devbappa/shared && npm run build --workspace=@devbappa/api`

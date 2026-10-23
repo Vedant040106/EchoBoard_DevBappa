@@ -51,13 +51,13 @@ This guide covers step-by-step production deployment to **Vercel** (Frontend), *
 2. Import `Vedant040106/EchoBoard_DevBappa`.
 3. Configure project settings:
    - **Framework Preset**: Vite
-   - **Root Directory**: `apps/web`
-   - **Build Command**: `npm run build`
-   - **Output Directory**: `dist`
+   - **Root Directory**: `./` (Keep as monorepo root so `@devbappa/shared` is resolved)
+   - **Build Command**: `npm run vercel-build` (Pre-configured in root `vercel.json`)
+   - **Output Directory**: `apps/web/dist` (Pre-configured in root `vercel.json`)
 4. Set Environment Variables:
-   - `VITE_API_BASE_URL`: `https://[your-render-service].onrender.com`
-   - `VITE_SOCKET_URL`: `https://[your-render-service].onrender.com`
-5. Deploy. Vercel automatically honors `apps/web/vercel.json` for SPA route rewriting (`/submit`, `/history`, `/admin`, `/admin/dashboard`).
+   - `VITE_API_BASE_URL`: `https://[your-render-service].onrender.com` (no trailing slash)
+   - `VITE_SOCKET_URL`: `https://[your-render-service].onrender.com` (no trailing slash)
+5. Deploy. Vercel automatically honors `vercel.json` for building the shared package and frontend, and provides SPA route rewriting (`/(.*)` -> `/index.html`).
 
 ---
 
