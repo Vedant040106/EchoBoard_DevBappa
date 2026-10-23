@@ -16,6 +16,7 @@ export const App: React.FC = () => {
   const [notes, setNotes] = useState<PublicFeedbackNote[]>([]);
   const [totalSubmissions, setTotalSubmissions] = useState<number>(0);
   const [newNoteId, setNewNoteId] = useState<string | null>(null);
+  const [thankYouToast, setThankYouToast] = useState<{ displayName: string } | null>(null);
 
   // Fetch initial notes and authoritative statistics
   const refreshData = useCallback(async () => {
@@ -53,9 +54,11 @@ export const App: React.FC = () => {
         return [...prev, incomingNote];
       });
 
-      // Highlight new note animation
+      // Highlight new note animation and show live thank you banner
       setNewNoteId(incomingNote.id);
-      setTimeout(() => setNewNoteId(null), 3000);
+      setThankYouToast({ displayName: incomingNote.publicDisplayName });
+      setTimeout(() => setNewNoteId(null), 3500);
+      setTimeout(() => setThankYouToast(null), 5000);
     },
     onFeedbackHidden: (id) => {
       setNotes((prev) => prev.filter((n) => n.id !== id));
@@ -95,6 +98,40 @@ export const App: React.FC = () => {
         queuedCount={queuedCount}
         totalSubmissions={totalSubmissions}
       />
+      {thankYouToast && (
+        <div
+          role="status"
+          aria-live="polite"
+          style={{
+            position: 'fixed',
+            top: '72px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            padding: '12px 24px',
+            backgroundColor: 'rgba(15, 23, 42, 0.94)',
+            backdropFilter: 'blur(16px)',
+            border: '1px solid rgba(255, 107, 0, 0.45)',
+            borderRadius: 'var(--radius-full)',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.7), 0 0 25px rgba(255, 107, 0, 0.3)',
+            color: '#ffffff',
+            fontSize: 'var(--text-body)',
+            fontWeight: 700,
+            maxWidth: '92vw',
+            textAlign: 'center',
+            animation: 'fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+            pointerEvents: 'none',
+          }}
+        >
+          <span style={{ fontSize: '18px' }}>🎉</span>
+          <span>
+            Thank you for your feedback! Team <strong style={{ color: '#fb923c' }}>DevBappa</strong> is thankful for your feedback.
+          </span>
+        </div>
+      )}
       <div style={{ flex: 1, position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         <Routes>
           <Route

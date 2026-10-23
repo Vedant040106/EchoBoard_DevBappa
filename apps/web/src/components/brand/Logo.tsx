@@ -20,7 +20,13 @@ export const Logo: React.FC<LogoProps> = ({ className = '', height = 40 }) => {
         <img
           src="/assets/devbappa-logo.png"
           alt="DevBappa Solutions"
-          style={{ height: `${height}px`, width: 'auto', objectFit: 'contain' }}
+          style={{
+            height: `${height}px`,
+            width: 'auto',
+            objectFit: 'contain',
+            mixBlendMode: 'screen',
+            display: 'block',
+          }}
           onError={() => setImageError(true)}
         />
       ) : (

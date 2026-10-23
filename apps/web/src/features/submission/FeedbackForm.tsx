@@ -13,6 +13,7 @@ import {
 } from '@devbappa/shared';
 import { api } from '../../services/api.js';
 import { offlineQueue } from '../offline-queue/offlineQueue.js';
+import { Logo } from '../../components/brand/Logo.js';
 
 export const FeedbackForm: React.FC = () => {
   const navigate = useNavigate();
@@ -155,6 +156,10 @@ export const FeedbackForm: React.FC = () => {
             textAlign: 'center',
           }}
         >
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+            <Logo height={42} />
+          </div>
+
           {isOfflineQueued ? (
             <div
               style={{
@@ -166,7 +171,7 @@ export const FeedbackForm: React.FC = () => {
                 color: '#60a5fa',
                 fontSize: '12px',
                 fontWeight: 700,
-                marginBottom: '16px',
+                marginBottom: '14px',
               }}
             >
               Queued — Waiting to sync
@@ -182,7 +187,7 @@ export const FeedbackForm: React.FC = () => {
                 color: '#34d399',
                 fontSize: '12px',
                 fontWeight: 700,
-                marginBottom: '16px',
+                marginBottom: '14px',
               }}
             >
               ✓ Feedback Published!
@@ -192,14 +197,37 @@ export const FeedbackForm: React.FC = () => {
           <h2
             style={{
               fontFamily: 'var(--font-brand)',
-              fontSize: '24px',
+              fontSize: '26px',
               fontWeight: 800,
-              color: '#fff',
-              marginBottom: '8px',
+              color: '#ffffff',
+              marginBottom: '10px',
+              letterSpacing: '-0.02em',
             }}
           >
-            {isOfflineQueued ? 'Saved Locally on Device' : 'Thank you for your feedback!'}
+            Thank You for Your Feedback!
           </h2>
+
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              padding: '10px 18px',
+              backgroundColor: 'rgba(255, 107, 0, 0.12)',
+              border: '1px solid rgba(255, 107, 0, 0.35)',
+              borderRadius: 'var(--radius-md)',
+              color: '#fed7aa',
+              fontSize: '15px',
+              fontWeight: 700,
+              marginBottom: '16px',
+              lineHeight: 1.4,
+              boxShadow: '0 4px 12px rgba(255, 107, 0, 0.1)',
+            }}
+          >
+            <span>🧡</span>
+            <span>Team DevBappa is thankful for your feedback!</span>
+          </div>
 
           <p
             style={{
@@ -211,7 +239,7 @@ export const FeedbackForm: React.FC = () => {
           >
             {isOfflineQueued
               ? 'Your feedback is safely saved in local storage on this phone. As soon as server connectivity returns, it will automatically synchronize and appear on the big screen wall.'
-              : 'Your note is now pinned to the physical wall for everyone at the Tech Expo to see.'}
+              : 'Your note is now pinned to the live feedback wall for everyone at the Tech Expo to see.'}
           </p>
 
           {/* Submission Preview Card */}
