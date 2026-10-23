@@ -14,12 +14,22 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL
   ? `${import.meta.env.VITE_API_BASE_URL}/api/v1`
   : '/api/v1';
 
+const AUTH_TOKEN_KEY = 'echoboard_admin_token';
+
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE}${endpoint}`;
   const headers = new Headers(options.headers || {});
 
   if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
     headers.set('Content-Type', 'application/json');
+  }
+
+  // Attach stored admin session token if available (supports cross-domain deployments where third-party cookies are blocked)
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+    if (token && !headers.has('Authorization')) {
+      headers.set('Authorization', `Bearer ${token}`);
+    }
   }
 
   // Include credentials for HttpOnly admin cookies
@@ -72,16 +82,28 @@ export const api = {
   getCanvasLayout: () => request<Array<{ feedbackId: string } & PublicFeedbackNote['layout']>>('/canvas/layout'),
 
   // Admin Auth
-  adminLogin: (credentials: AdminLoginInput) =>
-    request<{ adminId: string; token: string; expiresAt: string }>('/admin/auth/login', {
+  adminLogin: async (credentials: AdminLoginInput) => {
+    const res = await request<{ adminId: string; token: string; expiresAt: string }>('/admin/auth/login', {
       method: 'POST',
       body: JSON.stringify(credentials),
-    }),
+    });
+    if (res?.token && typeof window !== 'undefined') {
+      localStorage.setItem(AUTH_TOKEN_KEY, res.token);
+    }
+    return res;
+  },
   adminGetSession: () => request<{ authenticated: boolean; adminId: string }>('/admin/auth/session'),
-  adminLogout: () =>
-    request<{ message: string }>('/admin/auth/logout', {
-      method: 'POST',
-    }),
+  adminLogout: async () => {
+    try {
+      return await request<{ message: string }>('/admin/auth/logout', {
+        method: 'POST',
+      });
+    } finally {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(AUTH_TOKEN_KEY);
+      }
+    }
+  },
 
   // Admin Feedback & Moderation
   adminGetFeedback: (params: { search?: string; role?: string; status?: string; page?: number; limit?: number }) => {

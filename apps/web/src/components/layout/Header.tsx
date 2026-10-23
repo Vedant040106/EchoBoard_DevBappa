@@ -172,14 +172,22 @@ export const Header: React.FC<HeaderProps> = ({
             to="/admin"
             title="Admin Portal"
             style={{
-              padding: '7px 10px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '7px 12px',
               borderRadius: 'var(--radius-sm)',
               fontSize: 'var(--text-caption)',
-              color: location.pathname.startsWith('/admin') ? 'var(--accent-orange)' : 'var(--text-muted)',
+              fontWeight: location.pathname.startsWith('/admin') ? 700 : 500,
+              color: location.pathname.startsWith('/admin') ? 'var(--accent-orange)' : 'var(--text-secondary)',
+              backgroundColor: location.pathname.startsWith('/admin') ? 'rgba(255, 107, 0, 0.1)' : 'transparent',
+              border: location.pathname.startsWith('/admin') ? '1px solid rgba(255, 107, 0, 0.3)' : '1px solid transparent',
               textDecoration: 'none',
+              transition: 'all 0.15s ease',
             }}
           >
-            🛡️
+            <span>🛡️</span>
+            <span>Admin</span>
           </Link>
         </nav>
 
