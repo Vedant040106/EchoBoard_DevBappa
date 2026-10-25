@@ -948,8 +948,21 @@ export const FeedbackForm: React.FC = () => {
               justifyContent: 'space-between',
             }}
           >
-            {/* 3D Pushpin on top edge */}
-            <div className="pushpin pushpin-brass" style={{ top: '-11px' }} />
+            {/* Top Adhesive Strip Highlight (Real Post-it hold) */}
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '24px',
+                backgroundColor: 'rgba(255, 255, 255, 0.22)',
+                borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
+                borderTopLeftRadius: '2px',
+                borderTopRightRadius: '2px',
+                pointerEvents: 'none',
+              }}
+            />
 
             {/* Note Header: Name and Role Tag */}
             <div>

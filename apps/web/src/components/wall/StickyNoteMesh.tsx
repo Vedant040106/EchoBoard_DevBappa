@@ -11,28 +11,60 @@ interface StickyNoteMeshProps {
 }
 
 /**
- * Builds a subdivided 24x24 plane deformed with physical paper curvature.
- * Top adhesive strip (v > 0.82) stays flush against pinboard (z = 0).
- * Lower body curls smoothly outwards (+Z) with an asymmetric corner peel.
+ * Deterministic hash of string ID into positive integer.
  */
-function createCurledGeometry(width = 3.2, height = 3.2, curlHeight = 0.36): THREE.BufferGeometry {
-  const geom = new THREE.PlaneGeometry(width, height, 24, 24);
+function hashString(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
+/**
+ * Builds a subdivided 28x28 square plane deformed with physical paper curvature.
+ * - Top adhesive strip (uv.y > 0.82) stays flush against pegboard (z = 0.01).
+ * - Parabolic lower body lift (uv.y <= 0.82): z = Math.pow(1 - uv.y, 1.95) * liftAmount (0.22 - 0.38).
+ * - Asymmetric corner curl: upward curl on bottom-right or bottom-left corner + S-curve across X.
+ * - Vertex normals recomputed for studio lighting reflections.
+ */
+function createCurledStickyGeometry(
+  noteId: string,
+  width = 3.2,
+  height = 3.2
+): THREE.BufferGeometry {
+  const geom = new THREE.PlaneGeometry(width, height, 28, 28);
   const pos = geom.attributes.position;
   const uv = geom.attributes.uv;
 
+  const hashVal = hashString(noteId || 'default');
+  // liftAmount varies deterministically between 0.22 and 0.38
+  const liftAmount = 0.22 + ((hashVal % 100) / 100) * (0.38 - 0.22);
+  // Deterministic choice of which corner curls more (bottom-right vs bottom-left)
+  const curlRightCorner = (hashVal % 2) === 0;
+
   for (let i = 0; i < pos.count; i++) {
-    const u = uv.getX(i);
-    const v = uv.getY(i); // In Three.js PlaneGeometry, v goes from 1 (top) to 0 (bottom)
+    const u = uv.getX(i); // 0 (left) to 1 (right)
+    const v = uv.getY(i); // 1 (top) to 0 (bottom)
 
     if (v <= 0.82) {
-      // Parabolic curvature factor from adhesive fold to bottom edge
+      // Normalized distance from adhesive line (0 at v=0.82 down to 1 at bottom edge v=0)
       const t = (0.82 - v) / 0.82;
-      // Asymmetric lower-right corner peel factor (natural paper memory lift)
-      const cornerPeel = 1.0 + (u - 0.45) * 0.4;
-      const zLift = Math.pow(t, 2.1) * curlHeight * cornerPeel;
-      pos.setZ(i, zLift);
+      // Parabolic lower-body outward curvature
+      const parabolicLift = Math.pow(t, 1.95) * liftAmount;
+
+      // Asymmetric corner curl
+      const cornerX = curlRightCorner ? u : 1.0 - u;
+      const cornerCurl = Math.pow(t, 2.4) * Math.pow(cornerX, 1.8) * 0.25;
+
+      // Subtle concave/convex S-curve across the paper width
+      const sCurve = Math.sin((u - 0.5) * Math.PI) * 0.035 * t;
+
+      pos.setZ(i, 0.01 + parabolicLift + cornerCurl + sCurve);
     } else {
-      pos.setZ(i, 0);
+      // Adhesive strip sits flush against the pegboard surface
+      pos.setZ(i, 0.01);
     }
   }
 
@@ -54,6 +86,12 @@ export const StickyNoteMesh: React.FC<StickyNoteMeshProps> = ({ note, isNew, onS
     [note.layout.rotation]
   );
 
+  // Stagger overlapping notes along Z-axis by layer_order * 0.035
+  const layerZ = useMemo(
+    () => (note.layout.layerOrder || 0) * 0.035,
+    [note.layout.layerOrder]
+  );
+
   // Live pin-drop entrance animation (drops from Z = +4.5 and spring-settles)
   const [animProgress, setAnimProgress] = useState(isNew ? 0 : 1);
   const [impactRingScale, setImpactRingScale] = useState(0);
@@ -65,44 +103,16 @@ export const StickyNoteMesh: React.FC<StickyNoteMeshProps> = ({ note, isNew, onS
     }
   }, [isNew]);
 
-  // Sharp procedural high-DPI canvas texture
+  // Sharp procedural 1024x1024 high-DPI canvas texture
   const texture = useMemo(() => createNoteTexture(note), [note]);
 
-  // Curled 3D paper geometry
-  const curledPaperGeometry = useMemo(() => createCurledGeometry(3.2, 3.2, 0.38), []);
+  // Subdivided 28x28 curled 3D paper geometry
+  const curledPaperGeometry = useMemo(
+    () => createCurledStickyGeometry(note.id, 3.2, 3.2),
+    [note.id]
+  );
 
-  // Sculpted pushpin materials
-  const pinDomeMaterial = useMemo(() => {
-    const variant = note.pinVariant || 'brass';
-    switch (variant) {
-      case 'brass':
-        return new THREE.MeshStandardMaterial({
-          color: '#fbbf24',
-          metalness: 0.92,
-          roughness: 0.18,
-        });
-      case 'silver':
-        return new THREE.MeshStandardMaterial({
-          color: '#f1f5f9',
-          metalness: 0.96,
-          roughness: 0.12,
-        });
-      case 'copper':
-        return new THREE.MeshStandardMaterial({
-          color: '#ea580c',
-          metalness: 0.88,
-          roughness: 0.22,
-        });
-      default:
-        return new THREE.MeshStandardMaterial({
-          color: '#fbbf24',
-          metalness: 0.9,
-          roughness: 0.2,
-        });
-    }
-  }, [note.pinVariant]);
-
-  // Frame loop: smooth hover interpolation, tilt physics, and pin-drop physics
+  // Frame loop: smooth hover interpolation, tilt physics, and entrance physics
   useFrame((_, delta) => {
     if (!meshGroupRef.current) return;
 
@@ -115,10 +125,10 @@ export const StickyNoteMesh: React.FC<StickyNoteMeshProps> = ({ note, isNew, onS
       }
     }
 
-    // Live pin-drop Z offset: drops from +4.5 down to 0
+    // Live socket drop Z offset: drops from +4.5 down to 0
     const dropZ = (1 - animProgress) * 4.5;
     const hoverZ = hovered ? 0.35 : 0;
-    const targetZ = dropZ + hoverZ;
+    const targetZ = layerZ + dropZ + hoverZ;
 
     // Smooth Z position lerp
     meshGroupRef.current.position.z = THREE.MathUtils.lerp(
@@ -153,36 +163,29 @@ export const StickyNoteMesh: React.FC<StickyNoteMeshProps> = ({ note, isNew, onS
   return (
     <group
       ref={meshGroupRef}
-      position={[targetX, targetY, 0]}
+      position={[targetX, targetY, layerZ]}
       rotation={[0, 0, baseRotationZ]}
     >
       {/* 1. Impact shockwave ring for live socket arrival */}
       {isNew && animProgress > 0.7 && impactRingScale < 1.7 && (
         <mesh position={[0, 0, -0.015]}>
-          <ringGeometry args={[1.5 * impactRingScale, (1.5 * impactRingScale) + 0.18, 32]} />
+          <ringGeometry args={[1.5 * impactRingScale, 1.5 * impactRingScale + 0.18, 32]} />
           <meshBasicMaterial
-            color="#f97316"
+            color="#f08035"
             transparent
-            opacity={Math.max(0, 0.7 - (impactRingScale * 0.35))}
+            opacity={Math.max(0, 0.7 - impactRingScale * 0.35)}
             side={THREE.DoubleSide}
           />
         </mesh>
       )}
 
-      {/* 2. Dual-Stage 3D Shadows */}
-      {/* Tight contact shadow under pinned top edge */}
-      <mesh position={[0, 1.35, -0.01]}>
-        <planeGeometry args={[3.2, 0.5]} />
-        <meshBasicMaterial color="#000000" transparent opacity={0.35} />
+      {/* 2. Top adhesive strip contact shadow onto surface */}
+      <mesh position={[0, 1.35, -0.005]}>
+        <planeGeometry args={[3.2, 0.3]} />
+        <meshBasicMaterial color="#1a1838" transparent opacity={0.3} />
       </mesh>
 
-      {/* Skewed soft drop shadow under curled bottom edge */}
-      <mesh position={[0.12, -0.85, -0.02]} rotation={[0, 0, -0.02]}>
-        <planeGeometry args={[3.3, 2.2]} />
-        <meshBasicMaterial color="#000000" transparent opacity={0.28} />
-      </mesh>
-
-      {/* 3. True 3D Curled Sticky Note Paper Mesh */}
+      {/* 3. True 3D Curled Square Post-it Note Paper Mesh */}
       <mesh
         geometry={curledPaperGeometry}
         castShadow
@@ -228,39 +231,11 @@ export const StickyNoteMesh: React.FC<StickyNoteMeshProps> = ({ note, isNew, onS
       >
         <meshStandardMaterial
           map={texture}
-          roughness={0.82}
+          roughness={0.78}
           metalness={0.02}
           side={THREE.DoubleSide}
         />
       </mesh>
-
-      {/* 4. 3D Sculpted Pushpin Mesh (Top-Center) */}
-      <group position={[0, 1.44, 0.04]}>
-        {/* Contact shadow on paper under pin head */}
-        <mesh position={[0.04, -0.04, 0.01]}>
-          <circleGeometry args={[0.16, 20]} />
-          <meshBasicMaterial color="#000000" transparent opacity={0.38} />
-        </mesh>
-
-        {/* Metallic pin stem neck */}
-        <mesh
-          position={[0, 0, 0.08]}
-          rotation={[Math.PI / 2, 0, 0]}
-          castShadow
-        >
-          <cylinderGeometry args={[0.028, 0.028, 0.22, 16]} />
-          <meshStandardMaterial color="#cbd5e1" metalness={0.96} roughness={0.15} />
-        </mesh>
-
-        {/* Sculpted specular dome head */}
-        <mesh
-          position={[0, 0, 0.18]}
-          material={pinDomeMaterial}
-          castShadow
-        >
-          <sphereGeometry args={[0.15, 24, 24]} />
-        </mesh>
-      </group>
     </group>
   );
 };

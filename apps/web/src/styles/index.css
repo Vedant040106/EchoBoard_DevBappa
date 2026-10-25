@@ -76,21 +76,24 @@
   --space-10: 40px;
   --space-12: 48px;
 
-  /* Approved 7-Note Color Palette (Phase 2.2 Specification) */
-  --note-yellow-top: #FFF275;
-  --note-yellow-bg: #F2D43D;
-  --note-amber-top: #FFD166;
-  --note-amber-bg: #F0AE29;
-  --note-orange-top: #FF9F68;
-  --note-orange-bg: #E87738;
-  --note-pink-top: #FF9EBB;
-  --note-pink-bg: #E66C91;
-  --note-lavender-top: #DEC4FF;
-  --note-lavender-bg: #B98EFF;
-  --note-blue-top: #9EE6FF;
-  --note-blue-bg: #63C3EC;
-  --note-mint-top: #A6F7D1;
-  --note-mint-bg: #62D6A2;
+  /* Exact Studio Reference Note Palette */
+  --note-yellow-top: #FFE66D;
+  --note-yellow-bg: #F2CC39;
+  --note-amber-top: #FF9E58;
+  --note-amber-bg: #F08035;
+  --note-orange-top: #FF9E58;
+  --note-orange-bg: #F08035;
+  --note-pink-top: #FF5D68;
+  --note-pink-bg: #F04352;
+  --note-lavender-top: #B695FF;
+  --note-lavender-bg: #9A73F5;
+  --note-blue-top: #8CE0FF;
+  --note-blue-bg: #65C5F0;
+  --note-mint-top: #9B5DE5;
+  --note-mint-bg: #7E3ECF;
+  --note-ink-primary: #1A162B;
+  --note-ink-secondary: #2C2544;
+  --note-ink-meta: #453B66;
 
   /* Shadows (Physical depth) */
   --shadow-paper: 

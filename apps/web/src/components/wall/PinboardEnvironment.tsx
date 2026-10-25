@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useRef, useEffect } from 'react';
 import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 import { createAnnouncementTexture } from './noteTexture.js';
@@ -9,88 +9,267 @@ interface PinboardEnvironmentProps {
 }
 
 /**
- * Procedural woven felt & fine cork bump texture generator.
- * Creates physical micro-texture depth under directional and point lights.
+ * Mid-Century Wall Clock with live moving hands.
  */
-function createFeltBumpTexture(): THREE.CanvasTexture {
-  const canvas = document.createElement('canvas');
-  canvas.width = 256;
-  canvas.height = 256;
-  const ctx = canvas.getContext('2d');
+const MidCenturyWallClock: React.FC<{ position: [number, number, number] }> = ({ position }) => {
+  const secondHandRef = useRef<THREE.Group>(null);
+  const minuteHandRef = useRef<THREE.Group>(null);
+  const hourHandRef = useRef<THREE.Group>(null);
 
-  if (!ctx) return new THREE.CanvasTexture(canvas);
+  useFrame(() => {
+    const now = new Date();
+    const seconds = now.getSeconds() + now.getMilliseconds() / 1000;
+    const minutes = now.getMinutes() + seconds / 60;
+    const hours = (now.getHours() % 12) + minutes / 60;
 
-  ctx.fillStyle = '#808080';
-  ctx.fillRect(0, 0, 256, 256);
-
-  const imgData = ctx.getImageData(0, 0, 256, 256);
-  const data = imgData.data;
-
-  for (let y = 0; y < 256; y++) {
-    for (let x = 0; x < 256; x++) {
-      const idx = (y * 256 + x) * 4;
-      // Woven fiber modulation:
-      const weave = Math.sin(x * 0.8) * Math.cos(y * 0.8) * 18;
-      // High-frequency cork noise:
-      const noise = (Math.random() - 0.5) * 36;
-      const val = Math.min(255, Math.max(0, 128 + weave + noise));
-
-      data[idx] = val;
-      data[idx + 1] = val;
-      data[idx + 2] = val;
-      data[idx + 3] = 255;
+    if (secondHandRef.current) {
+      secondHandRef.current.rotation.z = -((seconds / 60) * Math.PI * 2);
     }
-  }
+    if (minuteHandRef.current) {
+      minuteHandRef.current.rotation.z = -((minutes / 60) * Math.PI * 2);
+    }
+    if (hourHandRef.current) {
+      hourHandRef.current.rotation.z = -((hours / 12) * Math.PI * 2);
+    }
+  });
 
-  ctx.putImageData(imgData, 0, 0);
+  // 12 hour tick marks
+  const hourTicks = useMemo(() => {
+    const ticks: Array<{ angle: number; isMajor: boolean }> = [];
+    for (let i = 0; i < 12; i++) {
+      ticks.push({ angle: (i / 12) * Math.PI * 2, isMajor: i % 3 === 0 });
+    }
+    return ticks;
+  }, []);
 
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(12, 9);
-  texture.needsUpdate = true;
-  return texture;
-}
+  return (
+    <group position={position}>
+      {/* Clock Outer Terracotta-Orange Case */}
+      <mesh rotation={[Math.PI / 2, 0, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[3.4, 3.4, 0.55, 36]} />
+        <meshStandardMaterial color="#e05a2b" roughness={0.48} metalness={0.06} />
+      </mesh>
+
+      {/* Recessed Inner Dial Face */}
+      <mesh position={[0, 0, 0.26]} rotation={[Math.PI / 2, 0, 0]} receiveShadow>
+        <cylinderGeometry args={[2.95, 2.95, 0.08, 36]} />
+        <meshStandardMaterial color="#fdfbf7" roughness={0.72} metalness={0.02} />
+      </mesh>
+
+      {/* Hour Tick Markers */}
+      {hourTicks.map((tick, i) => (
+        <group key={i} rotation={[0, 0, -tick.angle]} position={[0, 0, 0.31]}>
+          <mesh position={[0, 2.35, 0]}>
+            <boxGeometry args={[tick.isMajor ? 0.22 : 0.12, tick.isMajor ? 0.6 : 0.38, 0.04]} />
+            <meshStandardMaterial color={tick.isMajor ? '#1a162b' : '#786d8a'} roughness={0.5} />
+          </mesh>
+        </group>
+      ))}
+
+      {/* Hour Hand */}
+      <group ref={hourHandRef} position={[0, 0, 0.33]}>
+        <mesh position={[0, 0.75, 0]}>
+          <boxGeometry args={[0.18, 1.5, 0.04]} />
+          <meshStandardMaterial color="#1a162b" roughness={0.3} />
+        </mesh>
+      </group>
+
+      {/* Minute Hand */}
+      <group ref={minuteHandRef} position={[0, 0, 0.35]}>
+        <mesh position={[0, 1.05, 0]}>
+          <boxGeometry args={[0.12, 2.1, 0.04]} />
+          <meshStandardMaterial color="#1a162b" roughness={0.3} />
+        </mesh>
+      </group>
+
+      {/* Red-Orange Second Hand */}
+      <group ref={secondHandRef} position={[0, 0, 0.37]}>
+        <mesh position={[0, 1.15, 0]}>
+          <boxGeometry args={[0.06, 2.4, 0.02]} />
+          <meshStandardMaterial color="#f03a24" roughness={0.2} />
+        </mesh>
+      </group>
+
+      {/* Center Pin Cap */}
+      <mesh position={[0, 0, 0.39]}>
+        <sphereGeometry args={[0.16, 16, 16]} />
+        <meshStandardMaterial color="#1a162b" metalness={0.8} roughness={0.2} />
+      </mesh>
+    </group>
+  );
+};
 
 /**
- * Procedural spatial coordinate crosshairs texture.
+ * Top-Left Studio Shelf with Articulated Architect Lamp & Coral Sphere.
  */
-function createGridCrosshairsTexture(): THREE.CanvasTexture {
-  const canvas = document.createElement('canvas');
-  canvas.width = 512;
-  canvas.height = 512;
-  const ctx = canvas.getContext('2d');
+const TopLeftStudioShelf: React.FC<{ position: [number, number, number] }> = ({ position }) => {
+  return (
+    <group position={position}>
+      {/* Matte Violet Floating Shelf */}
+      <mesh position={[0, 0, 0]} castShadow receiveShadow>
+        <boxGeometry args={[14, 0.6, 3.4]} />
+        <meshStandardMaterial color="#6e54e8" roughness={0.55} metalness={0.05} />
+      </mesh>
 
-  if (!ctx) return new THREE.CanvasTexture(canvas);
+      {/* Two Cylindrical Wall Brackets */}
+      <mesh position={[-4.5, -1.1, -0.2]} rotation={[0, 0, 0]} castShadow>
+        <cylinderGeometry args={[0.22, 0.22, 1.8, 16]} />
+        <meshStandardMaterial color="#4e38b3" roughness={0.6} />
+      </mesh>
+      <mesh position={[4.5, -1.1, -0.2]} rotation={[0, 0, 0]} castShadow>
+        <cylinderGeometry args={[0.22, 0.22, 1.8, 16]} />
+        <meshStandardMaterial color="#4e38b3" roughness={0.6} />
+      </mesh>
 
-  ctx.clearRect(0, 0, 512, 512);
+      {/* Speckled Coral-Pink Sphere */}
+      <mesh position={[-4.2, 1.6, 0.3]} castShadow receiveShadow>
+        <sphereGeometry args={[1.2, 32, 32]} />
+        <meshStandardMaterial color="#ff626e" roughness={0.45} metalness={0.04} />
+      </mesh>
 
-  // Subtle coordinate crosshair at center (256, 256)
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-  ctx.lineWidth = 1;
+      {/* Glossy Red-Orange Articulated Desk Lamp */}
+      <group position={[2.5, 0.3, 0.2]}>
+        {/* Heavy Circular Base */}
+        <mesh position={[0, 0.15, 0]} rotation={[0, 0, 0]} castShadow receiveShadow>
+          <cylinderGeometry args={[1.3, 1.4, 0.3, 24]} />
+          <meshStandardMaterial color="#f03a24" roughness={0.22} metalness={0.12} />
+        </mesh>
 
-  // Cross lines
-  ctx.beginPath();
-  ctx.moveTo(246, 256);
-  ctx.lineTo(266, 256);
-  ctx.moveTo(256, 246);
-  ctx.lineTo(256, 266);
-  ctx.stroke();
+        {/* Lower Arm Pivot Ball */}
+        <mesh position={[0, 0.45, 0]} castShadow>
+          <sphereGeometry args={[0.28, 16, 16]} />
+          <meshStandardMaterial color="#d42c18" roughness={0.3} metalness={0.2} />
+        </mesh>
 
-  // Subtle corner dots
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
-  ctx.fillRect(0, 0, 2, 2);
-  ctx.fillRect(510, 0, 2, 2);
-  ctx.fillRect(0, 510, 2, 2);
-  ctx.fillRect(510, 510, 2, 2);
+        {/* Lower Articulated Arm (angled towards right/center) */}
+        <group position={[0, 0.45, 0]} rotation={[0, 0, -0.45]}>
+          <mesh position={[0, 1.9, 0]} castShadow>
+            <cylinderGeometry args={[0.1, 0.1, 3.8, 16]} />
+            <meshStandardMaterial color="#f03a24" roughness={0.22} metalness={0.12} />
+          </mesh>
 
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(16, 12);
-  texture.needsUpdate = true;
-  return texture;
-}
+          {/* Elbow Joint Ball */}
+          <mesh position={[0, 3.8, 0]} castShadow>
+            <sphereGeometry args={[0.3, 16, 16]} />
+            <meshStandardMaterial color="#d42c18" roughness={0.3} metalness={0.2} />
+          </mesh>
+
+          {/* Upper Arm (angled down towards pegboard) */}
+          <group position={[0, 3.8, 0]} rotation={[0, 0, 1.05]}>
+            <mesh position={[0, 1.6, 0]} castShadow>
+              <cylinderGeometry args={[0.09, 0.09, 3.2, 16]} />
+              <meshStandardMaterial color="#f03a24" roughness={0.22} metalness={0.12} />
+            </mesh>
+
+            {/* Lamp Shade Socket */}
+            <mesh position={[0, 3.2, 0]} castShadow>
+              <sphereGeometry args={[0.26, 16, 16]} />
+              <meshStandardMaterial color="#d42c18" roughness={0.3} metalness={0.2} />
+            </mesh>
+
+            {/* Angled Lampshade pointing down at pegboard */}
+            <group position={[0, 3.2, 0]} rotation={[0, 0, 0.5]}>
+              <mesh position={[0, 1.1, 0]} castShadow>
+                <coneGeometry args={[1.35, 2.0, 24, 1, true]} />
+                <meshStandardMaterial
+                  color="#f03a24"
+                  roughness={0.22}
+                  metalness={0.12}
+                  side={THREE.DoubleSide}
+                />
+              </mesh>
+
+              {/* Glowing Warm Emissive Bulb */}
+              <mesh position={[0, 0.65, 0]}>
+                <sphereGeometry args={[0.42, 16, 16]} />
+                <meshStandardMaterial
+                  color="#fff5d6"
+                  emissive="#fff5d6"
+                  emissiveIntensity={3.2}
+                  roughness={0.1}
+                />
+              </mesh>
+
+              {/* Warm Spot illumination from lamp bulb */}
+              <pointLight
+                position={[0, 0.8, 0]}
+                intensity={1.8}
+                distance={18}
+                color="#fff5d6"
+                decay={2}
+              />
+            </group>
+          </group>
+        </group>
+      </group>
+    </group>
+  );
+};
+
+/**
+ * Top-Right Mini Shelf & Planter with Stylized Foliage.
+ */
+const TopRightStudioShelf: React.FC<{ position: [number, number, number] }> = ({ position }) => {
+  return (
+    <group position={position}>
+      {/* Compact Violet Wall Ledge */}
+      <mesh position={[0, 0, 0]} castShadow receiveShadow>
+        <boxGeometry args={[11, 0.6, 3.2]} />
+        <meshStandardMaterial color="#6e54e8" roughness={0.55} metalness={0.05} />
+      </mesh>
+
+      {/* Wall Brackets */}
+      <mesh position={[-3.5, -1.0, -0.2]} castShadow>
+        <cylinderGeometry args={[0.2, 0.2, 1.6, 16]} />
+        <meshStandardMaterial color="#4e38b3" roughness={0.6} />
+      </mesh>
+      <mesh position={[3.5, -1.0, -0.2]} castShadow>
+        <cylinderGeometry args={[0.2, 0.2, 1.6, 16]} />
+        <meshStandardMaterial color="#4e38b3" roughness={0.6} />
+      </mesh>
+
+      {/* Matte White Cylindrical Planter Pot */}
+      <group position={[1.5, 0.3, 0.2]}>
+        <mesh position={[0, 1.1, 0]} castShadow receiveShadow>
+          <cylinderGeometry args={[1.35, 1.05, 2.0, 24]} />
+          <meshStandardMaterial color="#f8fafc" roughness={0.35} metalness={0.02} />
+        </mesh>
+
+        {/* Soil Layer */}
+        <mesh position={[0, 1.95, 0]}>
+          <cylinderGeometry args={[1.25, 1.25, 0.15, 24]} />
+          <meshStandardMaterial color="#382923" roughness={0.9} />
+        </mesh>
+
+        {/* Stylized Foliage Leaves */}
+        <mesh position={[0, 2.5, 0.1]} rotation={[0.2, 0, 0.15]} castShadow>
+          <sphereGeometry args={[0.9, 16, 16]} />
+          <meshStandardMaterial color="#22c55e" roughness={0.6} />
+        </mesh>
+        <mesh position={[-0.6, 2.3, -0.2]} rotation={[-0.3, 0.4, -0.2]} castShadow>
+          <sphereGeometry args={[0.75, 16, 16]} />
+          <meshStandardMaterial color="#16a34a" roughness={0.6} />
+        </mesh>
+        <mesh position={[0.7, 2.4, 0.3]} rotation={[0.4, -0.3, 0.3]} castShadow>
+          <sphereGeometry args={[0.8, 16, 16]} />
+          <meshStandardMaterial color="#34d399" roughness={0.6} />
+        </mesh>
+      </group>
+
+      {/* Stacked Decorative Studio Books */}
+      <group position={[-2.8, 0.3, 0.2]}>
+        <mesh position={[0, 0.3, 0]} castShadow receiveShadow>
+          <boxGeometry args={[2.8, 0.5, 2.1]} />
+          <meshStandardMaterial color="#ffd166" roughness={0.5} />
+        </mesh>
+        <mesh position={[0.1, 0.7, 0]} rotation={[0, 0.15, 0]} castShadow receiveShadow>
+          <boxGeometry args={[2.5, 0.45, 1.9]} />
+          <meshStandardMaterial color="#ff5d68" roughness={0.5} />
+        </mesh>
+      </group>
+    </group>
+  );
+};
 
 export const PinboardEnvironment: React.FC<PinboardEnvironmentProps> = ({
   showAnnouncement,
@@ -98,42 +277,48 @@ export const PinboardEnvironment: React.FC<PinboardEnvironmentProps> = ({
 }) => {
   const { camera, pointer } = useThree();
   const cursorLightRef = useRef<THREE.PointLight>(null);
-  const particlesRef = useRef<THREE.Points>(null);
+  const pegHolesMeshRef = useRef<THREE.InstancedMesh>(null);
 
-  const bumpMap = useMemo(() => createFeltBumpTexture(), []);
-  const gridTexture = useMemo(() => createGridCrosshairsTexture(), []);
   const announcementTexture = useMemo(() => createAnnouncementTexture(), []);
 
-  // Subtle atmospheric floating dust particles
-  const particleCount = 80;
-  const { particlePositions, particleVelocities } = useMemo(() => {
-    const pos = new Float32Array(particleCount * 3);
-    const vel: Array<{ vx: number; vy: number; vz: number }> = [];
-
-    for (let i = 0; i < particleCount; i++) {
-      pos[i * 3] = (Math.random() - 0.5) * 44;
-      pos[i * 3 + 1] = (Math.random() - 0.5) * 32;
-      pos[i * 3 + 2] = Math.random() * 4.5 + 0.5;
-
-      vel.push({
-        vx: (Math.random() - 0.5) * 0.006,
-        vy: (Math.random() - 0.5) * 0.006,
-        vz: (Math.random() - 0.5) * 0.003,
-      });
+  // Recessed Pegboard Holes Grid Layout Setup
+  // Pegboard dimensions: 64 wide x 44 high. Step = 2.4.
+  // Generates crisp regular grid of dark-indigo recessed cylindrical holes.
+  const pegHolesCount = useMemo(() => {
+    let count = 0;
+    for (let x = -29; x <= 29; x += 2.4) {
+      for (let y = -19; y <= 19; y += 2.4) {
+        count++;
+      }
     }
-
-    return { particlePositions: pos, particleVelocities: vel };
+    return count;
   }, []);
 
-  // Frame loop: update dynamic cursor light position and gentle particle drift
+  useEffect(() => {
+    if (!pegHolesMeshRef.current) return;
+    const dummy = new THREE.Object3D();
+    let idx = 0;
+
+    for (let x = -29; x <= 29; x += 2.4) {
+      for (let y = -19; y <= 19; y += 2.4) {
+        // Position cylindrical holes slightly sunken into the periwinkle pegboard
+        dummy.position.set(x, y, 0.17);
+        dummy.rotation.set(Math.PI / 2, 0, 0);
+        dummy.updateMatrix();
+        pegHolesMeshRef.current.setMatrixAt(idx, dummy.matrix);
+        idx++;
+      }
+    }
+    pegHolesMeshRef.current.instanceMatrix.needsUpdate = true;
+  }, []);
+
+  // Frame loop: update dynamic cursor light position
   useFrame(() => {
-    // 1. Position interactive cursor 3D pointLight
     if (cursorLightRef.current) {
-      // Map normalized pointer coordinates (-1 to +1) to approximate 3D world space
       const orthoCam = camera as THREE.OrthographicCamera;
       const zoom = orthoCam.zoom || 38;
-      const viewportHalfWidth = (window.innerWidth / (2 * zoom));
-      const viewportHalfHeight = (window.innerHeight / (2 * zoom));
+      const viewportHalfWidth = window.innerWidth / (2 * zoom);
+      const viewportHalfHeight = window.innerHeight / (2 * zoom);
 
       const worldCursorX = camera.position.x + pointer.x * viewportHalfWidth;
       const worldCursorY = camera.position.y + pointer.y * viewportHalfHeight;
@@ -150,86 +335,107 @@ export const PinboardEnvironment: React.FC<PinboardEnvironmentProps> = ({
       );
       cursorLightRef.current.position.z = 2.4;
     }
-
-    // 2. Drift particles
-    if (particlesRef.current) {
-      const posAttr = particlesRef.current.geometry.attributes.position as THREE.BufferAttribute;
-      const array = posAttr.array as Float32Array;
-
-      for (let i = 0; i < particleCount; i++) {
-        const v = particleVelocities[i];
-        array[i * 3] += v.vx;
-        array[i * 3 + 1] += v.vy;
-        array[i * 3 + 2] += v.vz;
-
-        if (array[i * 3] > 24) array[i * 3] = -24;
-        if (array[i * 3] < -24) array[i * 3] = 24;
-        if (array[i * 3 + 1] > 18) array[i * 3 + 1] = -18;
-        if (array[i * 3 + 1] < -18) array[i * 3 + 1] = 18;
-        if (array[i * 3 + 2] > 5) array[i * 3 + 2] = 0.5;
-        if (array[i * 3 + 2] < 0.5) array[i * 3 + 2] = 5;
-      }
-
-      posAttr.needsUpdate = true;
-    }
   });
 
   return (
     <group>
-      {/* Dynamic Cursor Light: Illuminates nearby paper curl and pushpins as visitor moves pointer */}
+      {/* Dynamic Cursor Light: Gently illuminates paper curls as visitor moves pointer */}
       <pointLight
         ref={cursorLightRef}
-        intensity={0.65}
+        intensity={0.8}
         distance={12}
         decay={2}
-        color="#fed7aa"
+        color="#fff0d4"
       />
 
-      {/* 1. Main Tactile Midnight Blue-Violet Pinboard Plane with Woven Felt Bump */}
-      <mesh position={[0, 0, -0.06]} receiveShadow>
-        <planeGeometry args={[90, 68]} />
+      {/* ============================================================== */}
+      {/* 1. STUDIO WALL BACKGROUND (Rich Saturated Cobalt/Ultramarine)  */}
+      {/* ============================================================== */}
+      <mesh position={[0, 4, -0.6]} receiveShadow>
+        <planeGeometry args={[190, 130]} />
         <meshStandardMaterial
-          color="#161a33"
-          bumpMap={bumpMap}
-          bumpScale={0.045}
-          roughness={0.92}
+          color="#253ce6"
+          roughness={0.85}
           metalness={0.04}
         />
       </mesh>
 
-      {/* 2. Coordinate Crosshairs Overlay Plane */}
-      <mesh position={[0, 0, -0.055]}>
-        <planeGeometry args={[90, 68]} />
-        <meshBasicMaterial
-          map={gridTexture}
-          transparent
-          opacity={0.4}
+      {/* Clean White Architectural Baseboard Trim along bottom edge */}
+      <group position={[0, -29, -0.05]}>
+        {/* Main Baseboard Board */}
+        <mesh position={[0, 0, 0]} castShadow receiveShadow>
+          <boxGeometry args={[190, 3.2, 0.65]} />
+          <meshStandardMaterial color="#ffffff" roughness={0.32} metalness={0.02} />
+        </mesh>
+        {/* Upper Molded Trim Lip */}
+        <mesh position={[0, 1.7, 0.1]} castShadow receiveShadow>
+          <boxGeometry args={[190, 0.45, 0.85]} />
+          <meshStandardMaterial color="#f8fafc" roughness={0.3} metalness={0.02} />
+        </mesh>
+      </group>
+
+      {/* ============================================================== */}
+      {/* 2. RAISED 3D PERIWINKLE PEGBOARD                              */}
+      {/* ============================================================== */}
+      {/* Deep Soft Indigo Drop Shadow cast onto Cobalt Wall behind */}
+      <mesh position={[1.4, -1.4, -0.45]}>
+        <planeGeometry args={[68, 48]} />
+        <meshBasicMaterial color="#141a5a" transparent opacity={0.42} />
+      </mesh>
+
+      {/* Beveled Perimeter Frame Border */}
+      <mesh position={[0, 0, -0.08]} castShadow receiveShadow>
+        <boxGeometry args={[66.2, 46.2, 0.35]} />
+        <meshStandardMaterial color="#5c48e0" roughness={0.7} metalness={0.04} />
+      </mesh>
+
+      {/* Main Raised 3D Periwinkle Pegboard Slab */}
+      <mesh position={[0, 0, 0]} castShadow receiveShadow>
+        <boxGeometry args={[64, 44, 0.35]} />
+        <meshStandardMaterial
+          color="#705cf0"
+          roughness={0.68}
+          metalness={0.03}
         />
       </mesh>
 
-      {/* 3. Deep Beveled Pinboard Frame Border */}
-      <mesh position={[0, 0, -0.07]}>
-        <planeGeometry args={[93, 71]} />
+      {/* ============================================================== */}
+      {/* 3. RECESSED PEGBOARD HOLES (InstancedMesh of dark cylinders)   */}
+      {/* ============================================================== */}
+      <instancedMesh
+        ref={pegHolesMeshRef}
+        args={[undefined, undefined, pegHolesCount]}
+        receiveShadow
+      >
+        <cylinderGeometry args={[0.18, 0.18, 0.36, 16]} />
         <meshStandardMaterial
-          color="#23284c"
-          roughness={0.88}
+          color="#23215a"
+          roughness={0.92}
           metalness={0.08}
         />
-      </mesh>
+      </instancedMesh>
 
-      {/* 4. Deep Void Back-Plane (Prevents any edge gaps) */}
-      <mesh position={[0, 0, -0.1]}>
-        <planeGeometry args={[260, 200]} />
-        <meshBasicMaterial color="#090a10" />
-      </mesh>
+      {/* ============================================================== */}
+      {/* 4. 3D STUDIO FRAMING PROPS (Mounted on Cobalt Wall Above)       */}
+      {/* ============================================================== */}
+      {/* Top-Left Shelf & Articulated Architect Lamp */}
+      <TopLeftStudioShelf position={[-20, 27.5, 0.2]} />
 
-      {/* 5. Center Announcement Note (when wall is currently empty) */}
+      {/* Top-Center Mid-Century Wall Clock */}
+      <MidCenturyWallClock position={[0, 28.5, 0.1]} />
+
+      {/* Top-Right Mini Shelf & Planter */}
+      <TopRightStudioShelf position={[20, 27.5, 0.2]} />
+
+      {/* ============================================================== */}
+      {/* 5. CENTER ANNOUNCEMENT NOTE (When wall is empty)               */}
+      {/* ============================================================== */}
       {showAnnouncement && (
-        <group position={[0, 0, 0.04]} rotation={[0, 0, -0.02]}>
-          {/* Paper shadow */}
-          <mesh position={[0.08, -0.08, -0.01]}>
-            <planeGeometry args={[4.5, 4.5]} />
-            <meshBasicMaterial color="#000000" transparent opacity={0.35} />
+        <group position={[0, 0, 0.25]} rotation={[0, 0, -0.015]}>
+          {/* Top adhesive contact shadow */}
+          <mesh position={[0, 1.8, -0.01]}>
+            <planeGeometry args={[4.4, 0.4]} />
+            <meshBasicMaterial color="#1a1838" transparent opacity={0.32} />
           </mesh>
 
           <mesh
@@ -249,43 +455,13 @@ export const PinboardEnvironment: React.FC<PinboardEnvironmentProps> = ({
             <planeGeometry args={[4.4, 4.4]} />
             <meshStandardMaterial
               map={announcementTexture}
-              roughness={0.82}
-              metalness={0.04}
+              roughness={0.78}
+              metalness={0.02}
               side={THREE.DoubleSide}
             />
           </mesh>
-
-          {/* Sculpted Pushpin on announcement note */}
-          <group position={[0, 2.02, 0.06]}>
-            <mesh position={[0, 0, 0.08]} rotation={[Math.PI / 2, 0, 0]} castShadow>
-              <cylinderGeometry args={[0.035, 0.035, 0.25, 16]} />
-              <meshStandardMaterial color="#cbd5e1" metalness={0.95} roughness={0.15} />
-            </mesh>
-            <mesh position={[0, 0, 0.2]} castShadow>
-              <sphereGeometry args={[0.18, 24, 24]} />
-              <meshStandardMaterial color="#fbbf24" metalness={0.92} roughness={0.18} />
-            </mesh>
-          </group>
         </group>
       )}
-
-      {/* 6. Ambient warm dust motes */}
-      <points ref={particlesRef}>
-        <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            args={[particlePositions, 3]}
-          />
-        </bufferGeometry>
-        <pointsMaterial
-          size={0.12}
-          color="#fde68a"
-          transparent
-          opacity={0.22}
-          sizeAttenuation
-          depthWrite={false}
-        />
-      </points>
     </group>
   );
 };

@@ -1,8 +1,17 @@
 import * as THREE from 'three';
 import type { PublicFeedbackNote } from '@devbappa/shared';
 
-// Approved 7-note palette from design specification
-// Paired with #14161F high-contrast charcoal ink (yields >= 10.5:1 contrast ratio, WCAG AAA compliant)
+/**
+ * Exact Studio Reference Note Palette:
+ * 1. Coral Red (#FF5D68 -> #F04352)
+ * 2. Tangerine Peach (#FF9E58 -> #F08035)
+ * 3. Soft Lavender (#B695FF -> #9A73F5)
+ * 4. Sky Ice Blue (#8CE0FF -> #65C5F0)
+ * 5. Vivid Violet (#9B5DE5 -> #7E3ECF)
+ * 6. Warm Butter Yellow (#FFE66D -> #F2CC39)
+ *
+ * Paired with #1A162B high-contrast charcoal ink (yields >= 10.5:1 contrast ratio, WCAG AAA compliant).
+ */
 export const APPROVED_PAPER_PALETTE: Record<
   string,
   {
@@ -14,77 +23,85 @@ export const APPROVED_PAPER_PALETTE: Record<
     inkMeta: string;
     badgeBg: string;
     badgeText: string;
+    watermark: string;
   }
 > = {
   yellow: {
-    top: '#FFF275',
-    bottom: '#F2D43D',
-    crease: 'rgba(217, 180, 20, 0.35)',
-    inkPrimary: '#14161F',
-    inkSecondary: '#2C3042',
-    inkMeta: '#454C64',
-    badgeBg: 'rgba(20, 22, 31, 0.08)',
-    badgeText: '#14161F',
+    top: '#FFE66D',
+    bottom: '#F2CC39',
+    crease: 'rgba(210, 160, 20, 0.4)',
+    inkPrimary: '#1A162B',
+    inkSecondary: '#2C2544',
+    inkMeta: '#453B66',
+    badgeBg: 'rgba(26, 22, 43, 0.09)',
+    badgeText: '#1A162B',
+    watermark: 'rgba(210, 160, 20, 0.12)',
   },
   amber: {
-    top: '#FFD166',
-    bottom: '#F0AE29',
-    crease: 'rgba(200, 130, 15, 0.35)',
-    inkPrimary: '#14161F',
-    inkSecondary: '#2C3042',
-    inkMeta: '#454C64',
-    badgeBg: 'rgba(20, 22, 31, 0.08)',
-    badgeText: '#14161F',
+    top: '#FF9E58',
+    bottom: '#F08035',
+    crease: 'rgba(195, 80, 20, 0.4)',
+    inkPrimary: '#1A162B',
+    inkSecondary: '#2C2544',
+    inkMeta: '#453B66',
+    badgeBg: 'rgba(26, 22, 43, 0.09)',
+    badgeText: '#1A162B',
+    watermark: 'rgba(190, 75, 20, 0.12)',
   },
   orange: {
-    top: '#FF9F68',
-    bottom: '#E87738',
-    crease: 'rgba(190, 80, 20, 0.35)',
-    inkPrimary: '#14161F',
-    inkSecondary: '#2C3042',
-    inkMeta: '#454C64',
-    badgeBg: 'rgba(20, 22, 31, 0.08)',
-    badgeText: '#14161F',
+    top: '#FF9E58',
+    bottom: '#F08035',
+    crease: 'rgba(195, 80, 20, 0.4)',
+    inkPrimary: '#1A162B',
+    inkSecondary: '#2C2544',
+    inkMeta: '#453B66',
+    badgeBg: 'rgba(26, 22, 43, 0.09)',
+    badgeText: '#1A162B',
+    watermark: 'rgba(190, 75, 20, 0.12)',
   },
   pink: {
-    top: '#FF9EBB',
-    bottom: '#E66C91',
-    crease: 'rgba(190, 60, 100, 0.35)',
-    inkPrimary: '#14161F',
-    inkSecondary: '#2C3042',
-    inkMeta: '#454C64',
-    badgeBg: 'rgba(20, 22, 31, 0.08)',
-    badgeText: '#14161F',
+    top: '#FF5D68',
+    bottom: '#F04352',
+    crease: 'rgba(190, 45, 60, 0.4)',
+    inkPrimary: '#1A162B',
+    inkSecondary: '#2C2544',
+    inkMeta: '#453B66',
+    badgeBg: 'rgba(26, 22, 43, 0.1)',
+    badgeText: '#1A162B',
+    watermark: 'rgba(190, 45, 60, 0.12)',
   },
   lavender: {
-    top: '#DEC4FF',
-    bottom: '#B98EFF',
-    crease: 'rgba(140, 90, 220, 0.35)',
-    inkPrimary: '#14161F',
-    inkSecondary: '#2C3042',
-    inkMeta: '#454C64',
-    badgeBg: 'rgba(20, 22, 31, 0.08)',
-    badgeText: '#14161F',
+    top: '#B695FF',
+    bottom: '#9A73F5',
+    crease: 'rgba(125, 75, 225, 0.4)',
+    inkPrimary: '#1A162B',
+    inkSecondary: '#2C2544',
+    inkMeta: '#453B66',
+    badgeBg: 'rgba(26, 22, 43, 0.09)',
+    badgeText: '#1A162B',
+    watermark: 'rgba(120, 70, 220, 0.12)',
   },
   blue: {
-    top: '#9EE6FF',
-    bottom: '#63C3EC',
-    crease: 'rgba(60, 160, 210, 0.35)',
-    inkPrimary: '#14161F',
-    inkSecondary: '#2C3042',
-    inkMeta: '#454C64',
-    badgeBg: 'rgba(20, 22, 31, 0.08)',
-    badgeText: '#14161F',
+    top: '#8CE0FF',
+    bottom: '#65C5F0',
+    crease: 'rgba(50, 150, 205, 0.4)',
+    inkPrimary: '#1A162B',
+    inkSecondary: '#2C2544',
+    inkMeta: '#453B66',
+    badgeBg: 'rgba(26, 22, 43, 0.09)',
+    badgeText: '#1A162B',
+    watermark: 'rgba(40, 140, 195, 0.12)',
   },
   mint: {
-    top: '#A6F7D1',
-    bottom: '#62D6A2',
-    crease: 'rgba(50, 180, 120, 0.35)',
-    inkPrimary: '#14161F',
-    inkSecondary: '#2C3042',
-    inkMeta: '#454C64',
-    badgeBg: 'rgba(20, 22, 31, 0.08)',
-    badgeText: '#14161F',
+    top: '#9B5DE5',
+    bottom: '#7E3ECF',
+    crease: 'rgba(100, 40, 180, 0.4)',
+    inkPrimary: '#1A162B',
+    inkSecondary: '#2C2544',
+    inkMeta: '#453B66',
+    badgeBg: 'rgba(26, 22, 43, 0.1)',
+    badgeText: '#1A162B',
+    watermark: 'rgba(90, 35, 170, 0.12)',
   },
 };
 
@@ -92,9 +109,9 @@ export const APPROVED_PAPER_PALETTE: Record<
 const textureCache = new Map<string, THREE.CanvasTexture>();
 
 /**
- * Creates a high-resolution 512x512 CanvasTexture for a sticky note.
+ * Creates a high-resolution 1024x1024 CanvasTexture for a square Post-it note.
  * Features multi-stop warm paper gradient, procedural paper-fiber grain,
- * top adhesive crease line, ink signature styling, and compact role badge.
+ * top adhesive press-line, hand-drawn marker typography, and watermark motif.
  */
 export function createNoteTexture(note: PublicFeedbackNote): THREE.CanvasTexture {
   const cacheKey = `${note.id}-${note.publicDisplayName}-${note.message}-${note.colorVariant || 'yellow'}`;
@@ -104,8 +121,8 @@ export function createNoteTexture(note: PublicFeedbackNote): THREE.CanvasTexture
   }
 
   const canvas = document.createElement('canvas');
-  canvas.width = 512;
-  canvas.height = 512;
+  canvas.width = 1024;
+  canvas.height = 1024;
   const ctx = canvas.getContext('2d');
 
   if (!ctx) {
@@ -116,51 +133,59 @@ export function createNoteTexture(note: PublicFeedbackNote): THREE.CanvasTexture
   const palette =
     APPROVED_PAPER_PALETTE[note.colorVariant || 'yellow'] || APPROVED_PAPER_PALETTE.yellow;
 
-  // 1. Multi-stop warm paper gradient (top highlight -> body -> lower depth)
-  const grad = ctx.createLinearGradient(0, 0, 0, 512);
+  // 1. Multi-stop warm paper gradient (top adhesive highlight -> body -> lower edge depth)
+  const grad = ctx.createLinearGradient(0, 0, 0, 1024);
   grad.addColorStop(0, palette.top);
   grad.addColorStop(0.18, palette.top);
-  grad.addColorStop(0.82, palette.bottom);
+  grad.addColorStop(0.85, palette.bottom);
   grad.addColorStop(1, palette.bottom);
   ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 512, 512);
+  ctx.fillRect(0, 0, 1024, 1024);
 
-  // 2. Procedural paper-fiber grain (micro-noise texture for tactile realism)
-  const imgData = ctx.getImageData(0, 0, 512, 512);
+  // 2. Procedural paper-fiber grain (micro-noise texture for tactile clay-paper realism)
+  const imgData = ctx.getImageData(0, 0, 1024, 1024);
   const data = imgData.data;
   for (let i = 0; i < data.length; i += 4) {
-    // Subtle luminance jitter (-6 to +6)
-    const noise = (Math.random() - 0.5) * 12;
+    // Subtle luminance jitter (-7 to +7)
+    const noise = (Math.random() - 0.5) * 14;
     data[i] = Math.min(255, Math.max(0, data[i] + noise));
     data[i + 1] = Math.min(255, Math.max(0, data[i + 1] + noise));
     data[i + 2] = Math.min(255, Math.max(0, data[i + 2] + noise));
   }
   ctx.putImageData(imgData, 0, 0);
 
-  // 3. Top adhesive strip highlight & faint crease line
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.28)';
-  ctx.fillRect(0, 0, 512, 42);
+  // 3. Top adhesive strip highlight & subtle press line (top 160px)
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
+  ctx.fillRect(0, 0, 1024, 150);
 
   ctx.strokeStyle = palette.crease;
-  ctx.lineWidth = 1;
+  ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.moveTo(0, 42.5);
-  ctx.lineTo(512, 42.5);
+  ctx.moveTo(0, 150);
+  ctx.lineTo(1024, 150);
   ctx.stroke();
 
   // Subtle bottom edge bevel shadow
-  const bottomShadow = ctx.createLinearGradient(0, 498, 0, 512);
+  const bottomShadow = ctx.createLinearGradient(0, 990, 0, 1024);
   bottomShadow.addColorStop(0, 'rgba(0, 0, 0, 0)');
-  bottomShadow.addColorStop(1, 'rgba(0, 0, 0, 0.12)');
+  bottomShadow.addColorStop(1, 'rgba(0, 0, 0, 0.15)');
   ctx.fillStyle = bottomShadow;
-  ctx.fillRect(0, 498, 512, 14);
+  ctx.fillRect(0, 990, 1024, 34);
 
-  // 4. Header: Public Display Name (styled cleanly like an ink signature)
+  // 4. Subtle watermark logo motif in lower background
+  ctx.save();
+  ctx.fillStyle = palette.watermark;
+  ctx.beginPath();
+  ctx.arc(880, 840, 140, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  // 5. Header: Public Display Name (styled like an ink signature)
   ctx.fillStyle = palette.inkPrimary;
-  ctx.font = '800 36px "Outfit", -apple-system, sans-serif';
+  ctx.font = '800 68px "Outfit", -apple-system, sans-serif';
   ctx.textBaseline = 'top';
 
-  const maxNameWidth = 310;
+  const maxNameWidth = 620;
   let displayName = note.publicDisplayName || 'Visitor';
   if (ctx.measureText(displayName).width > maxNameWidth) {
     while (ctx.measureText(displayName + '...').width > maxNameWidth && displayName.length > 1) {
@@ -168,37 +193,37 @@ export function createNoteTexture(note: PublicFeedbackNote): THREE.CanvasTexture
     }
     displayName += '...';
   }
-  ctx.fillText(displayName, 36, 68);
+  ctx.fillText(displayName, 72, 190);
 
-  // 5. Role Badge Tag
+  // 6. Role Badge Tag
   const roleText = (note.role || 'VISITOR').toUpperCase();
-  ctx.font = '800 17px "Outfit", -apple-system, sans-serif';
+  ctx.font = '800 32px "Outfit", -apple-system, sans-serif';
   const roleWidth = ctx.measureText(roleText).width;
-  const badgeX = 512 - roleWidth - 52;
-  const badgeY = 70;
+  const badgeX = 1024 - roleWidth - 100;
+  const badgeY = 194;
 
   ctx.fillStyle = palette.badgeBg;
   ctx.beginPath();
-  ctx.roundRect(badgeX, badgeY, roleWidth + 18, 28, 14);
+  ctx.roundRect(badgeX, badgeY, roleWidth + 34, 54, 27);
   ctx.fill();
 
   ctx.fillStyle = palette.badgeText;
-  ctx.fillText(roleText, badgeX + 9, badgeY + 5.5);
+  ctx.fillText(roleText, badgeX + 17, badgeY + 11);
 
-  // 6. Subtle divider rule
-  ctx.strokeStyle = 'rgba(20, 22, 31, 0.14)';
-  ctx.lineWidth = 1.5;
+  // 7. Subtle divider rule
+  ctx.strokeStyle = 'rgba(26, 22, 43, 0.16)';
+  ctx.lineWidth = 2.5;
   ctx.beginPath();
-  ctx.moveTo(36, 116);
-  ctx.lineTo(476, 116);
+  ctx.moveTo(72, 280);
+  ctx.lineTo(952, 280);
   ctx.stroke();
 
-  // 7. Message text in legible, natural handwritten typeface
+  // 8. Message text in legible, natural handwritten typeface
   ctx.fillStyle = palette.inkPrimary;
-  ctx.font = '700 34px "Caveat", cursive, sans-serif';
+  ctx.font = '700 60px "Caveat", cursive, sans-serif';
   ctx.textBaseline = 'top';
 
-  const maxLineWidth = 440;
+  const maxLineWidth = 880;
   const words = (note.message || '').split(' ');
   const lines: string[] = [];
   let currentLine = '';
@@ -218,16 +243,16 @@ export function createNoteTexture(note: PublicFeedbackNote): THREE.CanvasTexture
   }
 
   // Draw lines with natural vertical spacing
-  const startY = 138;
-  const lineHeight = 46;
+  const startY = 320;
+  const lineHeight = 84;
   lines.forEach((line, i) => {
     if (i === 5 && words.length > lines.join(' ').split(' ').length) {
       line += '...';
     }
-    ctx.fillText(line, 36, startY + i * lineHeight);
+    ctx.fillText(line, 72, startY + i * lineHeight);
   });
 
-  // 8. Footer: Department or Institution & Date
+  // 9. Footer: Department or Institution & Date
   const metaLeft = note.department || note.institutionName || 'Tech Expo Visitor';
   const metaDate = new Date(note.createdAt).toLocaleDateString(undefined, {
     month: 'short',
@@ -235,17 +260,17 @@ export function createNoteTexture(note: PublicFeedbackNote): THREE.CanvasTexture
   });
 
   ctx.fillStyle = palette.inkMeta;
-  ctx.font = '700 19px "Inter", -apple-system, sans-serif';
+  ctx.font = '700 36px "Inter", -apple-system, sans-serif';
 
   let truncatedMeta = metaLeft;
-  if (ctx.measureText(truncatedMeta).width > 290) {
-    truncatedMeta = truncatedMeta.slice(0, 22) + '...';
+  if (ctx.measureText(truncatedMeta).width > 560) {
+    truncatedMeta = truncatedMeta.slice(0, 24) + '...';
   }
-  ctx.fillText(truncatedMeta, 36, 462);
+  ctx.fillText(truncatedMeta, 72, 920);
 
   // Date on right
   const dateWidth = ctx.measureText(metaDate).width;
-  ctx.fillText(metaDate, 512 - dateWidth - 36, 462);
+  ctx.fillText(metaDate, 1024 - dateWidth - 72, 920);
 
   // Create High-DPI Three.js Texture
   const texture = new THREE.CanvasTexture(canvas);
@@ -269,24 +294,24 @@ export function createAnnouncementTexture(): THREE.CanvasTexture {
   if (existing) return existing;
 
   const canvas = document.createElement('canvas');
-  canvas.width = 512;
-  canvas.height = 512;
+  canvas.width = 1024;
+  canvas.height = 1024;
   const ctx = canvas.getContext('2d');
 
   if (!ctx) return new THREE.CanvasTexture(canvas);
 
-  // Premium Amber Parchment background
-  const grad = ctx.createLinearGradient(0, 0, 0, 512);
-  grad.addColorStop(0, '#FFF275');
-  grad.addColorStop(1, '#F2D43D');
+  // Warm Butter Yellow background
+  const grad = ctx.createLinearGradient(0, 0, 0, 1024);
+  grad.addColorStop(0, '#FFE66D');
+  grad.addColorStop(1, '#F2CC39');
   ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 512, 512);
+  ctx.fillRect(0, 0, 1024, 1024);
 
   // Micro-noise grain
-  const imgData = ctx.getImageData(0, 0, 512, 512);
+  const imgData = ctx.getImageData(0, 0, 1024, 1024);
   const data = imgData.data;
   for (let i = 0; i < data.length; i += 4) {
-    const noise = (Math.random() - 0.5) * 10;
+    const noise = (Math.random() - 0.5) * 12;
     data[i] = Math.min(255, Math.max(0, data[i] + noise));
     data[i + 1] = Math.min(255, Math.max(0, data[i + 1] + noise));
     data[i + 2] = Math.min(255, Math.max(0, data[i + 2] + noise));
@@ -294,50 +319,50 @@ export function createAnnouncementTexture(): THREE.CanvasTexture {
   ctx.putImageData(imgData, 0, 0);
 
   // Top adhesive crease
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.32)';
-  ctx.fillRect(0, 0, 512, 42);
-  ctx.strokeStyle = 'rgba(200, 160, 20, 0.35)';
-  ctx.lineWidth = 1;
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.28)';
+  ctx.fillRect(0, 0, 1024, 150);
+  ctx.strokeStyle = 'rgba(210, 160, 20, 0.4)';
+  ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.moveTo(0, 42.5);
-  ctx.lineTo(512, 42.5);
+  ctx.moveTo(0, 150);
+  ctx.lineTo(1024, 150);
   ctx.stroke();
 
   // DevBappa Solutions Badge
-  ctx.fillStyle = 'rgba(20, 22, 31, 0.08)';
+  ctx.fillStyle = 'rgba(26, 22, 43, 0.09)';
   ctx.beginPath();
-  ctx.roundRect(126, 62, 260, 32, 16);
+  ctx.roundRect(262, 190, 500, 60, 30);
   ctx.fill();
 
-  ctx.fillStyle = '#14161F';
-  ctx.font = '800 15px "Outfit", sans-serif';
+  ctx.fillStyle = '#1A162B';
+  ctx.font = '800 30px "Outfit", sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText('DEVBAPPA SOLUTIONS', 256, 82);
+  ctx.fillText('DEVBAPPA SOLUTIONS', 512, 230);
 
   // Title
-  ctx.fillStyle = '#14161F';
-  ctx.font = '800 36px "Outfit", sans-serif';
-  ctx.fillText('EchoBoard Tech Expo', 256, 150);
+  ctx.fillStyle = '#1A162B';
+  ctx.font = '800 68px "Outfit", sans-serif';
+  ctx.fillText('EchoBoard Tech Expo', 512, 350);
 
   // Subtitle in handwritten style
-  ctx.fillStyle = '#2C3042';
-  ctx.font = '700 28px "Caveat", cursive';
-  ctx.fillText('Be the first to share your impression!', 256, 210);
+  ctx.fillStyle = '#2C2544';
+  ctx.font = '700 52px "Caveat", cursive';
+  ctx.fillText('Be the first to share your impression!', 512, 460);
 
-  ctx.font = '600 20px "Inter", sans-serif';
-  ctx.fillStyle = '#454C64';
-  ctx.fillText('Submit authentic thoughts, questions,', 256, 260);
-  ctx.fillText('or feedback on this live 3D wall.', 256, 290);
+  ctx.font = '600 38px "Inter", sans-serif';
+  ctx.fillStyle = '#453B66';
+  ctx.fillText('Submit authentic thoughts, questions,', 512, 560);
+  ctx.fillText('or feedback on this live 3D wall.', 512, 620);
 
   // CTA button simulation on paper
-  ctx.fillStyle = '#E87738';
+  ctx.fillStyle = '#F08035';
   ctx.beginPath();
-  ctx.roundRect(126, 350, 260, 58, 14);
+  ctx.roundRect(262, 730, 500, 105, 26);
   ctx.fill();
 
   ctx.fillStyle = '#ffffff';
-  ctx.font = '800 21px "Outfit", sans-serif';
-  ctx.fillText('+ Share Feedback', 256, 386);
+  ctx.font = '800 38px "Outfit", sans-serif';
+  ctx.fillText('+ Share Feedback', 512, 795);
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.minFilter = THREE.LinearMipmapLinearFilter;

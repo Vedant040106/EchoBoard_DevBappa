@@ -60,10 +60,16 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
     return notes.filter((n) => n.layout && typeof n.layout.worldX === 'number');
   }, [notes]);
 
-  // Compute bounding box and auto-frame camera so notes occupy 75-85% of viewport
+  // Compute bounding box and auto-frame camera so notes and pegboard occupy viewport
   const handleResetView = useCallback(() => {
+    const vpW = window.innerWidth || 1024;
+    const vpH = window.innerHeight || 768;
+    const isMobile = vpW <= 600;
+
     if (visibleNotes.length === 0) {
-      setNavTarget({ x: 0, y: 0, zoom: 38, trigger: Date.now() });
+      // Frame the periwinkle pegboard and upper studio props naturally
+      const defaultZoom = isMobile ? Math.max(16, vpW / 58) : Math.min(vpW / 78, vpH / 62);
+      setNavTarget({ x: 0, y: isMobile ? 3 : 2, zoom: Math.min(48, Math.max(18, defaultZoom)), trigger: Date.now() });
       return;
     }
 
@@ -82,27 +88,24 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
     });
 
     // Add note paper dimensions padding (note is 3.2 x 3.2 units)
-    minX -= 1.8;
-    maxX += 1.8;
-    minY -= 1.8;
-    maxY += 1.8;
+    minX -= 2.0;
+    maxX += 2.0;
+    minY -= 2.0;
+    maxY += 2.0;
 
     const centerX = (minX + maxX) / 2;
     const centerY = (minY + maxY) / 2;
 
-    const spanX = Math.max(8, maxX - minX);
-    const spanY = Math.max(8, maxY - minY);
+    const spanX = Math.max(12, maxX - minX);
+    const spanY = Math.max(12, maxY - minY);
 
     // Calculate required orthographic zoom for 75-85% fill
-    const vpW = window.innerWidth || 1024;
-    const vpH = window.innerHeight || 768;
-
-    const targetFill = 0.8;
+    const targetFill = isMobile ? 0.88 : 0.8;
     const zoomX = (vpW * targetFill) / spanX;
     const zoomY = (vpH * targetFill) / spanY;
     const idealZoom = Math.min(zoomX, zoomY);
 
-    const clampedZoom = Math.max(20, Math.min(75, idealZoom));
+    const clampedZoom = Math.max(18, Math.min(65, idealZoom));
 
     setNavTarget({
       x: centerX,
@@ -115,9 +118,11 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
   // Auto-frame camera on initial load once notes are present
   const hasAutoFramed = React.useRef(false);
   useEffect(() => {
-    if (!hasAutoFramed.current && visibleNotes.length > 0) {
+    if (!hasAutoFramed.current) {
       handleResetView();
-      hasAutoFramed.current = true;
+      if (visibleNotes.length > 0) {
+        hasAutoFramed.current = true;
+      }
     }
   }, [visibleNotes, handleResetView]);
 
@@ -181,7 +186,7 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
         style={{
           width: '100%',
           height: '100%',
-          backgroundColor: 'var(--bg-outer)',
+          backgroundColor: '#253ce6',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -195,21 +200,21 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
             width: '56px',
             height: '56px',
             borderRadius: '50%',
-            backgroundColor: 'var(--accent-orange-subtle)',
+            backgroundColor: 'rgba(255, 255, 255, 0.15)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             marginBottom: '16px',
           }}
         >
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent-orange)" strokeWidth="2">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2">
             <path d="M12 2L15 8L21 9L17 14L18 20L12 17L6 20L7 14L3 9L9 8L12 2Z" />
           </svg>
         </div>
-        <h2 style={{ fontSize: 'var(--text-title-md)', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '8px' }}>
+        <h2 style={{ fontSize: 'var(--text-title-md)', fontWeight: 800, color: '#ffffff', marginBottom: '8px' }}>
           3D Hardware Acceleration Unavailable
         </h2>
-        <p style={{ fontSize: 'var(--text-body)', color: 'var(--text-secondary)', maxWidth: '440px', marginBottom: '24px' }}>
+        <p style={{ fontSize: 'var(--text-body)', color: 'rgba(255, 255, 255, 0.85)', maxWidth: '440px', marginBottom: '24px' }}>
           Your browser does not have WebGL enabled. You can still explore all public feedback in the feedback history.
         </p>
         <button
@@ -217,7 +222,7 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
           style={{
             height: '46px',
             padding: '0 24px',
-            backgroundColor: 'var(--accent-orange)',
+            backgroundColor: '#f08035',
             border: 'none',
             borderRadius: 'var(--radius-sm)',
             color: '#ffffff',
@@ -237,7 +242,7 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
         position: 'relative',
         width: '100%',
         height: '100%',
-        backgroundColor: '#090a10',
+        backgroundColor: '#253ce6',
         overflow: 'hidden',
         userSelect: 'none',
       }}
@@ -245,9 +250,9 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
       {/* Three.js Canvas Scene */}
       <Canvas
         orthographic
-        camera={{ position: [0, 0, 20], zoom: 38 }}
+        camera={{ position: [0, 2, 20], zoom: 34 }}
         dpr={typeof window !== 'undefined' ? [1, Math.min(window.devicePixelRatio, 2)] : 1}
-        shadows
+        shadows="soft"
         gl={{
           antialias: true,
           alpha: false,
@@ -255,25 +260,30 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
         }}
         style={{ width: '100%', height: '100%', display: 'block' }}
       >
-        {/* Lights Setup: Ambient Studio + Overhead Directional */}
-        <ambientLight intensity={0.85} color="#ffffff" />
+        {/* Cool Cobalt Ambient & Hemisphere Fill */}
+        <hemisphereLight
+          args={['#7c8cff', '#1b226b', 0.95]}
+        />
+
+        {/* Primary Warm Lamp Key Light (from upper-left articulated lamp position) */}
         <directionalLight
-          position={[14, 20, 24]}
-          intensity={1.4}
+          position={[-10, 14, 16]}
+          color="#fff2df"
+          intensity={2.1}
           castShadow
-          shadow-mapSize-width={1024}
-          shadow-mapSize-height={1024}
+          shadow-mapSize-width={2048}
+          shadow-mapSize-height={2048}
           shadow-camera-near={1}
           shadow-camera-far={65}
-          shadow-camera-left={-32}
-          shadow-camera-right={32}
-          shadow-camera-top={26}
-          shadow-camera-bottom={-26}
-          shadow-bias={-0.0006}
+          shadow-camera-left={-38}
+          shadow-camera-right={38}
+          shadow-camera-top={32}
+          shadow-camera-bottom={-32}
+          shadow-bias={-0.0004}
         />
-        {/* Warm Accent Rim Light */}
-        <pointLight position={[-18, -14, 12]} intensity={0.4} color="#f97316" />
-        <pointLight position={[18, -14, 12]} intensity={0.35} color="#38bdf8" />
+
+        {/* Studio Rim Fill Light */}
+        <pointLight position={[24, -12, 12]} intensity={0.35} color="#8ce0ff" />
 
         {/* Camera Pan & Pinch-Zoom Controller */}
         <CameraController
