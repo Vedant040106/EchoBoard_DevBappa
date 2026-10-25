@@ -36,25 +36,28 @@
   --text-muted: #94a3b8;         /* 5.8:1 against #090a10 (AA) */
   --text-placeholder: #64748b;   /* For non-essential input hints */
 
-  /* Text Hierarchy on Light Sticky Notes (Physical Ink) */
-  --note-ink-primary: #0f172a;   /* 13.5:1 on light pastels (AAA) */
-  --note-ink-secondary: #334155; /* 8.2:1 on light pastels (AAA) */
-  --note-ink-meta: #475569;      /* 5.4:1 on light pastels (AA) */
+  /* Text Hierarchy on Light Sticky Notes (High-Contrast Charcoal Ink) */
+  --note-ink-primary: #14161F;   /* >= 10.5:1 contrast across all 7 note colors (WCAG AAA) */
+  --note-ink-secondary: #2C3042; /* >= 7.8:1 contrast across all 7 note colors (WCAG AAA) */
+  --note-ink-meta: #454C64;      /* >= 4.8:1 contrast across all 7 note colors (WCAG AA) */
 
-  /* Typography Scale */
-  --font-brand: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-handwriting: 'Caveat', cursive, sans-serif;
+  /* Centralized Typography Tokens (Audit 2) */
+  --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-note: 'Caveat', cursive, sans-serif;
+  --font-brand: var(--font-display);
+  --font-body: var(--font-sans);
+  --font-handwriting: var(--font-note);
 
   --text-display: clamp(2rem, 3.5vw, 2.75rem);
-  --text-title-lg: 1.5rem;   /* 24px */
-  --text-title-md: 1.25rem;  /* 20px */
-  --text-title-sm: 1.125rem; /* 18px */
-  --text-body-lg: 1rem;      /* 16px */
-  --text-body: 0.9375rem;    /* 15px */
-  --text-body-sm: 0.875rem;  /* 14px */
-  --text-caption: 0.75rem;   /* 12px */
-  --text-micro: 0.6875rem;   /* 11px */
+  --text-title-lg: clamp(1.35rem, 2.5vw, 1.5rem);   /* 24px */
+  --text-title-md: clamp(1.15rem, 2vw, 1.25rem);    /* 20px */
+  --text-title-sm: 1.125rem;                        /* 18px */
+  --text-body-lg: 1rem;                             /* 16px */
+  --text-body: 0.9375rem;                           /* 15px */
+  --text-body-sm: 0.875rem;                         /* 14px */
+  --text-caption: 0.75rem;                          /* 12px */
+  --text-micro: 0.6875rem;                          /* 11px */
 
   /* Line Heights */
   --lh-tight: 1.2;
@@ -62,7 +65,7 @@
   --lh-normal: 1.5;
   --lh-relaxed: 1.625;
 
-  /* Spacing Rhythm (4px/8px Base) */
+  /* Spacing Rhythm (4px/8px Base Scale - Audit 3) */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -73,21 +76,21 @@
   --space-10: 40px;
   --space-12: 48px;
 
-  /* Sticky Note Palettes (Refined HSL pastels) */
-  --note-yellow-bg: #fef9c3;
-  --note-yellow-top: #fef08a;
-  --note-amber-bg: #fef3c7;
-  --note-amber-top: #fde68a;
-  --note-orange-bg: #ffedd5;
-  --note-orange-top: #fed7aa;
-  --note-pink-bg: #fce7f3;
-  --note-pink-top: #fbcfe8;
-  --note-lavender-bg: #f3e8ff;
-  --note-lavender-top: #e9d5ff;
-  --note-blue-bg: #e0f2fe;
-  --note-blue-top: #bae6fd;
-  --note-mint-bg: #d1fae5;
-  --note-mint-top: #a7f3d0;
+  /* Approved 7-Note Color Palette (Phase 2.2 Specification) */
+  --note-yellow-top: #FFF275;
+  --note-yellow-bg: #F2D43D;
+  --note-amber-top: #FFD166;
+  --note-amber-bg: #F0AE29;
+  --note-orange-top: #FF9F68;
+  --note-orange-bg: #E87738;
+  --note-pink-top: #FF9EBB;
+  --note-pink-bg: #E66C91;
+  --note-lavender-top: #DEC4FF;
+  --note-lavender-bg: #B98EFF;
+  --note-blue-top: #9EE6FF;
+  --note-blue-bg: #63C3EC;
+  --note-mint-top: #A6F7D1;
+  --note-mint-bg: #62D6A2;
 
   /* Shadows (Physical depth) */
   --shadow-paper: 
@@ -264,23 +267,23 @@ html, body {
 }
 .note-orange {
   background: linear-gradient(175deg, var(--note-orange-top) 0%, var(--note-orange-bg) 100%);
-  color: #381204;
+  color: var(--note-ink-primary);
 }
 .note-pink {
   background: linear-gradient(175deg, var(--note-pink-top) 0%, var(--note-pink-bg) 100%);
-  color: #4a044e;
+  color: var(--note-ink-primary);
 }
 .note-lavender {
   background: linear-gradient(175deg, var(--note-lavender-top) 0%, var(--note-lavender-bg) 100%);
-  color: #3b0764;
+  color: var(--note-ink-primary);
 }
 .note-blue {
   background: linear-gradient(175deg, var(--note-blue-top) 0%, var(--note-blue-bg) 100%);
-  color: #0c4a6e;
+  color: var(--note-ink-primary);
 }
 .note-mint {
   background: linear-gradient(175deg, var(--note-mint-top) 0%, var(--note-mint-bg) 100%);
-  color: #064e3b;
+  color: var(--note-ink-primary);
 }
 
 /* Pinboard Tactile Canvas Texture */

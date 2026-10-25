@@ -6,8 +6,8 @@ export const config = {
   isProduction: process.env.NODE_ENV === 'production',
   port: parseInt(process.env.PORT || '4000', 10),
   databaseUrl: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/devbappa_feedback',
-  appOrigin: process.env.APP_ORIGIN || 'http://localhost:5173',
-  corsOrigins: (process.env.CORS_ORIGINS || 'http://localhost:5173,http://127.0.0.1:5173')
+  appOrigin: process.env.APP_ORIGIN || 'https://echoboarddevbappa.vercel.app',
+  corsOrigins: (process.env.CORS_ORIGINS || 'http://localhost:5173,http://127.0.0.1:5173,https://echoboarddevbappa.vercel.app')
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean),

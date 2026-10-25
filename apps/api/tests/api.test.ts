@@ -50,6 +50,13 @@ describe('API Endpoints and Security Gates', () => {
     assert.equal(typeof res.body.uptimeSeconds, 'number');
   });
 
+  it('GET /health alias returns health status', async () => {
+    const res = await testRequest('GET', '/health');
+    assert.equal([200, 503].includes(res.status), true);
+    assert.equal(typeof res.body.status, 'string');
+    assert.equal(typeof res.body.uptimeSeconds, 'number');
+  });
+
   it('GET /api/v1/admin/feedback rejects unauthenticated requests with 401', async () => {
     const res = await testRequest('GET', '/api/v1/admin/feedback');
     assert.equal(res.status, 401);

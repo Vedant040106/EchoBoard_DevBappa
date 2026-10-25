@@ -15,6 +15,9 @@ import { API_ERROR_CODES } from '@devbappa/shared';
 
 export const app = express();
 
+// Trust reverse proxy (critical for Render + Vercel HTTPS cookies and rate limiting)
+app.set('trust proxy', 1);
+
 // Security headers
 app.use(
   helmet({
@@ -23,7 +26,7 @@ app.use(
   })
 );
 
-// CORS allowlist
+// CORS allowlist supporting production Vercel frontend and local development
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -31,6 +34,7 @@ app.use(
       if (!origin) return callback(null, true);
       if (
         config.corsOrigins.includes(origin) ||
+        origin === 'https://echoboarddevbappa.vercel.app' ||
         !config.isProduction ||
         origin.startsWith('http://localhost:') ||
         origin.startsWith('http://127.0.0.1:')
@@ -53,7 +57,8 @@ app.use((req: Request, _res: Response, next) => {
   next();
 });
 
-// API Routes prefix
+// Health check alias and API Routes prefix
+app.use('/health', healthRouter);
 app.use('/api/v1/health', healthRouter);
 app.use('/api/v1/feedback', feedbackRouter);
 app.use('/api/v1/history', historyRouter);

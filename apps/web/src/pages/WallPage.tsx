@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { PublicFeedbackNote } from '@devbappa/shared';
 import { ThreePinboardCanvas } from '../components/wall/ThreePinboardCanvas.js';
@@ -10,9 +10,14 @@ interface WallPageProps {
   onRefreshNotes: () => void;
 }
 
-export const WallPage: React.FC<WallPageProps> = ({ notes, newNoteId }) => {
+export const WallPage: React.FC<WallPageProps> = ({ notes, newNoteId, onRefreshNotes }) => {
   const navigate = useNavigate();
   const [selectedNote, setSelectedNote] = useState<PublicFeedbackNote | null>(null);
+
+  // Authoritative re-sync when navigating back to wall
+  useEffect(() => {
+    onRefreshNotes();
+  }, [onRefreshNotes]);
 
   const handleSelectNote = useCallback((note: PublicFeedbackNote) => {
     setSelectedNote(note);
@@ -70,8 +75,11 @@ export const WallPage: React.FC<WallPageProps> = ({ notes, newNoteId }) => {
             transition: 'transform 0.15s ease, background-color 0.15s ease',
           }}
         >
-          <span style={{ fontSize: '18px' }}>+</span>
-          <span>Pin Note</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          <span>Share Feedback</span>
         </button>
       </div>
 
@@ -80,4 +88,3 @@ export const WallPage: React.FC<WallPageProps> = ({ notes, newNoteId }) => {
     </main>
   );
 };
-

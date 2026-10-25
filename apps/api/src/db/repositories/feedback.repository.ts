@@ -197,9 +197,9 @@ export class FeedbackRepository {
              f.message, f.color_variant, f.pin_variant, f.size_variant, f.created_at,
              l.world_x, l.world_y, l.rotation, l.width, l.height, l.layer_order
       FROM feedback f
-      INNER JOIN canvas_layout l ON l.feedback_id = f.id
+      LEFT JOIN canvas_layout l ON l.feedback_id = f.id
       WHERE f.deleted_at IS NULL AND f.visibility_status = 'visible'
-      ORDER BY l.layer_order ASC
+      ORDER BY COALESCE(l.layer_order, 1) ASC, f.created_at ASC
     `;
 
     const { rows } = await query(sql);
@@ -216,12 +216,12 @@ export class FeedbackRepository {
       pinVariant: r.pin_variant,
       sizeVariant: r.size_variant,
       layout: {
-        worldX: r.world_x,
-        worldY: r.world_y,
-        rotation: r.rotation,
-        width: r.width,
-        height: r.height,
-        layerOrder: r.layer_order,
+        worldX: r.world_x ?? 0,
+        worldY: r.world_y ?? 0,
+        rotation: r.rotation ?? 0,
+        width: r.width ?? 240,
+        height: r.height ?? 240,
+        layerOrder: r.layer_order ?? 1,
       },
     }));
   }
@@ -521,7 +521,33 @@ export class FeedbackRepository {
     if (rows.length === 0) return null;
 
     const r = rows[0];
-    const layout = await CanvasRepository.calculateNextPlacement(client);
+    const layoutRes = await q(
+      `SELECT world_x, world_y, rotation, width, height, layer_order FROM canvas_layout WHERE feedback_id = $1`,
+      [id]
+    );
+
+    let layout: {
+      worldX: number;
+      worldY: number;
+      rotation: number;
+      width: number;
+      height: number;
+      layerOrder: number;
+    };
+
+    if (layoutRes.rows.length > 0) {
+      const l = layoutRes.rows[0];
+      layout = {
+        worldX: l.world_x,
+        worldY: l.world_y,
+        rotation: l.rotation,
+        width: l.width,
+        height: l.height,
+        layerOrder: l.layer_order,
+      };
+    } else {
+      layout = await CanvasRepository.calculateNextPlacement(client);
+    }
 
     return {
       id: r.id,

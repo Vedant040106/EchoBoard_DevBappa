@@ -136,7 +136,10 @@ export const PublicHistory: React.FC = () => {
                   justifyContent: 'center',
                 }}
               >
-                ✕
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
               </button>
             )}
           </div>
@@ -234,7 +237,24 @@ export const PublicHistory: React.FC = () => {
               border: '1px solid rgba(255, 255, 255, 0.08)',
             }}
           >
-            <div style={{ fontSize: '32px', marginBottom: '8px' }}>🔍</div>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}>
+              <div
+                style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '50%',
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+              </div>
+            </div>
             <h3 style={{ fontSize: 'var(--text-title-sm)', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '6px' }}>
               No feedback found
             </h3>

@@ -24,7 +24,24 @@ export const NotFoundPage: React.FC = () => {
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.65)',
         }}
       >
-        <div style={{ fontSize: '48px', marginBottom: '16px' }}>📍</div>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+          <div
+            style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              backgroundColor: 'var(--accent-orange-subtle)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent-orange)" strokeWidth="2.2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+          </div>
+        </div>
         <h1
           style={{
             fontFamily: 'var(--font-brand)',

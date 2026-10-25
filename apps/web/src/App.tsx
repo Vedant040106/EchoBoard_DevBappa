@@ -92,7 +92,7 @@ export const App: React.FC = () => {
   });
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100vw' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', width: '100vw', overflow: 'hidden' }}>
       <Header
         connectionStatus={connectionStatus}
         queuedCount={queuedCount}
@@ -104,21 +104,22 @@ export const App: React.FC = () => {
           aria-live="polite"
           style={{
             position: 'fixed',
-            top: '72px',
+            top: '68px',
             left: '50%',
             transform: 'translateX(-50%)',
             zIndex: 9999,
             display: 'flex',
             alignItems: 'center',
             gap: '10px',
-            padding: '12px 24px',
-            backgroundColor: 'rgba(15, 23, 42, 0.94)',
+            padding: '10px 22px',
+            backgroundColor: 'rgba(15, 17, 28, 0.95)',
             backdropFilter: 'blur(16px)',
-            border: '1px solid rgba(255, 107, 0, 0.45)',
+            WebkitBackdropFilter: 'blur(16px)',
+            border: '1px solid rgba(249, 115, 22, 0.5)',
             borderRadius: 'var(--radius-full)',
-            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.7), 0 0 25px rgba(255, 107, 0, 0.3)',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.7), 0 0 25px rgba(249, 115, 22, 0.3)',
             color: '#ffffff',
-            fontSize: 'var(--text-body)',
+            fontSize: 'var(--text-body-sm)',
             fontWeight: 700,
             maxWidth: '92vw',
             textAlign: 'center',
@@ -126,9 +127,11 @@ export const App: React.FC = () => {
             pointerEvents: 'none',
           }}
         >
-          <span style={{ fontSize: '18px' }}>🎉</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fb923c" strokeWidth="2.2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+          </svg>
           <span>
-            Thank you for your feedback! Team <strong style={{ color: '#fb923c' }}>DevBappa</strong> is thankful for your feedback.
+            Thank you, <span style={{ color: '#fb923c' }}>{thankYouToast.displayName}</span>! Team DevBappa appreciates your feedback.
           </span>
         </div>
       )}

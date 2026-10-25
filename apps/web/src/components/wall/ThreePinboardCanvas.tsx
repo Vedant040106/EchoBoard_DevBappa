@@ -60,14 +60,13 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
     return notes.filter((n) => n.layout && typeof n.layout.worldX === 'number');
   }, [notes]);
 
-  // Navigate to overview of all notes
+  // Compute bounding box and auto-frame camera so notes occupy 75-85% of viewport
   const handleResetView = useCallback(() => {
     if (visibleNotes.length === 0) {
       setNavTarget({ x: 0, y: 0, zoom: 38, trigger: Date.now() });
       return;
     }
 
-    // Calculate bounds of existing notes
     let minX = Infinity;
     let maxX = -Infinity;
     let minY = Infinity;
@@ -82,13 +81,47 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
       if (y > maxY) maxY = y;
     });
 
+    // Add note paper dimensions padding (note is 3.2 x 3.2 units)
+    minX -= 1.8;
+    maxX += 1.8;
+    minY -= 1.8;
+    maxY += 1.8;
+
     const centerX = (minX + maxX) / 2;
     const centerY = (minY + maxY) / 2;
 
-    setNavTarget({ x: centerX, y: centerY, zoom: 34, trigger: Date.now() });
+    const spanX = Math.max(8, maxX - minX);
+    const spanY = Math.max(8, maxY - minY);
+
+    // Calculate required orthographic zoom for 75-85% fill
+    const vpW = window.innerWidth || 1024;
+    const vpH = window.innerHeight || 768;
+
+    const targetFill = 0.8;
+    const zoomX = (vpW * targetFill) / spanX;
+    const zoomY = (vpH * targetFill) / spanY;
+    const idealZoom = Math.min(zoomX, zoomY);
+
+    const clampedZoom = Math.max(20, Math.min(75, idealZoom));
+
+    setNavTarget({
+      x: centerX,
+      y: centerY,
+      zoom: clampedZoom,
+      trigger: Date.now(),
+    });
   }, [visibleNotes]);
 
-  // Navigate to latest note
+  // Auto-frame camera on initial load once notes are present
+  const hasAutoFramed = React.useRef(false);
+  useEffect(() => {
+    if (!hasAutoFramed.current && visibleNotes.length > 0) {
+      handleResetView();
+      hasAutoFramed.current = true;
+    }
+  }, [visibleNotes, handleResetView]);
+
+  // Navigate directly to latest note
   const handleLatestNote = useCallback(() => {
     if (visibleNotes.length === 0) return;
     const sorted = [...visibleNotes].sort(
@@ -106,7 +139,7 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
     setNavTarget((prev) => ({
       x: prev ? prev.x : 0,
       y: prev ? prev.y : 0,
-      zoom: (prev ? prev.zoom : 38) * 1.3,
+      zoom: (prev ? prev.zoom : 38) * 1.25,
       trigger: Date.now(),
     }));
   };
@@ -115,7 +148,7 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
     setNavTarget((prev) => ({
       x: prev ? prev.x : 0,
       y: prev ? prev.y : 0,
-      zoom: (prev ? prev.zoom : 38) * 0.77,
+      zoom: (prev ? prev.zoom : 38) * 0.8,
       trigger: Date.now(),
     }));
   };
@@ -141,7 +174,7 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleResetView, handleLatestNote]);
 
-  // Fallback rendering if WebGL is unavailable on older device
+  // Fallback rendering if WebGL is unavailable on device
   if (!webglSupported) {
     return (
       <div
@@ -157,7 +190,22 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
           textAlign: 'center',
         }}
       >
-        <div style={{ fontSize: '48px', marginBottom: '16px' }}>📌</div>
+        <div
+          style={{
+            width: '56px',
+            height: '56px',
+            borderRadius: '50%',
+            backgroundColor: 'var(--accent-orange-subtle)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: '16px',
+          }}
+        >
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent-orange)" strokeWidth="2">
+            <path d="M12 2L15 8L21 9L17 14L18 20L12 17L6 20L7 14L3 9L9 8L12 2Z" />
+          </svg>
+        </div>
         <h2 style={{ fontSize: 'var(--text-title-md)', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '8px' }}>
           3D Hardware Acceleration Unavailable
         </h2>
@@ -198,7 +246,7 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
       <Canvas
         orthographic
         camera={{ position: [0, 0, 20], zoom: 38 }}
-        dpr={typeof window !== 'undefined' ? Math.min(window.devicePixelRatio, 2) : 1}
+        dpr={typeof window !== 'undefined' ? [1, Math.min(window.devicePixelRatio, 2)] : 1}
         shadows
         gl={{
           antialias: true,
@@ -207,25 +255,25 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
         }}
         style={{ width: '100%', height: '100%', display: 'block' }}
       >
-        {/* Lights Setup */}
-        <ambientLight intensity={0.88} />
+        {/* Lights Setup: Ambient Studio + Overhead Directional */}
+        <ambientLight intensity={0.85} color="#ffffff" />
         <directionalLight
-          position={[12, 18, 24]}
-          intensity={1.35}
+          position={[14, 20, 24]}
+          intensity={1.4}
           castShadow
           shadow-mapSize-width={1024}
           shadow-mapSize-height={1024}
           shadow-camera-near={1}
-          shadow-camera-far={60}
-          shadow-camera-left={-28}
-          shadow-camera-right={28}
-          shadow-camera-top={24}
-          shadow-camera-bottom={-24}
-          shadow-bias={-0.0008}
+          shadow-camera-far={65}
+          shadow-camera-left={-32}
+          shadow-camera-right={32}
+          shadow-camera-top={26}
+          shadow-camera-bottom={-26}
+          shadow-bias={-0.0006}
         />
-        {/* Warm Accent Rim Bounce Light */}
-        <pointLight position={[-16, -14, 12]} intensity={0.45} color="#f97316" />
-        <pointLight position={[16, -14, 12]} intensity={0.35} color="#38bdf8" />
+        {/* Warm Accent Rim Light */}
+        <pointLight position={[-18, -14, 12]} intensity={0.4} color="#f97316" />
+        <pointLight position={[18, -14, 12]} intensity={0.35} color="#38bdf8" />
 
         {/* Camera Pan & Pinch-Zoom Controller */}
         <CameraController
@@ -233,13 +281,13 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
           onZoomChange={setZoomPercent}
         />
 
-        {/* 3D Pinboard Background Environment & Particles */}
+        {/* 3D Pinboard Background Environment, Bump Texture & Dynamic Cursor Light */}
         <PinboardEnvironment
           showAnnouncement={visibleNotes.length === 0}
           onAnnouncementClick={() => navigate('/submit')}
         />
 
-        {/* 3D Sticky Note Meshes */}
+        {/* 3D Curled Sticky Note Meshes */}
         {visibleNotes.map((note) => (
           <StickyNoteMesh
             key={note.id}
@@ -250,41 +298,49 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
         ))}
       </Canvas>
 
-      {/* Floating Canvas Navigation Controls (Responsive & Frosted Glass) */}
+      {/* Floating Canvas Navigation HUD Pill (Bottom-Center Positioned, Frosted Glass) */}
       <div
         style={{
           position: 'absolute',
           bottom: '24px',
-          left: '20px',
+          left: '50%',
+          transform: 'translateX(-50%)',
           zIndex: 40,
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
-          backgroundColor: 'var(--bg-surface-glass)',
-          backdropFilter: 'blur(12px)',
-          padding: '6px 10px',
-          borderRadius: 'var(--radius-md)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.55)',
+          backgroundColor: 'rgba(15, 17, 28, 0.92)',
+          backdropFilter: 'blur(16px)',
+          padding: '6px 12px',
+          borderRadius: 'var(--radius-full)',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.65)',
         }}
       >
         <button
           onClick={handleResetView}
           title="Reset Canvas View (R)"
           style={{
-            height: '34px',
+            height: '32px',
             padding: '0 12px',
             backgroundColor: 'rgba(255, 255, 255, 0.08)',
             border: '1px solid rgba(255, 255, 255, 0.12)',
-            borderRadius: 'var(--radius-xs)',
+            borderRadius: 'var(--radius-full)',
             color: '#ffffff',
             fontSize: 'var(--text-caption)',
             fontWeight: 700,
             cursor: 'pointer',
             transition: 'background-color 0.15s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
           }}
         >
-          Reset View
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+            <path d="M3 3v5h5" />
+          </svg>
+          <span>Reset View</span>
         </button>
 
         <button
@@ -292,20 +348,26 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
           disabled={visibleNotes.length === 0}
           title="Navigate to Latest Note (L)"
           style={{
-            height: '34px',
+            height: '32px',
             padding: '0 12px',
-            backgroundColor: 'rgba(249, 115, 22, 0.16)',
-            border: '1px solid rgba(249, 115, 22, 0.35)',
-            borderRadius: 'var(--radius-xs)',
+            backgroundColor: 'rgba(249, 115, 22, 0.18)',
+            border: '1px solid rgba(249, 115, 22, 0.4)',
+            borderRadius: 'var(--radius-full)',
             color: 'var(--accent-orange)',
             fontSize: 'var(--text-caption)',
             fontWeight: 700,
             cursor: visibleNotes.length === 0 ? 'not-allowed' : 'pointer',
             opacity: visibleNotes.length === 0 ? 0.5 : 1,
             transition: 'background-color 0.15s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
           }}
         >
-          Latest
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+          </svg>
+          <span>Latest</span>
         </button>
 
         <div
@@ -322,13 +384,13 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
           onClick={handleZoomOut}
           title="Zoom Out (-)"
           style={{
-            width: '32px',
-            height: '32px',
+            width: '28px',
+            height: '28px',
             backgroundColor: 'rgba(255, 255, 255, 0.06)',
             border: 'none',
-            borderRadius: 'var(--radius-xs)',
+            borderRadius: '50%',
             color: '#ffffff',
-            fontSize: '18px',
+            fontSize: '16px',
             fontWeight: 800,
             cursor: 'pointer',
             display: 'flex',
@@ -336,7 +398,7 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
             justifyContent: 'center',
           }}
         >
-          −
+          -
         </button>
 
         <span
@@ -355,13 +417,13 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
           onClick={handleZoomIn}
           title="Zoom In (+)"
           style={{
-            width: '32px',
-            height: '32px',
+            width: '28px',
+            height: '28px',
             backgroundColor: 'rgba(255, 255, 255, 0.06)',
             border: 'none',
-            borderRadius: 'var(--radius-xs)',
+            borderRadius: '50%',
             color: '#ffffff',
-            fontSize: '18px',
+            fontSize: '16px',
             fontWeight: 800,
             cursor: 'pointer',
             display: 'flex',
@@ -389,7 +451,7 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
           border: 0,
         }}
       >
-        <h3>Live Feedback Wall Notes ({visibleNotes.length} total)</h3>
+        <h3>EchoBoard Notes ({visibleNotes.length} total)</h3>
         <ul>
           {visibleNotes.map((note) => (
             <li key={note.id}>

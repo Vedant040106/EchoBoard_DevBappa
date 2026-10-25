@@ -34,7 +34,7 @@ async function startServer(): Promise<void> {
           env: config.env,
           origins: config.corsOrigins,
         },
-        `🚀 DevBappa Live Feedback Wall API listening on http://0.0.0.0:${config.port}`
+        `[DevBappa Live Feedback Wall API] Server listening on http://0.0.0.0:${config.port}`
       );
     });
   } catch (err) {

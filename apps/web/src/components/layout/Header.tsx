@@ -43,53 +43,58 @@ export const Header: React.FC<HeaderProps> = ({
         style={{
           position: 'relative',
           zIndex: 50,
-          height: '60px',
-          backgroundColor: 'var(--bg-surface-glass)',
-          backdropFilter: 'blur(16px)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+          height: '56px',
+          backgroundColor: 'rgba(15, 17, 28, 0.88)',
+          backdropFilter: 'blur(14px)',
+          WebkitBackdropFilter: 'blur(14px)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.10)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '0 20px',
+          padding: '0 16px',
         }}
       >
-        {/* Brand & Product Identity */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        {/* Left: Original DevBappa Solutions Logo + EchoBoard Title */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <Link
             to="/"
             style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}
             onClick={() => setMobileMenuOpen(false)}
           >
-            <Logo height={30} />
+            <Logo height={28} />
           </Link>
           <div
-            className="hidden-on-mobile"
             style={{
-              height: '16px',
+              height: '14px',
               width: '1px',
-              backgroundColor: 'rgba(255, 255, 255, 0.12)',
+              backgroundColor: 'rgba(255, 255, 255, 0.15)',
             }}
           />
-          <span
-            className="hidden-on-mobile"
+          <Link
+            to="/"
             style={{
+              textDecoration: 'none',
               fontFamily: 'var(--font-brand)',
-              fontSize: 'var(--text-body)',
+              fontSize: '15px',
               fontWeight: 800,
-              letterSpacing: '-0.01em',
-              color: 'var(--text-primary)',
+              letterSpacing: '-0.02em',
+              color: '#ffffff',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
             }}
+            onClick={() => setMobileMenuOpen(false)}
           >
-            Live Feedback Wall
-          </span>
+            <span>EchoBoard</span>
+          </Link>
 
-          {/* Compact Live Status Dot for Mobile */}
+          {/* Compact Live Status Badge for Mobile Header */}
           <div
             className="visible-on-mobile-flex"
             style={{
               alignItems: 'center',
-              gap: '6px',
-              padding: '3px 8px',
+              gap: '5px',
+              padding: '2px 8px',
               borderRadius: 'var(--radius-full)',
               backgroundColor: 'rgba(0, 0, 0, 0.5)',
               border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -111,11 +116,11 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden-on-mobile" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <nav className="hidden-on-mobile" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Link
             to="/"
             style={{
-              padding: '7px 14px',
+              padding: '6px 14px',
               borderRadius: 'var(--radius-sm)',
               fontSize: 'var(--text-caption)',
               fontWeight: location.pathname === '/' ? 700 : 500,
@@ -135,7 +140,10 @@ export const Header: React.FC<HeaderProps> = ({
           <Link
             to="/submit"
             style={{
-              padding: '7px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 16px',
               borderRadius: 'var(--radius-sm)',
               fontSize: 'var(--text-caption)',
               fontWeight: 700,
@@ -146,12 +154,16 @@ export const Header: React.FC<HeaderProps> = ({
               transition: 'background-color 0.15s ease, transform 0.15s ease',
             }}
           >
-            + Pin Note
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            <span>Share Feedback</span>
           </Link>
           <Link
             to="/history"
             style={{
-              padding: '7px 14px',
+              padding: '6px 14px',
               borderRadius: 'var(--radius-sm)',
               fontSize: 'var(--text-caption)',
               fontWeight: location.pathname === '/history' ? 700 : 500,
@@ -170,12 +182,12 @@ export const Header: React.FC<HeaderProps> = ({
           </Link>
           <Link
             to="/admin"
-            title="Admin Portal"
+            title="Admin Moderation Portal"
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              padding: '7px 12px',
+              padding: '6px 12px',
               borderRadius: 'var(--radius-sm)',
               fontSize: 'var(--text-caption)',
               fontWeight: location.pathname.startsWith('/admin') ? 700 : 500,
@@ -186,12 +198,14 @@ export const Header: React.FC<HeaderProps> = ({
               transition: 'all 0.15s ease',
             }}
           >
-            <span>🛡️</span>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
             <span>Admin</span>
           </Link>
         </nav>
 
-        {/* Desktop Connection Status and Authoritative Count */}
+        {/* Right Desktop: Connection Status and Authoritative Count */}
         <div className="hidden-on-mobile" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           {/* Connection Badge */}
           <div
@@ -211,11 +225,11 @@ export const Header: React.FC<HeaderProps> = ({
             <span
               className={effectiveStatus === 'LIVE' ? 'live-dot-pulse' : ''}
               style={{
-                width: '8px',
-                height: '8px',
+                width: '7px',
+                height: '7px',
                 borderRadius: '50%',
                 backgroundColor: getStatusColor(),
-                boxShadow: `0 0 10px ${getStatusColor()}`,
+                boxShadow: `0 0 8px ${getStatusColor()}`,
               }}
             />
             <span style={{ color: getStatusColor() }}>{effectiveStatus}</span>
@@ -242,7 +256,7 @@ export const Header: React.FC<HeaderProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              padding: '5px 14px',
+              padding: '5px 12px',
               borderRadius: 'var(--radius-sm)',
               backgroundColor: 'var(--bg-surface-elevated)',
               border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -250,7 +264,7 @@ export const Header: React.FC<HeaderProps> = ({
             title="Authoritative accepted submissions count from database"
           >
             <span style={{ fontSize: 'var(--text-micro)', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>
-              TOTAL
+              COUNT
             </span>
             <span
               style={{
@@ -265,38 +279,60 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Mobile Header Right Controls: Compact Count + Hamburger Button */}
+        {/* Right Mobile: Compact Count + Action Button + Menu Trigger */}
         <div className="visible-on-mobile-flex" style={{ alignItems: 'center', gap: '8px' }}>
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '4px',
-              padding: '4px 10px',
+              padding: '3px 8px',
               borderRadius: 'var(--radius-full)',
               backgroundColor: 'var(--bg-surface-elevated)',
               border: '1px solid rgba(255, 255, 255, 0.08)',
-              fontSize: 'var(--text-caption)',
+              fontSize: '11px',
               fontWeight: 800,
               color: 'var(--accent-yellow)',
             }}
           >
-            <span>◈</span>
             <span>{totalSubmissions}</span>
           </div>
 
+          <Link
+            to="/submit"
+            style={{
+              height: '32px',
+              padding: '0 12px',
+              backgroundColor: 'var(--accent-orange)',
+              border: 'none',
+              borderRadius: 'var(--radius-full)',
+              color: '#ffffff',
+              fontSize: '12px',
+              fontWeight: 800,
+              textDecoration: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              boxShadow: '0 2px 8px var(--accent-glow)',
+            }}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            <span>Feedback</span>
+          </Link>
+
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle navigation menu"
+            aria-label="Toggle navigation drawer"
             style={{
-              width: '40px',
-              height: '40px',
+              width: '34px',
+              height: '34px',
               borderRadius: 'var(--radius-sm)',
               border: '1px solid rgba(255, 255, 255, 0.12)',
               backgroundColor: mobileMenuOpen ? 'var(--accent-orange)' : 'var(--bg-surface-elevated)',
               color: '#ffffff',
-              fontSize: '20px',
-              fontWeight: 700,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -304,31 +340,43 @@ export const Header: React.FC<HeaderProps> = ({
               transition: 'background-color 0.15s ease',
             }}
           >
-            {mobileMenuOpen ? '✕' : '☰'}
+            {mobileMenuOpen ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            ) : (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            )}
           </button>
         </div>
       </header>
 
-      {/* Mobile Slide-down Navigation Drawer */}
+      {/* Mobile Slide-down Navigation Drawer with accessible SVG icons */}
       {mobileMenuOpen && (
         <div
           style={{
             position: 'fixed',
             inset: 0,
-            top: '60px',
+            top: '56px',
             zIndex: 9999,
-            backgroundColor: 'rgba(5, 6, 12, 0.88)',
+            backgroundColor: 'rgba(5, 6, 12, 0.92)',
             backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
             display: 'flex',
             flexDirection: 'column',
-            padding: '24px 20px',
+            padding: '20px 16px',
             animation: 'fadeIn 0.2s ease',
           }}
           onClick={(e) => {
             if (e.target === e.currentTarget) setMobileMenuOpen(false);
           }}
         >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxWidth: '400px', width: '100%', margin: '0 auto' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '380px', width: '100%', margin: '0 auto' }}>
             <Link
               to="/"
               onClick={() => setMobileMenuOpen(false)}
@@ -336,7 +384,7 @@ export const Header: React.FC<HeaderProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: '12px',
-                padding: '14px 18px',
+                padding: '12px 16px',
                 borderRadius: 'var(--radius-md)',
                 backgroundColor: location.pathname === '/' ? 'var(--accent-orange-subtle)' : 'var(--bg-surface)',
                 border: `1px solid ${location.pathname === '/' ? 'var(--accent-orange)' : 'rgba(255, 255, 255, 0.08)'}`,
@@ -346,7 +394,11 @@ export const Header: React.FC<HeaderProps> = ({
                 fontSize: 'var(--text-body)',
               }}
             >
-              <span>📌</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-orange)" strokeWidth="2.2">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <path d="M3 9h18" />
+                <path d="M9 21V9" />
+              </svg>
               <span>Live 3D Feedback Wall</span>
             </Link>
 
@@ -357,7 +409,7 @@ export const Header: React.FC<HeaderProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: '12px',
-                padding: '14px 18px',
+                padding: '12px 16px',
                 borderRadius: 'var(--radius-md)',
                 backgroundColor: 'var(--accent-orange)',
                 color: '#ffffff',
@@ -367,8 +419,11 @@ export const Header: React.FC<HeaderProps> = ({
                 boxShadow: '0 4px 14px var(--accent-glow)',
               }}
             >
-              <span>✍️</span>
-              <span>+ Pin Your Feedback</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M12 20h9" />
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+              </svg>
+              <span>+ Share Feedback</span>
             </Link>
 
             <Link
@@ -378,7 +433,7 @@ export const Header: React.FC<HeaderProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: '12px',
-                padding: '14px 18px',
+                padding: '12px 16px',
                 borderRadius: 'var(--radius-md)',
                 backgroundColor: location.pathname === '/history' ? 'var(--accent-orange-subtle)' : 'var(--bg-surface)',
                 border: `1px solid ${location.pathname === '/history' ? 'var(--accent-orange)' : 'rgba(255, 255, 255, 0.08)'}`,
@@ -388,8 +443,11 @@ export const Header: React.FC<HeaderProps> = ({
                 fontSize: 'var(--text-body)',
               }}
             >
-              <span>📜</span>
-              <span>Public Feedback History</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2.2">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+              <span>Feedback History</span>
             </Link>
 
             <Link
@@ -399,7 +457,7 @@ export const Header: React.FC<HeaderProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: '12px',
-                padding: '14px 18px',
+                padding: '12px 16px',
                 borderRadius: 'var(--radius-md)',
                 backgroundColor: 'var(--bg-surface)',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -409,15 +467,17 @@ export const Header: React.FC<HeaderProps> = ({
                 fontSize: 'var(--text-body)',
               }}
             >
-              <span>🛡️</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2.2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
               <span>Admin Moderation Portal</span>
             </Link>
 
-            {/* Event & Connection Card in Drawer */}
+            {/* Connection and sync stats in drawer */}
             <div
               style={{
-                marginTop: '16px',
-                padding: '16px',
+                marginTop: '12px',
+                padding: '14px',
                 borderRadius: 'var(--radius-md)',
                 backgroundColor: 'rgba(255, 255, 255, 0.03)',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -426,7 +486,7 @@ export const Header: React.FC<HeaderProps> = ({
                 lineHeight: 'var(--lh-normal)',
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                 <span style={{ fontWeight: 700, color: '#ffffff' }}>System Status</span>
                 <span style={{ color: getStatusColor(), fontWeight: 800 }}>{effectiveStatus}</span>
               </div>

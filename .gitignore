@@ -18,6 +18,7 @@ dist/
 build/
 out/
 .next/
+.vercel/
 
 # Logs and Diagnostics
 logs/
