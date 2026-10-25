@@ -378,3 +378,192 @@ html, body {
   }
 }
 
+/* ============================================================== */
+/* 3D PEGBOARD STUDIO DESIGN SYSTEM (Prompt 1 Shared Spec)        */
+/* ============================================================== */
+
+/* Studio Wall Backdrop */
+.studio-wall-backdrop {
+  min-height: 100%;
+  width: 100%;
+  background-color: #253ce6;
+  background-image: 
+    radial-gradient(circle at 14% 8%, rgba(255, 240, 216, 0.28) 0%, rgba(37, 60, 230, 0) 48%),
+    radial-gradient(circle at 86% 92%, rgba(12, 16, 68, 0.65) 0%, rgba(37, 60, 230, 0) 50%);
+  background-attachment: fixed;
+  color: #f8fafc;
+  overflow-y: auto;
+  position: relative;
+}
+
+/* Raised 3D Periwinkle Pegboard Panel */
+.pegboard-panel {
+  position: relative;
+  background-color: #634ee2;
+  background-image:
+    radial-gradient(circle, #23215a 3.5px, transparent 4px),
+    radial-gradient(circle at calc(50% + 1px) calc(50% + 1px), rgba(255, 255, 255, 0.16) 4.5px, transparent 5px),
+    linear-gradient(165deg, #7662f4 0%, #634ee2 100%);
+  background-size: 28px 28px, 28px 28px, 100% 100%;
+  background-position: 0 0, 0 0, 0 0;
+  border-top: 2px solid rgba(255, 255, 255, 0.28);
+  border-left: 2px solid rgba(255, 255, 255, 0.18);
+  border-bottom: 8px solid #3f2eb0;
+  border-right: 6px solid #4835c4;
+  border-radius: 20px;
+  box-shadow: 14px 22px 38px rgba(12, 16, 68, 0.65);
+}
+
+/* Tactile 3D Studio Push-Buttons */
+.btn-3d-studio {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-brand);
+  font-weight: 800;
+  font-size: var(--text-body-sm);
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 10px;
+  padding: 10px 18px;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.15s ease;
+  user-select: none;
+  position: relative;
+  letter-spacing: -0.01em;
+}
+
+.btn-3d-studio:active:not(:disabled) {
+  transform: translateY(3px) !important;
+}
+
+/* Terracotta Red-Orange */
+.btn-3d-orange {
+  background-color: #f04328;
+  color: #ffffff;
+  border-top: 1px solid rgba(255, 255, 255, 0.35);
+  border-bottom: 4px solid #a82410;
+  box-shadow: 0 4px 12px rgba(168, 36, 16, 0.45);
+}
+.btn-3d-orange:active:not(:disabled) {
+  border-bottom-width: 1px;
+  box-shadow: 0 1px 4px rgba(168, 36, 16, 0.3);
+}
+
+/* Periwinkle */
+.btn-3d-periwinkle {
+  background-color: #7c68ff;
+  color: #ffffff;
+  border-top: 1px solid rgba(255, 255, 255, 0.35);
+  border-bottom: 4px solid #4634b5;
+  box-shadow: 0 4px 12px rgba(70, 52, 181, 0.45);
+}
+.btn-3d-periwinkle:active:not(:disabled) {
+  border-bottom-width: 1px;
+  box-shadow: 0 1px 4px rgba(70, 52, 181, 0.3);
+}
+
+/* Mint Sage */
+.btn-3d-mint {
+  background-color: #4cd995;
+  color: #14182e;
+  border-top: 1px solid rgba(255, 255, 255, 0.4);
+  border-bottom: 4px solid #1e8e58;
+  box-shadow: 0 4px 12px rgba(30, 142, 88, 0.4);
+}
+.btn-3d-mint:active:not(:disabled) {
+  border-bottom-width: 1px;
+  box-shadow: 0 1px 4px rgba(30, 142, 88, 0.3);
+}
+
+/* Coral Danger */
+.btn-3d-coral {
+  background-color: #ff5d68;
+  color: #ffffff;
+  border-top: 1px solid rgba(255, 255, 255, 0.35);
+  border-bottom: 4px solid #b02532;
+  box-shadow: 0 4px 12px rgba(176, 37, 50, 0.45);
+}
+.btn-3d-coral:active:not(:disabled) {
+  border-bottom-width: 1px;
+  box-shadow: 0 1px 4px rgba(176, 37, 50, 0.3);
+}
+
+/* Violet Floating Shelf Button */
+.btn-3d-violet {
+  background-color: #6e54e8;
+  color: #ffffff;
+  border-top: 1px solid rgba(255, 255, 255, 0.35);
+  border-bottom: 4px solid #432fa8;
+  box-shadow: 0 4px 12px rgba(67, 47, 168, 0.45);
+}
+.btn-3d-violet:active:not(:disabled) {
+  border-bottom-width: 1px;
+  box-shadow: 0 1px 4px rgba(67, 47, 168, 0.3);
+}
+
+/* Ghost Studio Button */
+.btn-3d-ghost {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 3px solid rgba(18, 14, 52, 0.5);
+  box-shadow: 0 3px 8px rgba(12, 16, 68, 0.3);
+}
+.btn-3d-ghost:active:not(:disabled) {
+  border-bottom-width: 1px;
+  box-shadow: 0 1px 3px rgba(12, 16, 68, 0.2);
+}
+
+/* Disabled 3D Button State */
+.btn-3d-studio:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Tactile Studio Off-White Pad Card */
+.studio-pad-card {
+  background-color: #f7f6ff;
+  color: #181528;
+  border-radius: 16px;
+  border-top: 2px solid #ffffff;
+  border-left: 1px solid #ffffff;
+  border-bottom: 6px solid #c5c0e8;
+  border-right: 2px solid #ded9f5;
+  box-shadow: 0 16px 36px rgba(14, 16, 60, 0.35);
+}
+
+/* Recessed Studio Input Well */
+.studio-input-well {
+  width: 100%;
+  background-color: #eae8f8;
+  border: 1.5px solid rgba(99, 78, 226, 0.25);
+  box-shadow: inset 0 3px 5px rgba(20, 18, 56, 0.16);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  font-weight: 600;
+  color: #181528;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.studio-input-well::placeholder {
+  color: #8b85a8;
+  font-weight: 500;
+}
+.studio-input-well:focus {
+  outline: none;
+  border-color: #634ee2;
+  box-shadow: inset 0 3px 5px rgba(20, 18, 56, 0.16), 0 0 0 3px rgba(99, 78, 226, 0.35);
+}
+
+/* Top Floating Violet Shelf Header */
+.studio-shelf-header {
+  background-color: #6e54e8;
+  border-top: 2px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 6px solid #432fa8;
+  box-shadow: 0 8px 24px rgba(14, 18, 72, 0.45);
+}
+

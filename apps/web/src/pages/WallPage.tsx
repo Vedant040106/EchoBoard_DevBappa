@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import type { PublicFeedbackNote } from '@devbappa/shared';
 import { ThreePinboardCanvas } from '../components/wall/ThreePinboardCanvas.js';
 import { NoteDetailModal } from '../components/sticky-note/NoteDetailModal.js';
+import { StudioIntroSequence, type IntroStage } from '../components/intro/StudioIntroSequence.js';
 
 interface WallPageProps {
   notes: PublicFeedbackNote[];
@@ -13,6 +14,7 @@ interface WallPageProps {
 export const WallPage: React.FC<WallPageProps> = ({ notes, newNoteId, onRefreshNotes }) => {
   const navigate = useNavigate();
   const [selectedNote, setSelectedNote] = useState<PublicFeedbackNote | null>(null);
+  const [introStage, setIntroStage] = useState<IntroStage>('initial');
 
   // Authoritative re-sync when navigating back to wall
   useEffect(() => {
@@ -38,11 +40,15 @@ export const WallPage: React.FC<WallPageProps> = ({ notes, newNoteId, onRefreshN
         backgroundColor: '#090a10',
       }}
     >
+      {/* DevBappa Logo Awakening -> FLIP Morph Header Landing Intro Sequence */}
+      <StudioIntroSequence onStageChange={setIntroStage} />
+
       {/* Immersive 3D Spatial Feedback Wall */}
       <ThreePinboardCanvas
         notes={notes}
         newNoteId={newNoteId}
         onSelectNote={handleSelectNote}
+        introStage={introStage}
       />
 
       {/* Mobile Floating Action Button (FAB) for fast feedback submission */}

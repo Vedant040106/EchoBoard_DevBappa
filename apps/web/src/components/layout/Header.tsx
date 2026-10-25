@@ -58,6 +58,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <Link
             to="/"
+            id="header-devbappa-logo"
             style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}
             onClick={() => setMobileMenuOpen(false)}
           >

@@ -1,17 +1,56 @@
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import { Canvas } from '@react-three/fiber';
+import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
 import { useNavigate } from 'react-router-dom';
 import type { PublicFeedbackNote } from '@devbappa/shared';
 import { StickyNoteMesh } from './StickyNoteMesh.js';
 import { PinboardEnvironment } from './PinboardEnvironment.js';
 import { CameraController } from './CameraController.js';
 import { clearTextureCache } from './noteTexture.js';
+import type { IntroStage } from '../intro/StudioIntroSequence.js';
 
 interface ThreePinboardCanvasProps {
   notes: PublicFeedbackNote[];
   newNoteId: string | null;
   onSelectNote: (note: PublicFeedbackNote) => void;
+  introStage?: IntroStage;
 }
+
+/**
+ * Animated Studio Key Light that ramps up intensity during Stage 2 opening transition.
+ */
+const StudioKeyLight: React.FC<{ targetIntensity: number }> = ({ targetIntensity }) => {
+  const lightRef = useRef<THREE.DirectionalLight>(null);
+  useFrame((_state, delta) => {
+    if (lightRef.current) {
+      lightRef.current.intensity = THREE.MathUtils.damp(
+        lightRef.current.intensity,
+        targetIntensity,
+        4.0,
+        delta
+      );
+    }
+  });
+
+  return (
+    <directionalLight
+      ref={lightRef}
+      position={[-10, 14, 16]}
+      color="#fff2df"
+      intensity={targetIntensity <= 0.5 ? 0.3 : 2.1}
+      castShadow
+      shadow-mapSize-width={2048}
+      shadow-mapSize-height={2048}
+      shadow-camera-near={1}
+      shadow-camera-far={65}
+      shadow-camera-left={-38}
+      shadow-camera-right={38}
+      shadow-camera-top={32}
+      shadow-camera-bottom={-32}
+      shadow-bias={-0.0004}
+    />
+  );
+};
 
 /**
  * Checks whether WebGL is supported in current client environment.
@@ -32,6 +71,7 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
   notes,
   newNoteId,
   onSelectNote,
+  introStage = 'complete',
 }) => {
   const navigate = useNavigate();
   const [webglSupported, setWebglSupported] = useState(true);
@@ -115,16 +155,19 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
     });
   }, [visibleNotes]);
 
-  // Auto-frame camera on initial load once notes are present
+  // Auto-frame camera on initial load / intro stages
   const hasAutoFramed = React.useRef(false);
   useEffect(() => {
-    if (!hasAutoFramed.current) {
+    if (introStage === 'stage2' || introStage === 'returning') {
+      handleResetView();
+      hasAutoFramed.current = true;
+    } else if (introStage === 'complete' && !hasAutoFramed.current) {
       handleResetView();
       if (visibleNotes.length > 0) {
         hasAutoFramed.current = true;
       }
     }
-  }, [visibleNotes, handleResetView]);
+  }, [visibleNotes, handleResetView, introStage]);
 
   // Navigate directly to latest note
   const handleLatestNote = useCallback(() => {
@@ -265,30 +308,17 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
           args={['#7c8cff', '#1b226b', 0.95]}
         />
 
-        {/* Primary Warm Lamp Key Light (from upper-left articulated lamp position) */}
-        <directionalLight
-          position={[-10, 14, 16]}
-          color="#fff2df"
-          intensity={2.1}
-          castShadow
-          shadow-mapSize-width={2048}
-          shadow-mapSize-height={2048}
-          shadow-camera-near={1}
-          shadow-camera-far={65}
-          shadow-camera-left={-38}
-          shadow-camera-right={38}
-          shadow-camera-top={32}
-          shadow-camera-bottom={-32}
-          shadow-bias={-0.0004}
-        />
+        {/* Primary Warm Lamp Key Light (ramps up from 0.3 to 2.1 during opening transition) */}
+        <StudioKeyLight targetIntensity={introStage === 'stage1' ? 0.3 : 2.1} />
 
         {/* Studio Rim Fill Light */}
         <pointLight position={[24, -12, 12]} intensity={0.35} color="#8ce0ff" />
 
-        {/* Camera Pan & Pinch-Zoom Controller */}
+        {/* Camera Pan & Pinch-Zoom Controller with Physics Inertia & Cursor Anchoring */}
         <CameraController
           navTarget={navTarget}
           onZoomChange={setZoomPercent}
+          isOpeningDolly={introStage === 'stage1'}
         />
 
         {/* 3D Pinboard Background Environment, Bump Texture & Dynamic Cursor Light */}
