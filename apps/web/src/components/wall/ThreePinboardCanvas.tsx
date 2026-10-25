@@ -96,8 +96,8 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
     const centerX = (minX + maxX) / 2;
     const centerY = (minY + maxY) / 2;
 
-    const spanX = Math.max(12, maxX - minX);
-    const spanY = Math.max(12, maxY - minY);
+    const spanX = Math.max(26, maxX - minX);
+    const spanY = Math.max(22, maxY - minY);
 
     // Calculate required orthographic zoom for 75-85% fill
     const targetFill = isMobile ? 0.88 : 0.8;
@@ -105,7 +105,7 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
     const zoomY = (vpH * targetFill) / spanY;
     const idealZoom = Math.min(zoomX, zoomY);
 
-    const clampedZoom = Math.max(18, Math.min(65, idealZoom));
+    const clampedZoom = Math.max(18, Math.min(46, idealZoom));
 
     setNavTarget({
       x: centerX,
@@ -136,7 +136,7 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
     const targetX = (newest.layout.worldX || 0) / 75;
     const targetY = -(newest.layout.worldY || 0) / 75;
 
-    setNavTarget({ x: targetX, y: targetY, zoom: 55, trigger: Date.now() });
+    setNavTarget({ x: targetX, y: targetY, zoom: 44, trigger: Date.now() });
   }, [visibleNotes]);
 
   // Zoom In / Zoom Out controls

@@ -128,7 +128,8 @@ export const StickyNoteMesh: React.FC<StickyNoteMeshProps> = ({ note, isNew, onS
     // Live socket drop Z offset: drops from +4.5 down to 0
     const dropZ = (1 - animProgress) * 4.5;
     const hoverZ = hovered ? 0.35 : 0;
-    const targetZ = layerZ + dropZ + hoverZ;
+    const baseElevation = 0.04;
+    const targetZ = baseElevation + layerZ + dropZ + hoverZ;
 
     // Smooth Z position lerp
     meshGroupRef.current.position.z = THREE.MathUtils.lerp(
@@ -160,10 +161,12 @@ export const StickyNoteMesh: React.FC<StickyNoteMeshProps> = ({ note, isNew, onS
     );
   });
 
+  const baseElevation = 0.04;
+
   return (
     <group
       ref={meshGroupRef}
-      position={[targetX, targetY, layerZ]}
+      position={[targetX, targetY, baseElevation + layerZ]}
       rotation={[0, 0, baseRotationZ]}
     >
       {/* 1. Impact shockwave ring for live socket arrival */}

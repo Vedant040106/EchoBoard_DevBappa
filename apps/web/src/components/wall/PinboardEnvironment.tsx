@@ -33,7 +33,6 @@ const MidCenturyWallClock: React.FC<{ position: [number, number, number] }> = ({
     }
   });
 
-  // 12 hour tick marks
   const hourTicks = useMemo(() => {
     const ticks: Array<{ angle: number; isMajor: boolean }> = [];
     for (let i = 0; i < 12; i++) {
@@ -112,11 +111,11 @@ const TopLeftStudioShelf: React.FC<{ position: [number, number, number] }> = ({ 
       </mesh>
 
       {/* Two Cylindrical Wall Brackets */}
-      <mesh position={[-4.5, -1.1, -0.2]} rotation={[0, 0, 0]} castShadow>
+      <mesh position={[-4.5, -1.1, -0.2]} castShadow>
         <cylinderGeometry args={[0.22, 0.22, 1.8, 16]} />
         <meshStandardMaterial color="#4e38b3" roughness={0.6} />
       </mesh>
-      <mesh position={[4.5, -1.1, -0.2]} rotation={[0, 0, 0]} castShadow>
+      <mesh position={[4.5, -1.1, -0.2]} castShadow>
         <cylinderGeometry args={[0.22, 0.22, 1.8, 16]} />
         <meshStandardMaterial color="#4e38b3" roughness={0.6} />
       </mesh>
@@ -130,7 +129,7 @@ const TopLeftStudioShelf: React.FC<{ position: [number, number, number] }> = ({ 
       {/* Glossy Red-Orange Articulated Desk Lamp */}
       <group position={[2.5, 0.3, 0.2]}>
         {/* Heavy Circular Base */}
-        <mesh position={[0, 0.15, 0]} rotation={[0, 0, 0]} castShadow receiveShadow>
+        <mesh position={[0, 0.15, 0]} castShadow receiveShadow>
           <cylinderGeometry args={[1.3, 1.4, 0.3, 24]} />
           <meshStandardMaterial color="#f03a24" roughness={0.22} metalness={0.12} />
         </mesh>
@@ -141,7 +140,7 @@ const TopLeftStudioShelf: React.FC<{ position: [number, number, number] }> = ({ 
           <meshStandardMaterial color="#d42c18" roughness={0.3} metalness={0.2} />
         </mesh>
 
-        {/* Lower Articulated Arm (angled towards right/center) */}
+        {/* Lower Articulated Arm */}
         <group position={[0, 0.45, 0]} rotation={[0, 0, -0.45]}>
           <mesh position={[0, 1.9, 0]} castShadow>
             <cylinderGeometry args={[0.1, 0.1, 3.8, 16]} />
@@ -154,7 +153,7 @@ const TopLeftStudioShelf: React.FC<{ position: [number, number, number] }> = ({ 
             <meshStandardMaterial color="#d42c18" roughness={0.3} metalness={0.2} />
           </mesh>
 
-          {/* Upper Arm (angled down towards pegboard) */}
+          {/* Upper Arm */}
           <group position={[0, 3.8, 0]} rotation={[0, 0, 1.05]}>
             <mesh position={[0, 1.6, 0]} castShadow>
               <cylinderGeometry args={[0.09, 0.09, 3.2, 16]} />
@@ -194,7 +193,7 @@ const TopLeftStudioShelf: React.FC<{ position: [number, number, number] }> = ({ 
               <pointLight
                 position={[0, 0.8, 0]}
                 intensity={1.8}
-                distance={18}
+                distance={20}
                 color="#fff5d6"
                 decay={2}
               />
@@ -282,35 +281,32 @@ export const PinboardEnvironment: React.FC<PinboardEnvironmentProps> = ({
   const announcementTexture = useMemo(() => createAnnouncementTexture(), []);
 
   // Recessed Pegboard Holes Grid Layout Setup
-  // Pegboard dimensions: 64 wide x 44 high. Step = 2.4.
-  // Generates crisp regular grid of dark-indigo recessed cylindrical holes.
-  const pegHolesCount = useMemo(() => {
-    let count = 0;
-    for (let x = -29; x <= 29; x += 2.4) {
-      for (let y = -19; y <= 19; y += 2.4) {
-        count++;
+  // Pegboard dimensions: 76 wide x 52 high. Step = 2.4.
+  // Generates regular grid of dark-indigo recessed cylindrical holes slightly sunken behind z = 0.
+  const { pegHolesCount, positions } = useMemo(() => {
+    const posList: Array<[number, number]> = [];
+    for (let x = -35; x <= 35; x += 2.4) {
+      for (let y = -23; y <= 23; y += 2.4) {
+        posList.push([x, y]);
       }
     }
-    return count;
+    return { pegHolesCount: posList.length, positions: posList };
   }, []);
 
   useEffect(() => {
     if (!pegHolesMeshRef.current) return;
     const dummy = new THREE.Object3D();
-    let idx = 0;
 
-    for (let x = -29; x <= 29; x += 2.4) {
-      for (let y = -19; y <= 19; y += 2.4) {
-        // Position cylindrical holes slightly sunken into the periwinkle pegboard
-        dummy.position.set(x, y, 0.17);
-        dummy.rotation.set(Math.PI / 2, 0, 0);
-        dummy.updateMatrix();
-        pegHolesMeshRef.current.setMatrixAt(idx, dummy.matrix);
-        idx++;
-      }
-    }
+    positions.forEach(([x, y], idx) => {
+      // Sunken recessed cylinder holes behind Z = 0 (into the pegboard depth from z = -0.02 down to -0.27)
+      dummy.position.set(x, y, -0.03);
+      dummy.rotation.set(Math.PI / 2, 0, 0);
+      dummy.updateMatrix();
+      pegHolesMeshRef.current!.setMatrixAt(idx, dummy.matrix);
+    });
+
     pegHolesMeshRef.current.instanceMatrix.needsUpdate = true;
-  }, []);
+  }, [positions]);
 
   // Frame loop: update dynamic cursor light position
   useFrame(() => {
@@ -339,11 +335,11 @@ export const PinboardEnvironment: React.FC<PinboardEnvironmentProps> = ({
 
   return (
     <group>
-      {/* Dynamic Cursor Light: Gently illuminates paper curls as visitor moves pointer */}
+      {/* Dynamic Cursor Light */}
       <pointLight
         ref={cursorLightRef}
         intensity={0.8}
-        distance={12}
+        distance={14}
         decay={2}
         color="#fff0d4"
       />
@@ -352,7 +348,7 @@ export const PinboardEnvironment: React.FC<PinboardEnvironmentProps> = ({
       {/* 1. STUDIO WALL BACKGROUND (Rich Saturated Cobalt/Ultramarine)  */}
       {/* ============================================================== */}
       <mesh position={[0, 4, -0.6]} receiveShadow>
-        <planeGeometry args={[190, 130]} />
+        <planeGeometry args={[220, 160]} />
         <meshStandardMaterial
           color="#253ce6"
           roughness={0.85}
@@ -361,15 +357,15 @@ export const PinboardEnvironment: React.FC<PinboardEnvironmentProps> = ({
       </mesh>
 
       {/* Clean White Architectural Baseboard Trim along bottom edge */}
-      <group position={[0, -29, -0.05]}>
+      <group position={[0, -32, -0.05]}>
         {/* Main Baseboard Board */}
         <mesh position={[0, 0, 0]} castShadow receiveShadow>
-          <boxGeometry args={[190, 3.2, 0.65]} />
+          <boxGeometry args={[220, 3.4, 0.65]} />
           <meshStandardMaterial color="#ffffff" roughness={0.32} metalness={0.02} />
         </mesh>
         {/* Upper Molded Trim Lip */}
-        <mesh position={[0, 1.7, 0.1]} castShadow receiveShadow>
-          <boxGeometry args={[190, 0.45, 0.85]} />
+        <mesh position={[0, 1.8, 0.1]} castShadow receiveShadow>
+          <boxGeometry args={[220, 0.45, 0.85]} />
           <meshStandardMaterial color="#f8fafc" roughness={0.3} metalness={0.02} />
         </mesh>
       </group>
@@ -378,20 +374,20 @@ export const PinboardEnvironment: React.FC<PinboardEnvironmentProps> = ({
       {/* 2. RAISED 3D PERIWINKLE PEGBOARD                              */}
       {/* ============================================================== */}
       {/* Deep Soft Indigo Drop Shadow cast onto Cobalt Wall behind */}
-      <mesh position={[1.4, -1.4, -0.45]}>
-        <planeGeometry args={[68, 48]} />
+      <mesh position={[1.8, -1.8, -0.45]}>
+        <planeGeometry args={[80, 56]} />
         <meshBasicMaterial color="#141a5a" transparent opacity={0.42} />
       </mesh>
 
-      {/* Beveled Perimeter Frame Border */}
-      <mesh position={[0, 0, -0.08]} castShadow receiveShadow>
-        <boxGeometry args={[66.2, 46.2, 0.35]} />
+      {/* Beveled Perimeter Frame Border (front at z = -0.02) */}
+      <mesh position={[0, 0, -0.2]} castShadow receiveShadow>
+        <boxGeometry args={[78.2, 54.2, 0.35]} />
         <meshStandardMaterial color="#5c48e0" roughness={0.7} metalness={0.04} />
       </mesh>
 
-      {/* Main Raised 3D Periwinkle Pegboard Slab */}
-      <mesh position={[0, 0, 0]} castShadow receiveShadow>
-        <boxGeometry args={[64, 44, 0.35]} />
+      {/* Main Raised 3D Periwinkle Pegboard Slab (Front face sits exactly at Z = 0) */}
+      <mesh position={[0, 0, -0.175]} castShadow receiveShadow>
+        <boxGeometry args={[76, 52, 0.35]} />
         <meshStandardMaterial
           color="#705cf0"
           roughness={0.68}
@@ -400,14 +396,14 @@ export const PinboardEnvironment: React.FC<PinboardEnvironmentProps> = ({
       </mesh>
 
       {/* ============================================================== */}
-      {/* 3. RECESSED PEGBOARD HOLES (InstancedMesh of dark cylinders)   */}
+      {/* 3. RECESSED PEGBOARD HOLES (InstancedMesh sunken behind z = 0) */}
       {/* ============================================================== */}
       <instancedMesh
         ref={pegHolesMeshRef}
         args={[undefined, undefined, pegHolesCount]}
         receiveShadow
       >
-        <cylinderGeometry args={[0.18, 0.18, 0.36, 16]} />
+        <cylinderGeometry args={[0.2, 0.2, 0.25, 16]} />
         <meshStandardMaterial
           color="#23215a"
           roughness={0.92}
@@ -418,20 +414,15 @@ export const PinboardEnvironment: React.FC<PinboardEnvironmentProps> = ({
       {/* ============================================================== */}
       {/* 4. 3D STUDIO FRAMING PROPS (Mounted on Cobalt Wall Above)       */}
       {/* ============================================================== */}
-      {/* Top-Left Shelf & Articulated Architect Lamp */}
-      <TopLeftStudioShelf position={[-20, 27.5, 0.2]} />
-
-      {/* Top-Center Mid-Century Wall Clock */}
-      <MidCenturyWallClock position={[0, 28.5, 0.1]} />
-
-      {/* Top-Right Mini Shelf & Planter */}
-      <TopRightStudioShelf position={[20, 27.5, 0.2]} />
+      <TopLeftStudioShelf position={[-24, 31.5, 0.2]} />
+      <MidCenturyWallClock position={[0, 32.5, 0.1]} />
+      <TopRightStudioShelf position={[24, 31.5, 0.2]} />
 
       {/* ============================================================== */}
       {/* 5. CENTER ANNOUNCEMENT NOTE (When wall is empty)               */}
       {/* ============================================================== */}
       {showAnnouncement && (
-        <group position={[0, 0, 0.25]} rotation={[0, 0, -0.015]}>
+        <group position={[0, 0, 0.04]} rotation={[0, 0, -0.015]}>
           {/* Top adhesive contact shadow */}
           <mesh position={[0, 1.8, -0.01]}>
             <planeGeometry args={[4.4, 0.4]} />
