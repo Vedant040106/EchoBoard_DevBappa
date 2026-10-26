@@ -48,11 +48,9 @@ export const NoteDetailModal: React.FC<NoteDetailModalProps> = ({ note, onClose 
     event,
     createdAt,
     colorVariant,
-    pinVariant,
   } = note;
 
   const colorClass = `note-${colorVariant || 'yellow'}`;
-  const pinClass = `pushpin-${pinVariant || 'brass'}`;
 
   const formattedDate = new Date(createdAt).toLocaleString(undefined, {
     dateStyle: 'medium',

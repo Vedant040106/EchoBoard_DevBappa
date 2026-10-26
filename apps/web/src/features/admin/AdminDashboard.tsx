@@ -6,6 +6,7 @@ import type {
   AdminEventItem,
   AuditEventItem,
   Role,
+  DoodleType,
 } from '@devbappa/shared';
 import { api } from '../../services/api.js';
 import { Logo } from '../../components/brand/Logo.js';
@@ -32,6 +33,123 @@ const SvgStar: React.FC<{ filled: boolean; size?: number }> = ({ filled, size = 
     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
   </svg>
 );
+
+const DoodleSvg: React.FC<{ type?: DoodleType | string; size?: number; color?: string }> = ({
+  type,
+  size = 16,
+  color = 'currentColor',
+}) => {
+  switch (type) {
+    case 'lightning':
+      return (
+        <svg
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke={color}
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+        </svg>
+      );
+    case 'heart':
+      return (
+        <svg
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke={color}
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+        </svg>
+      );
+    case 'spark':
+      return (
+        <svg
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke={color}
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <line x1="12" y1="2" x2="12" y2="6" />
+          <line x1="12" y1="18" x2="12" y2="22" />
+          <line x1="4.93" y1="4.93" x2="7.76" y2="7.76" />
+          <line x1="16.24" y1="16.24" x2="19.07" y2="19.07" />
+          <line x1="2" y1="12" x2="6" y2="12" />
+          <line x1="18" y1="12" x2="22" y2="12" />
+          <line x1="4.93" y1="19.07" x2="7.76" y2="16.24" />
+          <line x1="16.24" y1="7.76" x2="19.07" y2="4.93" />
+        </svg>
+      );
+    case 'spiral':
+      return (
+        <svg
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke={color}
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M12 2a10 10 0 1 0 10 10 7.5 7.5 0 1 0-7.5-7.5 5 5 0 1 0 5 5 2.5 2.5 0 1 0-2.5-2.5" />
+        </svg>
+      );
+    case 'lightbulb':
+      return (
+        <svg
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke={color}
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M9 18h6" />
+          <path d="M10 22h4" />
+          <path d="M12 2a7 7 0 0 0-7 7c0 2.4 1.2 4.5 3 5.7V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.3c1.8-1.2 3-3.3 3-5.7a7 7 0 0 0-7-7z" />
+        </svg>
+      );
+    case 'none':
+      return null;
+    case 'check':
+    default:
+      return (
+        <svg
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke={color}
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+      );
+  }
+};
 
 export const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -297,6 +415,224 @@ export const AdminDashboard: React.FC = () => {
       await loadAnalytics();
     } catch (err: any) {
       alert(err.message || 'Action failed');
+    }
+  };
+
+  // Export Helpers
+  const handleExportCsv = (itemsToExport: AdminFeedbackItem[], filenamePrefix: string) => {
+    if (itemsToExport.length === 0) {
+      alert('No feedback records available to export.');
+      return;
+    }
+    const headers = [
+      'Feedback ID',
+      'Public Display Name',
+      'Full Name (Confidential)',
+      'Role',
+      'Department / Institution',
+      'Designation',
+      'Rating',
+      'Doodle Stamp',
+      'Message',
+      'Event Name',
+      'Event Venue',
+      'Status',
+      'Created At',
+    ];
+
+    const escapeCsv = (val: any) => {
+      const str = String(val ?? '');
+      return `"${str.replace(/"/g, '""')}"`;
+    };
+
+    const rows = itemsToExport.map((item) => {
+      const isDeleted = !!item.deletedAt;
+      const isVisible = item.visibilityStatus === 'visible' && !item.deletedAt;
+      const status = isDeleted ? 'DELETED' : isVisible ? 'VISIBLE' : 'HIDDEN';
+      const dept = item.department || item.institutionName || '';
+      const desig = item.designation || '';
+      const eventName = item.event?.name || 'Tech Expo';
+      const eventVenue = item.event?.venue || 'VPPCOE&VA, Sion';
+      const doodle = item.doodleType || 'check';
+      const dateStr = new Date(item.createdAt).toISOString();
+
+      return [
+        escapeCsv(item.id),
+        escapeCsv(item.publicDisplayName),
+        escapeCsv(item.fullName),
+        escapeCsv(item.role),
+        escapeCsv(dept),
+        escapeCsv(desig),
+        escapeCsv(item.rating || 5),
+        escapeCsv(doodle),
+        escapeCsv(item.message),
+        escapeCsv(eventName),
+        escapeCsv(eventVenue),
+        escapeCsv(status),
+        escapeCsv(dateStr),
+      ].join(',');
+    });
+
+    const csvContent = [headers.join(','), ...rows].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    const today = new Date().toISOString().split('T')[0];
+    link.setAttribute('download', `${filenamePrefix}_${today}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportEventCsv = async (evt: AdminEventItem) => {
+    try {
+      const res = await api.adminGetFeedback({ eventId: evt.id, limit: 1000 });
+      const items = res.items || [];
+      handleExportCsv(items, `echoboard_${evt.slug || evt.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}`);
+    } catch (err: any) {
+      alert(err.message || 'Failed to export event CSV');
+    }
+  };
+
+  const handlePrintSummaryReport = async (evt: AdminEventItem) => {
+    try {
+      const res = await api.adminGetFeedback({ eventId: evt.id, limit: 1000 });
+      const items = res.items || [];
+
+      const roleCounts: Record<string, number> = {};
+      items.forEach((i) => {
+        roleCounts[i.role] = (roleCounts[i.role] || 0) + 1;
+      });
+
+      const ratings = items.map((i) => i.rating || 5);
+      const avgRating =
+        ratings.length > 0
+          ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1)
+          : '5.0';
+
+      const topQuotes = items
+        .filter((i) => i.visibilityStatus === 'visible' && !i.deletedAt)
+        .slice(0, 6);
+
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        alert('Please allow popups to open the printable summary report.');
+        return;
+      }
+
+      const html = `<!DOCTYPE html>
+<html>
+<head>
+  <title>EchoBoard Event Summary Report — ${evt.name}</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 40px; color: #181528; }
+    .header { border-bottom: 3px solid #705cf0; padding-bottom: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end; }
+    .title { font-size: 26px; font-weight: 800; color: #1e1b4b; margin: 0; }
+    .subtitle { font-size: 14px; color: #64748b; margin-top: 4px; }
+    .badge { background: #705cf0; color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; }
+    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+    .card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; text-align: center; }
+    .card .val { font-size: 28px; font-weight: 800; color: #1e1b4b; }
+    .card .lbl { font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 700; margin-top: 4px; }
+    .section-title { font-size: 16px; font-weight: 800; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-top: 24px; margin-bottom: 14px; }
+    .roles-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+    .roles-table th, .roles-table td { border: 1px solid #e2e8f0; padding: 8px 12px; font-size: 13px; text-align: left; }
+    .roles-table th { background: #f1f5f9; font-weight: 700; }
+    .quotes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .quote-box { background: #fffbeb; border: 1px solid #fef3c7; border-left: 4px solid #f59e0b; padding: 12px; border-radius: 4px; font-size: 13px; }
+    .quote-author { font-size: 11px; font-weight: 700; color: #92400e; margin-top: 6px; }
+    @media print {
+      body { margin: 20px; }
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <h1 class="title">${evt.name}</h1>
+      <div class="subtitle">Date: ${evt.eventDate} | Venue: ${evt.venue}</div>
+      ${evt.description ? `<div class="subtitle" style="margin-top:2px;">${evt.description}</div>` : ''}
+    </div>
+    <div style="text-align: right;">
+      <div class="badge">EchoBoard Executive Report</div>
+      <div style="font-size: 11px; color: #94a3b8; margin-top: 6px;">Generated: ${new Date().toLocaleDateString()}</div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="val">${items.length}</div>
+      <div class="lbl">Total Submissions</div>
+    </div>
+    <div class="card">
+      <div class="val">${avgRating} / 5.0</div>
+      <div class="lbl">Average Star Rating</div>
+    </div>
+    <div class="card">
+      <div class="val">${evt.visibleCount || items.filter((i) => i.visibilityStatus === 'visible' && !i.deletedAt).length}</div>
+      <div class="lbl">Live Wall Notes</div>
+    </div>
+    <div class="card">
+      <div class="val">${items.filter((i) => i.visibilityStatus === 'hidden' || i.deletedAt).length}</div>
+      <div class="lbl">Moderated / Hidden</div>
+    </div>
+  </div>
+
+  <div class="section-title">Audience Role Breakdown</div>
+  <table class="roles-table">
+    <thead>
+      <tr><th>Audience Category</th><th>Count</th><th>Percentage</th></tr>
+    </thead>
+    <tbody>
+      ${Object.entries(roleCounts)
+        .map(
+          ([role, cnt]) => `
+        <tr>
+          <td><strong>${role}</strong></td>
+          <td>${cnt}</td>
+          <td>${items.length > 0 ? ((cnt / items.length) * 100).toFixed(1) : 0}%</td>
+        </tr>
+      `
+        )
+        .join('')}
+    </tbody>
+  </table>
+
+  <div class="section-title">Highlighted Public Visitor Feedback</div>
+  <div class="quotes-grid">
+    ${topQuotes
+      .map(
+        (q) => `
+      <div class="quote-box">
+        <div>"${q.message}"</div>
+        <div class="quote-author">— ${q.publicDisplayName} (${q.role}${q.department ? `, ${q.department}` : ''}) • Rating: ${q.rating || 5}/5</div>
+      </div>
+    `
+      )
+      .join('')}
+  </div>
+
+  <div style="margin-top: 36px; padding-top: 14px; border-top: 1px solid #e2e8f0; font-size: 11px; color: #94a3b8; display: flex; justify-content: space-between;">
+    <span>DevBappa Solutions — EchoBoard Platform</span>
+    <span>Confidential Operator Report</span>
+  </div>
+
+  <script>
+    window.onload = function() {
+      window.print();
+    };
+  </script>
+</body>
+</html>`;
+
+      printWindow.document.open();
+      printWindow.document.write(html);
+      printWindow.document.close();
+    } catch (err: any) {
+      alert(err.message || 'Failed to generate print summary report');
     }
   };
 
@@ -658,6 +994,7 @@ export const AdminDashboard: React.FC = () => {
                   {analytics.totalHidden + analytics.totalDeleted}
                 </div>
                 <div style={{ fontSize: '10px', fontWeight: 700, color: '#fff0d4' }}>
+                  {analytics.autoHeldCount !== undefined ? `${analytics.autoHeldCount} Auto-Held | ` : ''}
                   {analytics.totalHidden} Hidden | {analytics.totalDeleted} Deleted
                 </div>
               </div>
@@ -1103,6 +1440,55 @@ export const AdminDashboard: React.FC = () => {
                             {isAccepting ? 'Active' : 'Paused'}
                           </button>
                         </div>
+
+                        {/* Control 3: One-Click Event Report Exporter & Summary */}
+                        <div style={{ display: 'flex', gap: '8px', marginTop: '2px' }}>
+                          <button
+                            type="button"
+                            onClick={() => handleExportEventCsv(evt)}
+                            className="btn-3d-studio btn-3d-mint"
+                            style={{
+                              flex: 1,
+                              padding: '6px 8px',
+                              fontSize: '11px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '4px',
+                            }}
+                            title="Export all submissions for this event to CSV"
+                          >
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                              <polyline points="7 10 12 15 17 10" />
+                              <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                            <span>Export CSV</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handlePrintSummaryReport(evt)}
+                            className="btn-3d-studio btn-3d-periwinkle"
+                            style={{
+                              flex: 1,
+                              padding: '6px 8px',
+                              fontSize: '11px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '4px',
+                            }}
+                            title="Generate and print executive event summary report"
+                          >
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                              <polyline points="6 9 6 2 18 2 18 9" />
+                              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                              <rect x="6" y="14" width="12" height="8" />
+                            </svg>
+                            <span>Summary Report</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   );
@@ -1241,6 +1627,33 @@ export const AdminDashboard: React.FC = () => {
                     </button>
                   ))}
                 </div>
+
+                {/* Export Filtered Submissions to CSV */}
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleExportCsv(
+                      feedbackItems,
+                      `echoboard_${selectedEventFilter ? 'event' : 'all'}_feedback`
+                    )
+                  }
+                  className="btn-3d-studio btn-3d-mint"
+                  style={{
+                    padding: '6px 12px',
+                    fontSize: '11px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                  title="Export currently filtered feedback records to CSV"
+                >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                  <span>Export Filtered CSV</span>
+                </button>
 
                 {/* View Switcher: Pegboard Cards vs Ledger Table */}
                 <div
@@ -1420,6 +1833,23 @@ export const AdminDashboard: React.FC = () => {
                         <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--note-ink-meta)', marginTop: '8px' }}>
                           {item.department || item.institutionName || 'Expo Visitor'}
                         </div>
+
+                        {/* Hand-Drawn Ink Doodle Stamp Watermark */}
+                        {item.doodleType && item.doodleType !== 'none' && (
+                          <div
+                            style={{
+                              position: 'absolute',
+                              right: '14px',
+                              bottom: '12px',
+                              opacity: 0.16,
+                              pointerEvents: 'none',
+                              color: 'var(--note-ink-primary)',
+                              transform: 'rotate(-8deg)',
+                            }}
+                          >
+                            <DoodleSvg type={item.doodleType} size={54} />
+                          </div>
+                        )}
                       </div>
 
                       {/* Admin Confidential Footer Strip (#1E1B4B) with private full_name and Event info */}
@@ -1576,6 +2006,7 @@ export const AdminDashboard: React.FC = () => {
                       <th style={{ padding: '12px 14px', fontWeight: 800 }}>Visitor</th>
                       <th style={{ padding: '12px 14px', fontWeight: 800 }}>Event</th>
                       <th style={{ padding: '12px 14px', fontWeight: 800 }}>Rating</th>
+                      <th style={{ padding: '12px 14px', fontWeight: 800 }}>Doodle</th>
                       <th style={{ padding: '12px 14px', fontWeight: 800 }}>Role & Dept</th>
                       <th style={{ padding: '12px 14px', fontWeight: 800 }}>Message</th>
                       <th style={{ padding: '12px 14px', fontWeight: 800 }}>Status</th>
@@ -1609,6 +2040,14 @@ export const AdminDashboard: React.FC = () => {
                             <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
                               <span style={{ fontWeight: 800, marginRight: '4px' }}>{itemRating}</span>
                               <SvgStar filled size={13} />
+                            </div>
+                          </td>
+                          <td style={{ padding: '12px 14px', whiteSpace: 'nowrap' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <DoodleSvg type={item.doodleType || 'check'} size={15} color="#4f46e5" />
+                              <span style={{ fontSize: '11px', color: '#565070', textTransform: 'capitalize' }}>
+                                {item.doodleType || 'check'}
+                              </span>
                             </div>
                           </td>
                           <td style={{ padding: '12px 14px' }}>
