@@ -6,6 +6,7 @@ import {
   PIN_VARIANTS,
   NOTE_SIZES,
   FIELD_LIMITS,
+  DOODLE_TYPES,
 } from '../constants/index.js';
 
 export const roleSchema = z.enum(ROLES);
@@ -15,6 +16,7 @@ export const predefinedDepartmentSchema = z.enum(PREDEFINED_DEPARTMENTS);
 export const noteColorSchema = z.enum(NOTE_COLORS);
 export const pinVariantSchema = z.enum(PIN_VARIANTS);
 export const noteSizeSchema = z.enum(NOTE_SIZES);
+export const doodleTypeSchema = z.enum(DOODLE_TYPES);
 
 export const feedbackSubmissionSchema = z
   .object({
@@ -59,6 +61,17 @@ export const feedbackSubmissionSchema = z
       .min(8)
       .max(128),
     colorVariant: noteColorSchema.optional(),
+    rating: z.coerce
+      .number()
+      .int()
+      .min(FIELD_LIMITS.RATING_MIN, `Rating must be at least ${FIELD_LIMITS.RATING_MIN}`)
+      .max(FIELD_LIMITS.RATING_MAX, `Rating cannot exceed ${FIELD_LIMITS.RATING_MAX}`)
+      .default(5),
+    doodleType: doodleTypeSchema.default('check'),
+    eventId: z
+      .string()
+      .uuid('Event ID must be a valid UUID')
+      .optional(),
   })
   .superRefine((data, ctx) => {
     if (data.role === 'Student' || data.role === 'Faculty') {
@@ -115,6 +128,7 @@ export type AdminLoginInput = z.infer<typeof adminLoginSchema>;
 export const historyQuerySchema = z.object({
   search: z.string().trim().max(100).optional(),
   role: roleSchema.optional(),
+  eventId: z.string().uuid().optional(),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(50).default(12),
 });
@@ -125,6 +139,7 @@ export const adminFeedbackQuerySchema = z.object({
   search: z.string().trim().max(100).optional(),
   role: roleSchema.optional(),
   status: z.enum(['all', 'visible', 'hidden', 'deleted']).default('all'),
+  eventId: z.string().optional(),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),
 });
@@ -139,3 +154,56 @@ export const layoutUpdateSchema = z.object({
 });
 
 export type LayoutUpdateInput = z.infer<typeof layoutUpdateSchema>;
+
+export const createEventSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(FIELD_LIMITS.EVENT_NAME_MIN, `Event name must be at least ${FIELD_LIMITS.EVENT_NAME_MIN} characters`)
+    .max(FIELD_LIMITS.EVENT_NAME_MAX, `Event name cannot exceed ${FIELD_LIMITS.EVENT_NAME_MAX} characters`),
+  eventDate: z
+    .string()
+    .trim()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Event date must be in YYYY-MM-DD format'),
+  venue: z
+    .string()
+    .trim()
+    .min(FIELD_LIMITS.VENUE_MIN, `Venue must be at least ${FIELD_LIMITS.VENUE_MIN} characters`)
+    .max(FIELD_LIMITS.VENUE_MAX, `Venue cannot exceed ${FIELD_LIMITS.VENUE_MAX} characters`),
+  description: z.string().trim().max(1000).optional().or(z.literal('')),
+  isDisplayedOnWall: z.boolean().default(true),
+  isAcceptingFeedback: z.boolean().default(true),
+});
+
+export type CreateEventInput = z.infer<typeof createEventSchema>;
+
+export const updateEventSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(FIELD_LIMITS.EVENT_NAME_MIN)
+    .max(FIELD_LIMITS.EVENT_NAME_MAX)
+    .optional(),
+  eventDate: z
+    .string()
+    .trim()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Event date must be in YYYY-MM-DD format')
+    .optional(),
+  venue: z
+    .string()
+    .trim()
+    .min(FIELD_LIMITS.VENUE_MIN)
+    .max(FIELD_LIMITS.VENUE_MAX)
+    .optional(),
+  description: z.string().trim().max(1000).optional().or(z.literal('')),
+  isDisplayedOnWall: z.boolean().optional(),
+  isAcceptingFeedback: z.boolean().optional(),
+});
+
+export type UpdateEventInput = z.infer<typeof updateEventSchema>;
+
+export const wallSelectionSchema = z.object({
+  eventIds: z.array(z.string().uuid('Each item must be a valid event UUID')),
+});
+
+export type WallSelectionInput = z.infer<typeof wallSelectionSchema>;

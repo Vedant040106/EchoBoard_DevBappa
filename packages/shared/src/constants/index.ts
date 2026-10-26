@@ -33,6 +33,17 @@ export type NoteSize = (typeof NOTE_SIZES)[number];
 export const VISIBILITY_STATUS = ['visible', 'hidden'] as const;
 export type VisibilityStatus = (typeof VISIBILITY_STATUS)[number];
 
+export const DOODLE_TYPES = [
+  'check',
+  'lightning',
+  'heart',
+  'spark',
+  'spiral',
+  'lightbulb',
+  'none',
+] as const;
+export type DoodleType = (typeof DOODLE_TYPES)[number];
+
 export const REALTIME_EVENTS = {
   FEEDBACK_NEW: 'feedback:new',
   FEEDBACK_HIDDEN: 'feedback:hidden',
@@ -40,6 +51,7 @@ export const REALTIME_EVENTS = {
   FEEDBACK_DELETED: 'feedback:deleted',
   STATS_UPDATED: 'stats:updated',
   LAYOUT_UPDATED: 'canvas:layout_updated',
+  WALL_EVENTS_UPDATED: 'wall:events_updated',
 } as const;
 
 export const CONNECTION_STATUS = {
@@ -61,6 +73,12 @@ export const FIELD_LIMITS = {
   INSTITUTION_MAX: 150,
   DEPARTMENT_OTHER_MIN: 2,
   DEPARTMENT_OTHER_MAX: 100,
+  EVENT_NAME_MIN: 2,
+  EVENT_NAME_MAX: 120,
+  VENUE_MIN: 2,
+  VENUE_MAX: 200,
+  RATING_MIN: 1,
+  RATING_MAX: 5,
 } as const;
 
 export const API_ERROR_CODES = {

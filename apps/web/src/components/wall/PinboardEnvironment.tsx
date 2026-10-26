@@ -6,6 +6,8 @@ import { createAnnouncementTexture } from './noteTexture.js';
 interface PinboardEnvironmentProps {
   showAnnouncement: boolean;
   onAnnouncementClick?: () => void;
+  isSpotlightMode?: boolean;
+  onToggleSpotlight?: () => void;
 }
 
 /**
@@ -17,7 +19,8 @@ const MidCenturyWallClock: React.FC<{ position: [number, number, number] }> = ({
   const hourHandRef = useRef<THREE.Group>(null);
 
   useFrame(() => {
-    const now = new Date();
+    // Real local time in IST (Asia/Kolkata)
+    const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
     const seconds = now.getSeconds() + now.getMilliseconds() / 1000;
     const minutes = now.getMinutes() + seconds / 60;
     const hours = (now.getHours() % 12) + minutes / 60;
@@ -98,10 +101,21 @@ const MidCenturyWallClock: React.FC<{ position: [number, number, number] }> = ({
   );
 };
 
+interface TopLeftStudioShelfProps {
+  position: [number, number, number];
+  isSpotlightMode?: boolean;
+  onToggleSpotlight?: () => void;
+}
+
 /**
  * Top-Left Studio Shelf with Articulated Architect Lamp & Coral Sphere.
+ * Clicking/tapping the lamp toggles Studio Spotlight Mode.
  */
-const TopLeftStudioShelf: React.FC<{ position: [number, number, number] }> = ({ position }) => {
+const TopLeftStudioShelf: React.FC<TopLeftStudioShelfProps> = ({
+  position,
+  isSpotlightMode = false,
+  onToggleSpotlight,
+}) => {
   return (
     <group position={position}>
       {/* Matte Violet Floating Shelf */}
@@ -126,8 +140,20 @@ const TopLeftStudioShelf: React.FC<{ position: [number, number, number] }> = ({ 
         <meshStandardMaterial color="#ff626e" roughness={0.45} metalness={0.04} />
       </mesh>
 
-      {/* Glossy Red-Orange Articulated Desk Lamp */}
-      <group position={[2.5, 0.3, 0.2]}>
+      {/* Glossy Red-Orange Articulated Desk Lamp (Clickable/Tappable) */}
+      <group
+        position={[2.5, 0.3, 0.2]}
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggleSpotlight?.();
+        }}
+        onPointerOver={() => {
+          document.body.style.cursor = 'pointer';
+        }}
+        onPointerOut={() => {
+          document.body.style.cursor = 'default';
+        }}
+      >
         {/* Heavy Circular Base */}
         <mesh position={[0, 0.15, 0]} castShadow receiveShadow>
           <cylinderGeometry args={[1.3, 1.4, 0.3, 24]} />
@@ -184,7 +210,7 @@ const TopLeftStudioShelf: React.FC<{ position: [number, number, number] }> = ({ 
                 <meshStandardMaterial
                   color="#fff5d6"
                   emissive="#fff5d6"
-                  emissiveIntensity={3.2}
+                  emissiveIntensity={isSpotlightMode ? 5.8 : 3.2}
                   roughness={0.1}
                 />
               </mesh>
@@ -192,8 +218,8 @@ const TopLeftStudioShelf: React.FC<{ position: [number, number, number] }> = ({ 
               {/* Warm Spot illumination from lamp bulb */}
               <pointLight
                 position={[0, 0.8, 0]}
-                intensity={1.8}
-                distance={20}
+                intensity={isSpotlightMode ? 3.8 : 1.8}
+                distance={isSpotlightMode ? 35 : 20}
                 color="#fff5d6"
                 decay={2}
               />
@@ -273,6 +299,8 @@ const TopRightStudioShelf: React.FC<{ position: [number, number, number] }> = ({
 export const PinboardEnvironment: React.FC<PinboardEnvironmentProps> = ({
   showAnnouncement,
   onAnnouncementClick,
+  isSpotlightMode = false,
+  onToggleSpotlight,
 }) => {
   const { camera, pointer } = useThree();
   const cursorLightRef = useRef<THREE.PointLight>(null);
@@ -414,7 +442,11 @@ export const PinboardEnvironment: React.FC<PinboardEnvironmentProps> = ({
       {/* ============================================================== */}
       {/* 4. 3D STUDIO FRAMING PROPS (Mounted on Cobalt Wall Above)       */}
       {/* ============================================================== */}
-      <TopLeftStudioShelf position={[-24, 31.5, 0.2]} />
+      <TopLeftStudioShelf
+        position={[-24, 31.5, 0.2]}
+        isSpotlightMode={isSpotlightMode}
+        onToggleSpotlight={onToggleSpotlight}
+      />
       <MidCenturyWallClock position={[0, 32.5, 0.1]} />
       <TopRightStudioShelf position={[24, 31.5, 0.2]} />
 

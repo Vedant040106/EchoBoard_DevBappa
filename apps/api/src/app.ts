@@ -10,6 +10,7 @@ import { historyRouter } from './modules/history/history.router.js';
 import { statsRouter } from './modules/stats/stats.router.js';
 import { canvasRouter } from './modules/canvas/canvas.router.js';
 import { adminRouter } from './modules/admin/admin.router.js';
+import { publicEventRouter } from './modules/event/event.router.js';
 import { errorHandler } from './middleware/error.middleware.js';
 import { API_ERROR_CODES } from '@devbappa/shared';
 
@@ -61,6 +62,7 @@ app.use((req: Request, _res: Response, next) => {
 app.use('/health', healthRouter);
 app.use('/api/v1/health', healthRouter);
 app.use('/api/v1/feedback', feedbackRouter);
+app.use('/api/v1/events', publicEventRouter);
 app.use('/api/v1/history', historyRouter);
 app.use('/api/v1/stats', statsRouter);
 app.use('/api/v1/canvas', canvasRouter);

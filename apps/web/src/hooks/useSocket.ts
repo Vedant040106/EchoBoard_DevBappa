@@ -7,6 +7,7 @@ import {
   type PublicFeedbackNote,
   type PublicStats,
   type CanvasNoteLayout,
+  type PublicEvent,
 } from '@devbappa/shared';
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || '';
@@ -18,6 +19,7 @@ interface UseSocketOptions {
   onFeedbackDeleted?: (id: string) => void;
   onStatsUpdated?: (stats: PublicStats) => void;
   onLayoutUpdated?: (data: { feedbackId: string; layout: CanvasNoteLayout }) => void;
+  onWallEventsUpdated?: (data: { wallEvents: PublicEvent[] }) => void;
   onReconnect?: () => void;
 }
 
@@ -87,6 +89,10 @@ export function useSocket(options: UseSocketOptions = {}) {
 
     socket.on(REALTIME_EVENTS.LAYOUT_UPDATED, (data: { feedbackId: string; layout: CanvasNoteLayout }) => {
       optionsRef.current.onLayoutUpdated?.(data);
+    });
+
+    socket.on(REALTIME_EVENTS.WALL_EVENTS_UPDATED, (data: { wallEvents: PublicEvent[] }) => {
+      optionsRef.current.onWallEventsUpdated?.(data);
     });
 
     const handleWindowOnline = () => {

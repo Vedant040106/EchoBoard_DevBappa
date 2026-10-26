@@ -8,6 +8,7 @@ import {
   type PublicFeedbackNote,
   type PublicStats,
   type CanvasNoteLayout,
+  type PublicEvent,
 } from '@devbappa/shared';
 
 let io: SocketIOServer | null = null;
@@ -66,6 +67,10 @@ export function broadcastNewFeedback(note: PublicFeedbackNote): void {
     designation: note.designation,
     institutionName: note.institutionName,
     message: note.message,
+    rating: note.rating,
+    doodleType: note.doodleType,
+    eventId: note.eventId,
+    event: note.event,
     createdAt: note.createdAt,
     colorVariant: note.colorVariant,
     pinVariant: note.pinVariant,
@@ -73,6 +78,11 @@ export function broadcastNewFeedback(note: PublicFeedbackNote): void {
     layout: note.layout,
   };
   io.emit(REALTIME_EVENTS.FEEDBACK_NEW, publicPayload);
+}
+
+export function broadcastAdminAutoHeld(item: unknown): void {
+  if (!io) return;
+  io.to('admin-room').emit('admin:auto_held', item);
 }
 
 export function broadcastFeedbackHidden(id: string): void {
@@ -98,4 +108,9 @@ export function broadcastStatsUpdated(stats: PublicStats): void {
 export function broadcastLayoutUpdated(feedbackId: string, layout: CanvasNoteLayout): void {
   if (!io) return;
   io.emit(REALTIME_EVENTS.LAYOUT_UPDATED, { feedbackId, layout });
+}
+
+export function broadcastWallEventsUpdated(wallEvents: PublicEvent[]): void {
+  if (!io) return;
+  io.emit(REALTIME_EVENTS.WALL_EVENTS_UPDATED, { wallEvents });
 }

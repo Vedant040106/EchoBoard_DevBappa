@@ -8,6 +8,10 @@ import type {
   AdminLoginInput,
   AuditEventItem,
   ApiResponse,
+  PublicEvent,
+  AdminEventItem,
+  CreateEventInput,
+  UpdateEventInput,
 } from '@devbappa/shared';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL
@@ -63,6 +67,8 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 export const api = {
   // Public
   getHealth: () => request<{ status: string; database: { connected: boolean } }>('/health'),
+  getPublicEvents: () =>
+    request<{ wallEvents: PublicEvent[]; activeSubmissionEvents: PublicEvent[] }>('/events/public'),
   getPublicNotes: () => request<PublicFeedbackNote[]>('/feedback'),
   getPublicNoteById: (id: string) => request<PublicFeedbackNote>(`/feedback/${id}`),
   submitFeedback: (payload: FeedbackSubmissionInput) =>
@@ -70,10 +76,17 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(payload),
     }),
-  getPublicHistory: (params: { search?: string; role?: string; page?: number; limit?: number }) => {
+  getPublicHistory: (params: {
+    search?: string;
+    role?: string;
+    eventId?: string;
+    page?: number;
+    limit?: number;
+  }) => {
     const query = new URLSearchParams();
     if (params.search) query.set('search', params.search);
     if (params.role) query.set('role', params.role);
+    if (params.eventId) query.set('eventId', params.eventId);
     if (params.page) query.set('page', String(params.page));
     if (params.limit) query.set('limit', String(params.limit));
     return request<PaginatedData<PublicFeedbackNote>>(`/history?${query.toString()}`);
@@ -105,17 +118,46 @@ export const api = {
     }
   },
 
+  // Admin Events & Wall Selection
+  adminGetEvents: () => request<AdminEventItem[]>('/admin/events'),
+  adminCreateEvent: (payload: CreateEventInput) =>
+    request<AdminEventItem>('/admin/events', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+  adminUpdateEvent: (id: string, payload: UpdateEventInput) =>
+    request<AdminEventItem>(`/admin/events/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    }),
+  adminSetWallSelection: (eventIds: string[]) =>
+    request<{ activeWallEvents: PublicEvent[]; selectedCount: number }>('/admin/events/wall-selection', {
+      method: 'PUT',
+      body: JSON.stringify({ eventIds }),
+    }),
+
   // Admin Feedback & Moderation
-  adminGetFeedback: (params: { search?: string; role?: string; status?: string; page?: number; limit?: number }) => {
+  adminGetFeedback: (params: {
+    search?: string;
+    role?: string;
+    status?: string;
+    eventId?: string;
+    page?: number;
+    limit?: number;
+  }) => {
     const query = new URLSearchParams();
     if (params.search) query.set('search', params.search);
     if (params.role) query.set('role', params.role);
     if (params.status) query.set('status', params.status);
+    if (params.eventId && params.eventId !== 'all') query.set('eventId', params.eventId);
     if (params.page) query.set('page', String(params.page));
     if (params.limit) query.set('limit', String(params.limit));
     return request<PaginatedData<AdminFeedbackItem>>(`/admin/feedback?${query.toString()}`);
   },
-  adminGetAnalytics: () => request<AdminAnalytics>('/admin/analytics'),
+  adminGetAnalytics: (eventId?: string) => {
+    const query = eventId && eventId !== 'all' ? `?eventId=${eventId}` : '';
+    return request<AdminAnalytics>(`/admin/analytics${query}`);
+  },
   adminHideFeedback: (id: string) =>
     request<PublicFeedbackNote>(`/admin/feedback/${id}/hide`, { method: 'POST' }),
   adminRestoreFeedback: (id: string) =>
@@ -124,9 +166,10 @@ export const api = {
     request<{ message: string }>(`/admin/feedback/${id}/soft-delete`, { method: 'POST' }),
   adminRecoverFeedback: (id: string) =>
     request<{ message: string }>(`/admin/feedback/${id}/recover`, { method: 'POST' }),
-  adminGetAudit: (params: { feedbackId?: string; page?: number; limit?: number }) => {
+  adminGetAudit: (params: { feedbackId?: string; eventId?: string; page?: number; limit?: number }) => {
     const query = new URLSearchParams();
     if (params.feedbackId) query.set('feedbackId', params.feedbackId);
+    if (params.eventId) query.set('eventId', params.eventId);
     if (params.page) query.set('page', String(params.page));
     if (params.limit) query.set('limit', String(params.limit));
     return request<PaginatedData<AuditEventItem>>(`/admin/audit?${query.toString()}`);

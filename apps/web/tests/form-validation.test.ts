@@ -67,4 +67,38 @@ describe('Frontend Form Validation & Conditional Role Fields', () => {
     };
     assert.equal(feedbackSubmissionSchema.safeParse(visitorValid).success, true);
   });
+
+  it('validates rating between 1 and 5', () => {
+    const base = {
+      name: 'Aditya Mehta',
+      role: 'Other Visitor',
+      institutionName: 'Infosys Ltd.',
+      message: 'Excited to see the college tech startups.',
+      idempotencyKey: 'idemp-visitor-rating',
+    };
+
+    // Valid ratings: 1, 3, 5
+    assert.equal(feedbackSubmissionSchema.safeParse({ ...base, rating: 1 }).success, true);
+    assert.equal(feedbackSubmissionSchema.safeParse({ ...base, rating: 3 }).success, true);
+    assert.equal(feedbackSubmissionSchema.safeParse({ ...base, rating: 5 }).success, true);
+
+    // Invalid ratings: 0, 6, -1, 3.5
+    assert.equal(feedbackSubmissionSchema.safeParse({ ...base, rating: 0 }).success, false);
+    assert.equal(feedbackSubmissionSchema.safeParse({ ...base, rating: 6 }).success, false);
+    assert.equal(feedbackSubmissionSchema.safeParse({ ...base, rating: 3.5 }).success, false);
+  });
+
+  it('accepts optional UUID eventId', () => {
+    const base = {
+      name: 'Aditya Mehta',
+      role: 'Other Visitor',
+      institutionName: 'Infosys Ltd.',
+      message: 'Excited to see the college tech startups.',
+      idempotencyKey: 'idemp-visitor-event',
+      rating: 5,
+    };
+
+    assert.equal(feedbackSubmissionSchema.safeParse({ ...base, eventId: 'b942a447-1cde-4610-b8ba-a9ee4e27fd43' }).success, true);
+    assert.equal(feedbackSubmissionSchema.safeParse({ ...base, eventId: 'not-a-uuid' }).success, false);
+  });
 });

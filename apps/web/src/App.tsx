@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import type { PublicFeedbackNote, PublicStats, CanvasNoteLayout } from '@devbappa/shared';
+import type { PublicFeedbackNote, PublicStats, CanvasNoteLayout, PublicEvent } from '@devbappa/shared';
 import { api } from './services/api.js';
 import { useSocket } from './hooks/useSocket.js';
 import { useOfflineQueue } from './hooks/useOfflineQueue.js';
@@ -15,19 +15,31 @@ import { NotFoundPage } from './pages/NotFoundPage.js';
 export const App: React.FC = () => {
   const [notes, setNotes] = useState<PublicFeedbackNote[]>([]);
   const [totalSubmissions, setTotalSubmissions] = useState<number>(0);
+  const [activeWallEvents, setActiveWallEvents] = useState<PublicEvent[]>([]);
+  const [averageRating, setAverageRating] = useState<number>(5.0);
   const [newNoteId, setNewNoteId] = useState<string | null>(null);
   const [thankYouToast, setThankYouToast] = useState<{ displayName: string } | null>(null);
 
   // Fetch initial notes and authoritative statistics
   const refreshData = useCallback(async () => {
     try {
-      const [notesData, statsData] = await Promise.all([
+      const [notesData, statsData, eventsData] = await Promise.all([
         api.getPublicNotes(),
         api.getPublicStats().catch(() => null),
+        api.getPublicEvents().catch(() => null),
       ]);
       setNotes(notesData);
       if (statsData) {
         setTotalSubmissions(statsData.totalAccepted);
+        if (statsData.averageRating !== undefined) {
+          setAverageRating(statsData.averageRating);
+        }
+        if (statsData.activeWallEvents && statsData.activeWallEvents.length > 0) {
+          setActiveWallEvents(statsData.activeWallEvents);
+        }
+      }
+      if (eventsData && eventsData.wallEvents) {
+        setActiveWallEvents(eventsData.wallEvents);
       }
     } catch {
       // Backend might be starting up or currently unreachable
@@ -79,6 +91,16 @@ export const App: React.FC = () => {
     },
     onStatsUpdated: (stats: PublicStats) => {
       setTotalSubmissions(stats.totalAccepted);
+      if (stats.averageRating !== undefined) {
+        setAverageRating(stats.averageRating);
+      }
+      if (stats.activeWallEvents) {
+        setActiveWallEvents(stats.activeWallEvents);
+      }
+    },
+    onWallEventsUpdated: (data: { wallEvents: PublicEvent[] }) => {
+      setActiveWallEvents(data.wallEvents);
+      refreshData();
     },
     onLayoutUpdated: ({ feedbackId, layout }: { feedbackId: string; layout: CanvasNoteLayout }) => {
       setNotes((prev) =>
@@ -97,6 +119,8 @@ export const App: React.FC = () => {
         connectionStatus={connectionStatus}
         queuedCount={queuedCount}
         totalSubmissions={totalSubmissions}
+        activeWallEvents={activeWallEvents}
+        averageRating={averageRating}
       />
       {thankYouToast && (
         <div

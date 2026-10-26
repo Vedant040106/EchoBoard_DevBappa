@@ -7,6 +7,7 @@ import { createNoteTexture } from './noteTexture.js';
 interface StickyNoteMeshProps {
   note: PublicFeedbackNote;
   isNew: boolean;
+  isHighlighted?: boolean;
   onSelect: (note: PublicFeedbackNote) => void;
 }
 
@@ -72,7 +73,12 @@ function createCurledStickyGeometry(
   return geom;
 }
 
-export const StickyNoteMesh: React.FC<StickyNoteMeshProps> = ({ note, isNew, onSelect }) => {
+export const StickyNoteMesh: React.FC<StickyNoteMeshProps> = ({
+  note,
+  isNew,
+  isHighlighted = false,
+  onSelect,
+}) => {
   const meshGroupRef = useRef<THREE.Group>(null);
   const [hovered, setHovered] = useState(false);
   const pointerDownPos = useRef<{ x: number; y: number } | null>(null);
@@ -128,8 +134,9 @@ export const StickyNoteMesh: React.FC<StickyNoteMeshProps> = ({ note, isNew, onS
     // Live socket drop Z offset: drops from +4.5 down to 0
     const dropZ = (1 - animProgress) * 4.5;
     const hoverZ = hovered ? 0.35 : 0;
+    const highlightZ = isHighlighted ? 0.35 : 0;
     const baseElevation = 0.04;
-    const targetZ = baseElevation + layerZ + dropZ + hoverZ;
+    const targetZ = baseElevation + layerZ + dropZ + hoverZ + highlightZ;
 
     // Smooth Z position lerp
     meshGroupRef.current.position.z = THREE.MathUtils.lerp(
@@ -177,6 +184,19 @@ export const StickyNoteMesh: React.FC<StickyNoteMeshProps> = ({ note, isNew, onS
             color="#f08035"
             transparent
             opacity={Math.max(0, 0.7 - impactRingScale * 0.35)}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+      )}
+
+      {/* Find My Note Spotlight Pulse Ring */}
+      {isHighlighted && (
+        <mesh position={[0, 0, -0.012]}>
+          <ringGeometry args={[2.0, 2.38, 36]} />
+          <meshBasicMaterial
+            color="#f08035"
+            transparent
+            opacity={0.85}
             side={THREE.DoubleSide}
           />
         </mesh>

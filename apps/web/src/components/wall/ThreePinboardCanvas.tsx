@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { PublicFeedbackNote } from '@devbappa/shared';
 import { StickyNoteMesh } from './StickyNoteMesh.js';
 import { PinboardEnvironment } from './PinboardEnvironment.js';
@@ -74,6 +74,12 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
   introStage = 'complete',
 }) => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const highlightId = searchParams.get('highlight');
+  const [activeHighlightId, setActiveHighlightId] = useState<string | null>(highlightId);
+  const [isSpotlightMode, setIsSpotlightMode] = useState<boolean>(false);
+  const [isAutoPilot, setIsAutoPilot] = useState<boolean>(false);
+
   const [webglSupported, setWebglSupported] = useState(true);
   const [zoomPercent, setZoomPercent] = useState(100);
 
@@ -222,6 +228,87 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleResetView, handleLatestNote]);
 
+  // "Find My Note" Camera Spotlight (?highlight=<feedbackId>)
+  useEffect(() => {
+    if (highlightId && visibleNotes.length > 0) {
+      const targetNote = visibleNotes.find((n) => n.id === highlightId);
+      if (targetNote) {
+        const x = (targetNote.layout.worldX || 0) / 75;
+        const y = -(targetNote.layout.worldY || 0) / 75;
+        setNavTarget({ x, y, zoom: 48, trigger: Date.now() });
+        setActiveHighlightId(highlightId);
+        // Elevate for 4 seconds then gracefully settle
+        const timer = setTimeout(() => {
+          setActiveHighlightId(null);
+        }, 4000);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [highlightId, visibleNotes]);
+
+  // Big-Screen Expo Auto-Pilot Mode (activates after 35s of inactivity on >= 1024px viewports)
+  const lastInteractionTime = useRef(Date.now());
+  useEffect(() => {
+    const handleActivity = () => {
+      lastInteractionTime.current = Date.now();
+      if (isAutoPilot) {
+        setIsAutoPilot(false);
+      }
+    };
+
+    window.addEventListener('pointermove', handleActivity);
+    window.addEventListener('pointerdown', handleActivity);
+    window.addEventListener('wheel', handleActivity);
+    window.addEventListener('keydown', handleActivity);
+    window.addEventListener('touchstart', handleActivity);
+
+    const interval = setInterval(() => {
+      const vpW = window.innerWidth || 1024;
+      if (vpW >= 1024 && !isAutoPilot && Date.now() - lastInteractionTime.current >= 35000) {
+        if (visibleNotes.length > 0) {
+          setIsAutoPilot(true);
+        }
+      }
+    }, 2000);
+
+    return () => {
+      window.removeEventListener('pointermove', handleActivity);
+      window.removeEventListener('pointerdown', handleActivity);
+      window.removeEventListener('wheel', handleActivity);
+      window.removeEventListener('keydown', handleActivity);
+      window.removeEventListener('touchstart', handleActivity);
+      clearInterval(interval);
+    };
+  }, [isAutoPilot, visibleNotes.length]);
+
+  // Auto-Pilot Tour Loop: glides from note to note every 7 seconds
+  const autoPilotIndex = useRef(0);
+  useEffect(() => {
+    if (!isAutoPilot || visibleNotes.length === 0) return;
+    const tourTimer = setInterval(() => {
+      autoPilotIndex.current = (autoPilotIndex.current + 1) % visibleNotes.length;
+      const targetNote = visibleNotes[autoPilotIndex.current];
+      if (targetNote) {
+        const x = (targetNote.layout.worldX || 0) / 75;
+        const y = -(targetNote.layout.worldY || 0) / 75;
+        setNavTarget({ x, y, zoom: 42, trigger: Date.now() });
+      }
+    }, 7000);
+    return () => clearInterval(tourTimer);
+  }, [isAutoPilot, visibleNotes]);
+
+  // Fly directly to newly committed Socket note
+  useEffect(() => {
+    if (newNoteId && visibleNotes.length > 0) {
+      const incoming = visibleNotes.find((n) => n.id === newNoteId);
+      if (incoming) {
+        const x = (incoming.layout.worldX || 0) / 75;
+        const y = -(incoming.layout.worldY || 0) / 75;
+        setNavTarget({ x, y, zoom: 46, trigger: Date.now() });
+      }
+    }
+  }, [newNoteId, visibleNotes]);
+
   // Fallback rendering if WebGL is unavailable on device
   if (!webglSupported) {
     return (
@@ -303,16 +390,16 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
         }}
         style={{ width: '100%', height: '100%', display: 'block' }}
       >
-        {/* Cool Cobalt Ambient & Hemisphere Fill */}
+        {/* Cool Cobalt Ambient & Hemisphere Fill (smoothly dims during Studio Spotlight Mode) */}
         <hemisphereLight
-          args={['#7c8cff', '#1b226b', 0.95]}
+          args={['#7c8cff', '#1b226b', isSpotlightMode ? 0.35 : 0.95]}
         />
 
-        {/* Primary Warm Lamp Key Light (ramps up from 0.3 to 2.1 during opening transition) */}
-        <StudioKeyLight targetIntensity={introStage === 'stage1' ? 0.3 : 2.1} />
+        {/* Primary Warm Lamp Key Light (ramps up from 0.3 to 2.1 during opening transition, 3.0 in spotlight mode) */}
+        <StudioKeyLight targetIntensity={introStage === 'stage1' ? 0.3 : (isSpotlightMode ? 3.0 : 2.1)} />
 
         {/* Studio Rim Fill Light */}
-        <pointLight position={[24, -12, 12]} intensity={0.35} color="#8ce0ff" />
+        <pointLight position={[24, -12, 12]} intensity={isSpotlightMode ? 0.15 : 0.35} color="#8ce0ff" />
 
         {/* Camera Pan & Pinch-Zoom Controller with Physics Inertia & Cursor Anchoring */}
         <CameraController
@@ -321,10 +408,12 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
           isOpeningDolly={introStage === 'stage1'}
         />
 
-        {/* 3D Pinboard Background Environment, Bump Texture & Dynamic Cursor Light */}
+        {/* 3D Pinboard Background Environment, Bump Texture, Clock & Interactive Lamp */}
         <PinboardEnvironment
           showAnnouncement={visibleNotes.length === 0}
           onAnnouncementClick={() => navigate('/submit')}
+          isSpotlightMode={isSpotlightMode}
+          onToggleSpotlight={() => setIsSpotlightMode((prev) => !prev)}
         />
 
         {/* 3D Curled Sticky Note Meshes */}
@@ -333,6 +422,7 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
             key={note.id}
             note={note}
             isNew={note.id === newNoteId}
+            isHighlighted={note.id === activeHighlightId}
             onSelect={onSelectNote}
           />
         ))}
@@ -408,6 +498,33 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
           </svg>
           <span>Latest</span>
+        </button>
+
+        <button
+          onClick={() => setIsAutoPilot((prev) => !prev)}
+          disabled={visibleNotes.length === 0}
+          title="Toggle Big-Screen Expo Auto-Pilot Mode"
+          style={{
+            height: '32px',
+            padding: '0 12px',
+            backgroundColor: isAutoPilot ? 'rgba(34, 197, 94, 0.22)' : 'rgba(255, 255, 255, 0.08)',
+            border: isAutoPilot ? '1px solid rgba(34, 197, 94, 0.5)' : '1px solid rgba(255, 255, 255, 0.12)',
+            borderRadius: 'var(--radius-full)',
+            color: isAutoPilot ? '#4ade80' : '#ffffff',
+            fontSize: 'var(--text-caption)',
+            fontWeight: 700,
+            cursor: visibleNotes.length === 0 ? 'not-allowed' : 'pointer',
+            opacity: visibleNotes.length === 0 ? 0.5 : 1,
+            transition: 'all 0.15s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+          }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <polygon points="5 3 19 12 5 21 5 3" />
+          </svg>
+          <span>{isAutoPilot ? 'Auto-Pilot ON' : 'Auto-Pilot'}</span>
         </button>
 
         <div

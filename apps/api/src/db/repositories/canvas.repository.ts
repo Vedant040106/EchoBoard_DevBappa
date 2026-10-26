@@ -49,8 +49,8 @@ export class CanvasRepository {
     const worldX = Math.round(r * Math.cos(theta) + jitterX);
     const worldY = Math.round(r * Math.sin(theta) + jitterY);
 
-    // Natural paper rotation: small angle between -4.5 and +4.5 degrees
-    const rotation = parseFloat(((Math.sin(count * 13) * 4.5)).toFixed(2));
+    // Natural paper rotation: organic angle between -11 and +11 degrees
+    const rotation = parseFloat(((Math.sin(count * 13) * 11)).toFixed(2));
 
     return {
       worldX,

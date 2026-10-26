@@ -22,8 +22,12 @@ import {
   broadcastStatsUpdated,
 } from '../../realtime/socket.server.js';
 import { logger } from '../../utils/logger.js';
+import { adminEventRouter } from '../event/event.router.js';
 
 export const adminRouter = Router();
+
+// Mount events sub-router
+adminRouter.use('/events', adminEventRouter);
 
 // POST /api/v1/admin/auth/login
 adminRouter.post(
@@ -133,11 +137,12 @@ adminRouter.get(
   validateQuery(adminFeedbackQuerySchema),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { search, role, status, page, limit } = req.query as unknown as AdminFeedbackQueryInput;
+      const { search, role, status, eventId, page, limit } = req.query as unknown as AdminFeedbackQueryInput;
       const data = await FeedbackRepository.getAdminFeedback({
         search,
         role,
         status: status || 'all',
+        eventId,
         page: Number(page) || 1,
         limit: Number(limit) || 20,
       });
@@ -153,9 +158,10 @@ adminRouter.get(
 );
 
 // GET /api/v1/admin/analytics - Comprehensive analytics
-adminRouter.get('/analytics', requireAdminAuth, async (_req: Request, res: Response, next: NextFunction) => {
+adminRouter.get('/analytics', requireAdminAuth, async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const analytics = await FeedbackRepository.getAdminAnalytics();
+    const eventId = req.query.eventId as string | undefined;
+    const analytics = await FeedbackRepository.getAdminAnalytics(eventId);
     res.json({
       success: true,
       data: analytics,

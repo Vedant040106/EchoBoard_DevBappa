@@ -5,7 +5,7 @@ import { pool } from '../src/db/index.js';
 
 // Helper to make mock requests to express app without needing live network port
 async function testRequest(
-  method: 'GET' | 'POST',
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
   path: string,
   body?: unknown,
   headers: Record<string, string> = {}
@@ -88,6 +88,53 @@ describe('API Endpoints and Security Gates', () => {
     assert.equal(res.body.success, false);
     assert.equal(res.body.error.code, 'VALIDATION_ERROR');
     assert.ok(res.body.error.details);
+  });
+
+  it('GET /api/v1/events/public returns public wallEvents and activeSubmissionEvents', async () => {
+    const res = await testRequest('GET', '/api/v1/events/public');
+    assert.equal(res.status, 200);
+    assert.equal(res.body.success, true);
+    assert.ok(Array.isArray(res.body.data.wallEvents));
+    assert.ok(Array.isArray(res.body.data.activeSubmissionEvents));
+    assert.ok(res.body.data.wallEvents.length >= 1);
+    const techExpo = res.body.data.wallEvents.find((e: any) => e.name === 'Tech Expo');
+    assert.ok(techExpo);
+    assert.equal(techExpo.venue, 'VPPCOE&VA, Sion');
+  });
+
+  it('GET /api/v1/stats includes averageRating and activeWallEvents', async () => {
+    const res = await testRequest('GET', '/api/v1/stats');
+    assert.equal(res.status, 200);
+    assert.equal(res.body.success, true);
+    assert.equal(typeof res.body.data.averageRating, 'number');
+    assert.equal(typeof res.body.data.totalAcceptedCount, 'number');
+    assert.equal(typeof res.body.data.visibleWallCount, 'number');
+    assert.ok(Array.isArray(res.body.data.activeWallEvents));
+  });
+
+  it('GET /api/v1/admin/events rejects unauthenticated requests with 401', async () => {
+    const res = await testRequest('GET', '/api/v1/admin/events');
+    assert.equal(res.status, 401);
+    assert.equal(res.body.success, false);
+    assert.equal(res.body.error.code, 'UNAUTHORIZED');
+  });
+
+  it('POST /api/v1/admin/events rejects unauthenticated requests with 401', async () => {
+    const res = await testRequest('POST', '/api/v1/admin/events', {
+      name: 'Hackathon 2026',
+      eventDate: '2026-11-15',
+      venue: 'Main Auditorium',
+    });
+    assert.equal(res.status, 401);
+    assert.equal(res.body.success, false);
+    assert.equal(res.body.error.code, 'UNAUTHORIZED');
+  });
+
+  it('PUT /api/v1/admin/events/wall-selection rejects unauthenticated requests with 401', async () => {
+    const res = await testRequest('PUT', '/api/v1/admin/events/wall-selection', {
+      eventIds: [],
+    });
+    assert.equal(res.status, 401);
   });
 
   after(async () => {

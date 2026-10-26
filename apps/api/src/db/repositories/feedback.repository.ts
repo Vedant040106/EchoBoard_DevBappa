@@ -1,6 +1,7 @@
 import type pg from 'pg';
 import { query, withTransaction } from '../index.js';
 import { CanvasRepository } from './canvas.repository.js';
+import { EventRepository } from './event.repository.js';
 import type {
   PublicFeedbackNote,
   AdminFeedbackItem,
@@ -12,7 +13,24 @@ import type {
   PinVariant,
   NoteSize,
   VisibilityStatus,
+  DoodleType,
 } from '@devbappa/shared';
+import { checkModerationShield } from '../../utils/moderation-shield.js';
+
+function formatDate(dateVal: unknown): string {
+  if (!dateVal) return '';
+  if (typeof dateVal === 'string') {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateVal)) return dateVal;
+    return dateVal.slice(0, 10);
+  }
+  if (dateVal instanceof Date) {
+    const year = dateVal.getFullYear();
+    const month = String(dateVal.getMonth() + 1).padStart(2, '0');
+    const day = String(dateVal.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+  return String(dateVal).slice(0, 10);
+}
 
 export interface CreateFeedbackParams {
   fullName: string;
@@ -26,6 +44,9 @@ export interface CreateFeedbackParams {
   colorVariant: NoteColor;
   pinVariant: PinVariant;
   sizeVariant: NoteSize;
+  rating: number;
+  doodleType?: DoodleType;
+  eventId: string;
 }
 
 export class FeedbackRepository {
@@ -35,11 +56,11 @@ export class FeedbackRepository {
    */
   static async createFeedbackWithLayout(
     params: CreateFeedbackParams
-  ): Promise<{ note: PublicFeedbackNote; isDuplicate: boolean }> {
+  ): Promise<{ note: PublicFeedbackNote; isDuplicate: boolean; isAutoHeld: boolean }> {
     // 1. Check if record with this idempotency key already exists
     const existing = await this.findByIdempotencyKey(params.idempotencyKey);
     if (existing) {
-      return { note: existing, isDuplicate: true };
+      return { note: existing, isDuplicate: true, isAutoHeld: false };
     }
 
     return withTransaction(async (client) => {
@@ -52,9 +73,27 @@ export class FeedbackRepository {
       if (existingInTx.rows.length > 0) {
         const fullExisting = await this.findByIdempotencyKey(params.idempotencyKey, client);
         if (fullExisting) {
-          return { note: fullExisting, isDuplicate: true };
+          return { note: fullExisting, isDuplicate: true, isAutoHeld: false };
         }
       }
+
+      // Verify target event exists and is accepting feedback
+      const eventRes = await client.query(
+        `SELECT id, name, event_date, venue, is_accepting_feedback FROM events WHERE id = $1`,
+        [params.eventId]
+      );
+      if (eventRes.rows.length === 0) {
+        throw new Error('Target event does not exist');
+      }
+      if (!eventRes.rows[0].is_accepting_feedback) {
+        throw new Error('Target event is not currently accepting submissions');
+      }
+      const targetEvent = eventRes.rows[0];
+
+      // Run server-side auto-moderation check
+      const modCheck = checkModerationShield(`${params.fullName} ${params.message}`);
+      const visibilityStatus: VisibilityStatus = modCheck.isFlagged ? 'hidden' : 'visible';
+      const doodleType: DoodleType = params.doodleType || 'check';
 
       // Insert Feedback
       const feedbackSql = `
@@ -72,11 +111,14 @@ export class FeedbackRepository {
           color_variant,
           pin_variant,
           size_variant,
+          rating,
+          doodle_type,
+          event_id,
           created_at,
           updated_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'visible', NULL, $8, $9, $10, $11, NOW(), NOW())
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NULL, $9, $10, $11, $12, $13, $14, $15, NOW(), NOW())
         RETURNING id, public_display_name, role, department, designation, institution_name,
-                  message, color_variant, pin_variant, size_variant, created_at
+                  message, color_variant, pin_variant, size_variant, rating, doodle_type, event_id, created_at, visibility_status
       `;
 
       const feedbackValues = [
@@ -87,14 +129,33 @@ export class FeedbackRepository {
         params.designation,
         params.institutionName,
         params.message,
+        visibilityStatus,
         params.idempotencyKey,
         params.colorVariant,
         params.pinVariant,
         params.sizeVariant,
+        params.rating,
+        doodleType,
+        params.eventId,
       ];
 
       const { rows: fbRows } = await client.query(feedbackSql, feedbackValues);
       const fb = fbRows[0];
+
+      // If auto-moderated hold, write audit event inside transaction
+      if (modCheck.isFlagged) {
+        await client.query(
+          `INSERT INTO audit_events (admin_id, feedback_id, event_id, action, new_state, timestamp)
+           VALUES ($1, $2, $3, $4, $5, NOW())`,
+          [
+            'SYSTEM_SHIELD',
+            fb.id,
+            params.eventId,
+            'AUTO_MODERATED_HOLD',
+            JSON.stringify({ reason: modCheck.reason }),
+          ]
+        );
+      }
 
       // Calculate deterministic spatial coordinates
       const layout = await CanvasRepository.calculateNextPlacement(client);
@@ -133,6 +194,15 @@ export class FeedbackRepository {
         designation: fb.designation,
         institutionName: fb.institution_name,
         message: fb.message,
+        rating: fb.rating,
+        doodleType: fb.doodle_type || 'check',
+        eventId: fb.event_id,
+        event: {
+          id: targetEvent.id,
+          name: targetEvent.name,
+          eventDate: formatDate(targetEvent.event_date),
+          venue: targetEvent.venue,
+        },
         createdAt: fb.created_at.toISOString(),
         colorVariant: fb.color_variant,
         pinVariant: fb.pin_variant,
@@ -147,7 +217,7 @@ export class FeedbackRepository {
         },
       };
 
-      return { note, isDuplicate: false };
+      return { note, isDuplicate: false, isAutoHeld: modCheck.isFlagged };
     });
   }
 
@@ -158,10 +228,12 @@ export class FeedbackRepository {
     const q = client ? client.query.bind(client) : query;
     const sql = `
       SELECT f.id, f.public_display_name, f.role, f.department, f.designation, f.institution_name,
-             f.message, f.color_variant, f.pin_variant, f.size_variant, f.created_at,
-             l.world_x, l.world_y, l.rotation, l.width, l.height, l.layer_order
+             f.message, f.color_variant, f.pin_variant, f.size_variant, f.rating, f.doodle_type, f.event_id, f.created_at,
+             l.world_x, l.world_y, l.rotation, l.width, l.height, l.layer_order,
+             e.id AS event_pk, e.name AS event_name, e.event_date, e.venue AS event_venue
       FROM feedback f
       LEFT JOIN canvas_layout l ON l.feedback_id = f.id
+      LEFT JOIN events e ON e.id = f.event_id
       WHERE f.idempotency_key = $1
     `;
     const { rows } = await q(sql, [key]);
@@ -176,6 +248,17 @@ export class FeedbackRepository {
       designation: r.designation,
       institutionName: r.institution_name,
       message: r.message,
+      rating: r.rating ?? 5,
+      doodleType: r.doodle_type || 'check',
+      eventId: r.event_id,
+      event: r.event_pk
+        ? {
+            id: r.event_pk,
+            name: r.event_name,
+            eventDate: formatDate(r.event_date),
+            venue: r.event_venue,
+          }
+        : null,
       createdAt: r.created_at.toISOString(),
       colorVariant: r.color_variant,
       pinVariant: r.pin_variant,
@@ -191,14 +274,22 @@ export class FeedbackRepository {
     };
   }
 
+  /**
+   * Returns all public active notes displayed on the 3D wall.
+   * Strictly filtered to events where events.is_displayed_on_wall = true.
+   */
   static async getPublicNotes(): Promise<PublicFeedbackNote[]> {
     const sql = `
       SELECT f.id, f.public_display_name, f.role, f.department, f.designation, f.institution_name,
-             f.message, f.color_variant, f.pin_variant, f.size_variant, f.created_at,
-             l.world_x, l.world_y, l.rotation, l.width, l.height, l.layer_order
+             f.message, f.color_variant, f.pin_variant, f.size_variant, f.rating, f.doodle_type, f.event_id, f.created_at,
+             l.world_x, l.world_y, l.rotation, l.width, l.height, l.layer_order,
+             e.id AS event_pk, e.name AS event_name, e.event_date, e.venue AS event_venue
       FROM feedback f
+      INNER JOIN events e ON e.id = f.event_id
       LEFT JOIN canvas_layout l ON l.feedback_id = f.id
-      WHERE f.deleted_at IS NULL AND f.visibility_status = 'visible'
+      WHERE f.deleted_at IS NULL
+        AND f.visibility_status = 'visible'
+        AND e.is_displayed_on_wall = true
       ORDER BY COALESCE(l.layer_order, 1) ASC, f.created_at ASC
     `;
 
@@ -211,6 +302,17 @@ export class FeedbackRepository {
       designation: r.designation,
       institutionName: r.institution_name,
       message: r.message,
+      rating: r.rating ?? 5,
+      doodleType: r.doodle_type || 'check',
+      eventId: r.event_id,
+      event: r.event_pk
+        ? {
+            id: r.event_pk,
+            name: r.event_name,
+            eventDate: formatDate(r.event_date),
+            venue: r.event_venue,
+          }
+        : null,
       createdAt: r.created_at.toISOString(),
       colorVariant: r.color_variant,
       pinVariant: r.pin_variant,
@@ -229,11 +331,16 @@ export class FeedbackRepository {
   static async getPublicNoteById(id: string): Promise<PublicFeedbackNote | null> {
     const sql = `
       SELECT f.id, f.public_display_name, f.role, f.department, f.designation, f.institution_name,
-             f.message, f.color_variant, f.pin_variant, f.size_variant, f.created_at,
-             l.world_x, l.world_y, l.rotation, l.width, l.height, l.layer_order
+             f.message, f.color_variant, f.pin_variant, f.size_variant, f.rating, f.doodle_type, f.event_id, f.created_at,
+             l.world_x, l.world_y, l.rotation, l.width, l.height, l.layer_order,
+             e.id AS event_pk, e.name AS event_name, e.event_date, e.venue AS event_venue
       FROM feedback f
+      INNER JOIN events e ON e.id = f.event_id
       LEFT JOIN canvas_layout l ON l.feedback_id = f.id
-      WHERE f.id = $1 AND f.deleted_at IS NULL AND f.visibility_status = 'visible'
+      WHERE f.id = $1
+        AND f.deleted_at IS NULL
+        AND f.visibility_status = 'visible'
+        AND e.is_displayed_on_wall = true
     `;
     const { rows } = await query(sql, [id]);
     if (rows.length === 0) return null;
@@ -247,6 +354,17 @@ export class FeedbackRepository {
       designation: r.designation,
       institutionName: r.institution_name,
       message: r.message,
+      rating: r.rating ?? 5,
+      doodleType: r.doodle_type || 'check',
+      eventId: r.event_id,
+      event: r.event_pk
+        ? {
+            id: r.event_pk,
+            name: r.event_name,
+            eventDate: formatDate(r.event_date),
+            venue: r.event_venue,
+          }
+        : null,
       createdAt: r.created_at.toISOString(),
       colorVariant: r.color_variant,
       pinVariant: r.pin_variant,
@@ -265,19 +383,29 @@ export class FeedbackRepository {
   static async getPublicHistory(options: {
     search?: string;
     role?: Role;
+    eventId?: string;
     page: number;
     limit: number;
   }): Promise<PaginatedData<PublicFeedbackNote>> {
-    const { search, role, page, limit } = options;
+    const { search, role, eventId, page, limit } = options;
     const offset = (page - 1) * limit;
 
-    const whereClauses: string[] = ['f.deleted_at IS NULL', "f.visibility_status = 'visible'"];
+    const whereClauses: string[] = [
+      'f.deleted_at IS NULL',
+      "f.visibility_status = 'visible'",
+      'e.is_displayed_on_wall = true',
+    ];
     const values: unknown[] = [];
     let paramIndex = 1;
 
     if (role) {
       whereClauses.push(`f.role = $${paramIndex++}`);
       values.push(role);
+    }
+
+    if (eventId) {
+      whereClauses.push(`f.event_id = $${paramIndex++}`);
+      values.push(eventId);
     }
 
     if (search && search.trim().length > 0) {
@@ -288,17 +416,24 @@ export class FeedbackRepository {
       paramIndex++;
     }
 
-    const whereSql = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
+    const whereSql = `WHERE ${whereClauses.join(' AND ')}`;
 
-    const countSql = `SELECT COUNT(*)::int AS total FROM feedback f ${whereSql}`;
+    const countSql = `
+      SELECT COUNT(*)::int AS total
+      FROM feedback f
+      INNER JOIN events e ON e.id = f.event_id
+      ${whereSql}
+    `;
     const { rows: countRows } = await query<{ total: number }>(countSql, values);
     const total = countRows[0]?.total ?? 0;
 
     const dataSql = `
       SELECT f.id, f.public_display_name, f.role, f.department, f.designation, f.institution_name,
-             f.message, f.color_variant, f.pin_variant, f.size_variant, f.created_at,
-             l.world_x, l.world_y, l.rotation, l.width, l.height, l.layer_order
+             f.message, f.color_variant, f.pin_variant, f.size_variant, f.rating, f.doodle_type, f.event_id, f.created_at,
+             l.world_x, l.world_y, l.rotation, l.width, l.height, l.layer_order,
+             e.id AS event_pk, e.name AS event_name, e.event_date, e.venue AS event_venue
       FROM feedback f
+      INNER JOIN events e ON e.id = f.event_id
       LEFT JOIN canvas_layout l ON l.feedback_id = f.id
       ${whereSql}
       ORDER BY f.created_at DESC
@@ -315,6 +450,17 @@ export class FeedbackRepository {
       designation: r.designation,
       institutionName: r.institution_name,
       message: r.message,
+      rating: r.rating ?? 5,
+      doodleType: r.doodle_type || 'check',
+      eventId: r.event_id,
+      event: r.event_pk
+        ? {
+            id: r.event_pk,
+            name: r.event_name,
+            eventDate: formatDate(r.event_date),
+            venue: r.event_venue,
+          }
+        : null,
       createdAt: r.created_at.toISOString(),
       colorVariant: r.color_variant,
       pinVariant: r.pin_variant,
@@ -339,23 +485,42 @@ export class FeedbackRepository {
   }
 
   static async getPublicStats(): Promise<PublicStats> {
-    const sql = `
+    const statsSql = `
       SELECT
         COUNT(*)::int AS total_accepted,
-        COUNT(CASE WHEN role = 'Student' THEN 1 END)::int AS students,
-        COUNT(CASE WHEN role = 'Faculty' THEN 1 END)::int AS faculty,
-        COUNT(CASE WHEN role = 'Other Visitor' THEN 1 END)::int AS other_visitors
-      FROM feedback
-      WHERE deleted_at IS NULL
+        COUNT(CASE WHEN f.visibility_status = 'visible' THEN 1 END)::int AS visible_wall_count,
+        COUNT(CASE WHEN f.role = 'Student' THEN 1 END)::int AS students,
+        COUNT(CASE WHEN f.role = 'Faculty' THEN 1 END)::int AS faculty,
+        COUNT(CASE WHEN f.role = 'Other Visitor' THEN 1 END)::int AS other_visitors,
+        ROUND(COALESCE(AVG(f.rating), 5.0)::numeric, 1)::float AS average_rating
+      FROM feedback f
+      INNER JOIN events e ON e.id = f.event_id
+      WHERE f.deleted_at IS NULL AND e.is_displayed_on_wall = true
     `;
-    const { rows } = await query(sql);
-    const r = rows[0] || { total_accepted: 0, students: 0, faculty: 0, other_visitors: 0 };
+
+    const [statsRes, activeWallEvents] = await Promise.all([
+      query(statsSql),
+      EventRepository.getActiveWallEvents(),
+    ]);
+
+    const r = statsRes.rows[0] || {
+      total_accepted: 0,
+      visible_wall_count: 0,
+      students: 0,
+      faculty: 0,
+      other_visitors: 0,
+      average_rating: 5.0,
+    };
 
     return {
       totalAccepted: r.total_accepted,
+      totalAcceptedCount: r.total_accepted,
+      visibleWallCount: r.visible_wall_count,
       students: r.students,
       faculty: r.faculty,
       otherVisitors: r.other_visitors,
+      averageRating: r.average_rating,
+      activeWallEvents,
       lastUpdated: new Date().toISOString(),
     };
   }
@@ -364,10 +529,11 @@ export class FeedbackRepository {
     search?: string;
     role?: Role;
     status: 'all' | 'visible' | 'hidden' | 'deleted';
+    eventId?: string;
     page: number;
     limit: number;
   }): Promise<PaginatedData<AdminFeedbackItem>> {
-    const { search, role, status, page, limit } = options;
+    const { search, role, status, eventId, page, limit } = options;
     const offset = (page - 1) * limit;
 
     const whereClauses: string[] = [];
@@ -387,6 +553,11 @@ export class FeedbackRepository {
       values.push(role);
     }
 
+    if (eventId && eventId !== 'all') {
+      whereClauses.push(`f.event_id = $${paramIndex++}`);
+      values.push(eventId);
+    }
+
     if (search && search.trim().length > 0) {
       whereClauses.push(
         `(f.full_name ILIKE $${paramIndex} OR f.public_display_name ILIKE $${paramIndex} OR f.message ILIKE $${paramIndex} OR f.department ILIKE $${paramIndex} OR f.institution_name ILIKE $${paramIndex})`
@@ -404,10 +575,12 @@ export class FeedbackRepository {
     const dataSql = `
       SELECT f.id, f.full_name, f.public_display_name, f.role, f.department, f.designation,
              f.institution_name, f.message, f.visibility_status, f.deleted_at, f.idempotency_key,
-             f.color_variant, f.pin_variant, f.size_variant, f.created_at, f.updated_at,
-             l.world_x, l.world_y, l.rotation, l.width, l.height, l.layer_order
+             f.color_variant, f.pin_variant, f.size_variant, f.rating, f.doodle_type, f.event_id, f.created_at, f.updated_at,
+             l.world_x, l.world_y, l.rotation, l.width, l.height, l.layer_order,
+             e.id AS event_pk, e.name AS event_name, e.event_date, e.venue AS event_venue
       FROM feedback f
       LEFT JOIN canvas_layout l ON l.feedback_id = f.id
+      LEFT JOIN events e ON e.id = f.event_id
       ${whereSql}
       ORDER BY f.created_at DESC
       LIMIT $${paramIndex++} OFFSET $${paramIndex++}
@@ -424,6 +597,17 @@ export class FeedbackRepository {
       designation: r.designation,
       institutionName: r.institution_name,
       message: r.message,
+      rating: r.rating ?? 5,
+      doodleType: r.doodle_type || 'check',
+      eventId: r.event_id,
+      event: r.event_pk
+        ? {
+            id: r.event_pk,
+            name: r.event_name,
+            eventDate: formatDate(r.event_date),
+            venue: r.event_venue,
+          }
+        : null,
       createdAt: r.created_at.toISOString(),
       updatedAt: r.updated_at.toISOString(),
       visibilityStatus: r.visibility_status,
@@ -451,7 +635,15 @@ export class FeedbackRepository {
     };
   }
 
-  static async getAdminAnalytics(): Promise<AdminAnalytics> {
+  static async getAdminAnalytics(eventId?: string): Promise<AdminAnalytics> {
+    const whereClauses: string[] = [];
+    const values: unknown[] = [];
+    if (eventId && eventId !== 'all') {
+      whereClauses.push(`event_id = $1`);
+      values.push(eventId);
+    }
+    const whereSql = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
+
     const totalsSql = `
       SELECT
         COUNT(CASE WHEN deleted_at IS NULL THEN 1 END)::int AS total_accepted,
@@ -460,11 +652,13 @@ export class FeedbackRepository {
         COUNT(CASE WHEN deleted_at IS NOT NULL THEN 1 END)::int AS total_deleted,
         COUNT(CASE WHEN deleted_at IS NULL AND role = 'Student' THEN 1 END)::int AS students,
         COUNT(CASE WHEN deleted_at IS NULL AND role = 'Faculty' THEN 1 END)::int AS faculty,
-        COUNT(CASE WHEN deleted_at IS NULL AND role = 'Other Visitor' THEN 1 END)::int AS other_visitors
+        COUNT(CASE WHEN deleted_at IS NULL AND role = 'Other Visitor' THEN 1 END)::int AS other_visitors,
+        ROUND(COALESCE(AVG(CASE WHEN deleted_at IS NULL THEN rating END), 5.0)::numeric, 1)::float AS average_rating
       FROM feedback
+      ${whereSql}
     `;
 
-    const { rows: totalRows } = await query(totalsSql);
+    const { rows: totalRows } = await query(totalsSql, values);
     const t = totalRows[0] || {
       total_accepted: 0,
       total_visible: 0,
@@ -473,33 +667,71 @@ export class FeedbackRepository {
       students: 0,
       faculty: 0,
       other_visitors: 0,
+      average_rating: 5.0,
     };
 
+    const deptWhere = [
+      'deleted_at IS NULL',
+      'department IS NOT NULL',
+      "TRIM(department) != ''",
+    ];
+    if (eventId && eventId !== 'all') {
+      deptWhere.push(`event_id = $1`);
+    }
     const deptSql = `
       SELECT COALESCE(department, 'Unspecified') AS department, COUNT(*)::int AS count
       FROM feedback
-      WHERE deleted_at IS NULL AND department IS NOT NULL AND TRIM(department) != ''
+      WHERE ${deptWhere.join(' AND ')}
       GROUP BY department
       ORDER BY count DESC
       LIMIT 20
     `;
-    const { rows: deptRows } = await query<{ department: string; count: number }>(deptSql);
+    const { rows: deptRows } = await query<{ department: string; count: number }>(deptSql, values);
     const departmentBreakdown: Record<string, number> = {};
     for (const d of deptRows) {
       departmentBreakdown[d.department] = d.count;
     }
+
+    // Per-event analytics
+    const eventStatsSql = `
+      SELECT
+        e.id AS event_id,
+        e.name,
+        COUNT(CASE WHEN f.deleted_at IS NULL THEN 1 END)::int AS total_accepted,
+        ROUND(COALESCE(AVG(CASE WHEN f.deleted_at IS NULL THEN f.rating END), 5.0)::numeric, 1)::float AS average_rating
+      FROM events e
+      LEFT JOIN feedback f ON f.event_id = e.id
+      GROUP BY e.id, e.name
+      ORDER BY total_accepted DESC, e.event_date DESC
+    `;
+    const { rows: eventStatsRows } = await query<{
+      event_id: string;
+      name: string;
+      total_accepted: number;
+      average_rating: number;
+    }>(eventStatsSql);
+
+    const eventsAnalytics = eventStatsRows.map((r) => ({
+      eventId: r.event_id,
+      name: r.name,
+      totalAccepted: r.total_accepted,
+      averageRating: r.average_rating,
+    }));
 
     return {
       totalAccepted: t.total_accepted,
       totalVisible: t.total_visible,
       totalHidden: t.total_hidden,
       totalDeleted: t.total_deleted,
+      autoHeldCount: t.total_hidden,
+      averageRating: t.average_rating,
       roleBreakdown: {
         Student: t.students,
         Faculty: t.faculty,
         'Other Visitor': t.other_visitors,
       },
       departmentBreakdown,
+      eventsAnalytics,
     };
   }
 
@@ -514,13 +746,21 @@ export class FeedbackRepository {
       SET visibility_status = $2, updated_at = NOW()
       WHERE id = $1 AND deleted_at IS NULL
       RETURNING id, public_display_name, role, department, designation, institution_name,
-                message, color_variant, pin_variant, size_variant, created_at, visibility_status
+                message, color_variant, pin_variant, size_variant, rating, doodle_type, event_id, created_at, visibility_status
     `;
 
     const { rows } = await q(sql, [id, visibility]);
     if (rows.length === 0) return null;
 
     const r = rows[0];
+
+    // Fetch event info
+    const eventRes = await q(
+      `SELECT id, name, event_date, venue FROM events WHERE id = $1`,
+      [r.event_id]
+    );
+    const ev = eventRes.rows[0];
+
     const layoutRes = await q(
       `SELECT world_x, world_y, rotation, width, height, layer_order FROM canvas_layout WHERE feedback_id = $1`,
       [id]
@@ -557,6 +797,17 @@ export class FeedbackRepository {
       designation: r.designation,
       institutionName: r.institution_name,
       message: r.message,
+      rating: r.rating ?? 5,
+      doodleType: r.doodle_type || 'check',
+      eventId: r.event_id,
+      event: ev
+        ? {
+            id: ev.id,
+            name: ev.name,
+            eventDate: formatDate(ev.event_date),
+            venue: ev.venue,
+          }
+        : null,
       createdAt: r.created_at.toISOString(),
       colorVariant: r.color_variant,
       pinVariant: r.pin_variant,
