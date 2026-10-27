@@ -195,9 +195,12 @@ export const FeedbackForm: React.FC = () => {
     () => `devbappa-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
   );
 
-  // Fetch active submission events on mount & update cache
+  // Fetch active submission events on mount & update cache with cold-start wake-up ping
   useEffect(() => {
     let isMounted = true;
+    // Immediate background cold-start wake-up ping to /api/v1/health
+    api.getHealth().catch(() => {});
+
     api
       .getPublicEvents()
       .then((data) => {

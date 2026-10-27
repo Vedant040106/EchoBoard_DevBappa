@@ -4,9 +4,7 @@ node_modules/
 .pnp.js
 
 # Environment and Local Secrets
-.env
-.env.local
-.env.*.local
+.env*
 *.env
 !.env.example
 *.pem
