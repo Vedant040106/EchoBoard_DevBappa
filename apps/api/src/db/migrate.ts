@@ -1,16 +1,32 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { pool } from './index.js';
+import pg from 'pg';
+import { config } from '../config/index.js';
 import { logger } from '../utils/logger.js';
+
+const isNeonOrCloud =
+  config.databaseUrlUnpooled.includes('neon.tech') ||
+  config.databaseUrlUnpooled.includes('sslmode=require') ||
+  config.isProduction;
+
+const migrationPool = new pg.Pool({
+  connectionString: config.databaseUrlUnpooled,
+  ssl: isNeonOrCloud
+    ? {
+        rejectUnauthorized: false,
+      }
+    : undefined,
+  max: 2,
+});
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export async function runMigrations(): Promise<void> {
-  const client = await pool.connect();
+  const client = await migrationPool.connect();
   try {
-    logger.info('Starting database migrations...');
+    logger.info('Starting database migrations (using direct unpooled connection)...');
 
     await client.query(`
       CREATE TABLE IF NOT EXISTS _migrations (
@@ -20,10 +36,15 @@ export async function runMigrations(): Promise<void> {
       );
     `);
 
-    const migrationsDir = path.join(__dirname, 'migrations');
+    let migrationsDir = path.join(__dirname, 'migrations');
     if (!fs.existsSync(migrationsDir)) {
-      logger.warn({ migrationsDir }, 'Migrations directory not found');
-      return;
+      const srcDir = path.resolve(__dirname, '../../src/db/migrations');
+      if (fs.existsSync(srcDir)) {
+        migrationsDir = srcDir;
+      } else {
+        logger.warn({ migrationsDir }, 'Migrations directory not found');
+        return;
+      }
     }
 
     const files = fs
@@ -70,12 +91,12 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   runMigrations()
     .then(async () => {
       logger.info('Migration runner finished');
-      await pool.end();
+      await migrationPool.end();
       process.exit(0);
     })
     .catch(async (err) => {
       logger.error({ err }, 'Migration runner terminated with error');
-      await pool.end();
+      await migrationPool.end();
       process.exit(1);
     });
 }
