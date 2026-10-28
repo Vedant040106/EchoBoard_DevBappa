@@ -18,22 +18,22 @@ import {
   broadcastStatsUpdated,
 } from '../../realtime/socket.server.js';
 import { logger } from '../../utils/logger.js';
+import { swrRoute } from '../../cache/swr-cache.js';
+import { invalidateEventsCache } from '../../cache/invalidator.js';
 
 export const publicEventRouter = Router();
 export const adminEventRouter = Router();
 
-// GET /api/v1/events/public
-publicEventRouter.get('/public', async (_req: Request, res: Response, next: NextFunction) => {
-  try {
-    const data = await EventRepository.getPublicEvents();
-    res.json({
-      success: true,
-      data,
-    });
-  } catch (err) {
-    next(err);
-  }
-});
+// GET /api/v1/events/public (TTL: 5s, SWR: 15s)
+publicEventRouter.get(
+  '/public',
+  swrRoute(
+    () => 'events:public',
+    5,
+    15,
+    async () => EventRepository.getPublicEvents()
+  )
+);
 
 // GET /api/v1/admin/events
 adminEventRouter.get('/', requireAdminAuth, async (_req: Request, res: Response, next: NextFunction) => {
@@ -73,6 +73,9 @@ adminEventRouter.post(
         broadcastWallEventsUpdated(wallEvents);
         FeedbackRepository.getPublicStats().then(broadcastStatsUpdated).catch(() => {});
       }
+
+      // Invalidate events and stats caches
+      await invalidateEventsCache();
 
       logger.info({ eventId: created.id, name: created.name }, 'Admin created event');
 
@@ -115,6 +118,9 @@ adminEventRouter.put(
       FeedbackRepository.getPublicStats()
         .then(broadcastStatsUpdated)
         .catch((err) => logger.warn({ err }, 'Failed to broadcast stats after wall selection change'));
+
+      // Invalidate events and stats caches
+      await invalidateEventsCache();
 
       logger.info({ eventIds }, 'Admin updated wall events selection');
 
@@ -176,6 +182,9 @@ adminEventRouter.patch(
         broadcastWallEventsUpdated(wallEvents);
         FeedbackRepository.getPublicStats().then(broadcastStatsUpdated).catch(() => {});
       }
+
+      // Invalidate events and stats caches
+      await invalidateEventsCache();
 
       res.json({
         success: true,

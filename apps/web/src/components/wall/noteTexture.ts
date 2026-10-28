@@ -296,18 +296,22 @@ function drawDoodleWatermark(
  * hand-drawn marker typography, compact event tag, and role badge.
  */
 export function createNoteTexture(note: PublicFeedbackNote): THREE.CanvasTexture {
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const canvasSize = isMobile ? 512 : 1024;
+  const scale = canvasSize / 1024;
+
   const rating = typeof note.rating === 'number' ? Math.max(1, Math.min(5, note.rating)) : 5;
   const doodleType = note.doodleType || 'check';
   const eventName = note.event?.name || 'Tech Expo';
-  const cacheKey = `${note.id}-${note.publicDisplayName}-${note.message}-${note.colorVariant || 'yellow'}-${rating}-${doodleType}-${eventName}`;
+  const cacheKey = `${note.id}-${note.publicDisplayName}-${note.message}-${note.colorVariant || 'yellow'}-${rating}-${doodleType}-${eventName}-${canvasSize}`;
   const existing = textureCache.get(cacheKey);
   if (existing) {
     return existing;
   }
 
   const canvas = document.createElement('canvas');
-  canvas.width = 1024;
-  canvas.height = 1024;
+  canvas.width = canvasSize;
+  canvas.height = canvasSize;
   const ctx = canvas.getContext('2d');
 
   if (!ctx) {
@@ -319,16 +323,16 @@ export function createNoteTexture(note: PublicFeedbackNote): THREE.CanvasTexture
     APPROVED_PAPER_PALETTE[note.colorVariant || 'yellow'] || APPROVED_PAPER_PALETTE.yellow;
 
   // 1. Multi-stop warm paper gradient (top adhesive highlight -> body -> lower edge depth)
-  const grad = ctx.createLinearGradient(0, 0, 0, 1024);
+  const grad = ctx.createLinearGradient(0, 0, 0, canvasSize);
   grad.addColorStop(0, palette.top);
   grad.addColorStop(0.18, palette.top);
   grad.addColorStop(0.85, palette.bottom);
   grad.addColorStop(1, palette.bottom);
   ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 1024, 1024);
+  ctx.fillRect(0, 0, canvasSize, canvasSize);
 
   // 2. Procedural paper-fiber grain (micro-noise texture for tactile clay-paper realism)
-  const imgData = ctx.getImageData(0, 0, 1024, 1024);
+  const imgData = ctx.getImageData(0, 0, canvasSize, canvasSize);
   const data = imgData.data;
   for (let i = 0; i < data.length; i += 4) {
     // Subtle luminance jitter (-7 to +7)
@@ -338,6 +342,10 @@ export function createNoteTexture(note: PublicFeedbackNote): THREE.CanvasTexture
     data[i + 2] = Math.min(255, Math.max(0, data[i + 2] + noise));
   }
   ctx.putImageData(imgData, 0, 0);
+
+  // Scale remaining vector and typography operations to canvas resolution
+  ctx.save();
+  ctx.scale(scale, scale);
 
   // 3. Top adhesive strip highlight & subtle press line (top 150px)
   ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
@@ -528,13 +536,15 @@ export function createNoteTexture(note: PublicFeedbackNote): THREE.CanvasTexture
   ctx.fillStyle = palette.badgeText;
   ctx.fillText(roleText, roleBadgeX + 14, 934);
 
+  ctx.restore();
+
   // Create High-DPI Three.js Texture
   const texture = new THREE.CanvasTexture(canvas);
   texture.minFilter = THREE.LinearMipmapLinearFilter;
   texture.magFilter = THREE.LinearFilter;
   texture.generateMipmaps = true;
   texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = 16;
+  texture.anisotropy = isMobile ? 4 : 16;
   texture.needsUpdate = true;
 
   textureCache.set(cacheKey, texture);
@@ -545,26 +555,29 @@ export function createNoteTexture(note: PublicFeedbackNote): THREE.CanvasTexture
  * Creates texture for master announcement memo when wall is empty.
  */
 export function createAnnouncementTexture(): THREE.CanvasTexture {
-  const cacheKey = '__announcement__';
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const canvasSize = isMobile ? 512 : 1024;
+  const scale = canvasSize / 1024;
+  const cacheKey = `__announcement__${canvasSize}`;
   const existing = textureCache.get(cacheKey);
   if (existing) return existing;
 
   const canvas = document.createElement('canvas');
-  canvas.width = 1024;
-  canvas.height = 1024;
+  canvas.width = canvasSize;
+  canvas.height = canvasSize;
   const ctx = canvas.getContext('2d');
 
   if (!ctx) return new THREE.CanvasTexture(canvas);
 
   // Warm Butter Yellow background
-  const grad = ctx.createLinearGradient(0, 0, 0, 1024);
+  const grad = ctx.createLinearGradient(0, 0, 0, canvasSize);
   grad.addColorStop(0, '#FFE66D');
   grad.addColorStop(1, '#F2CC39');
   ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 1024, 1024);
+  ctx.fillRect(0, 0, canvasSize, canvasSize);
 
   // Micro-noise grain
-  const imgData = ctx.getImageData(0, 0, 1024, 1024);
+  const imgData = ctx.getImageData(0, 0, canvasSize, canvasSize);
   const data = imgData.data;
   for (let i = 0; i < data.length; i += 4) {
     const noise = (Math.random() - 0.5) * 12;
@@ -573,6 +586,9 @@ export function createAnnouncementTexture(): THREE.CanvasTexture {
     data[i + 2] = Math.min(255, Math.max(0, data[i + 2] + noise));
   }
   ctx.putImageData(imgData, 0, 0);
+
+  ctx.save();
+  ctx.scale(scale, scale);
 
   // Top adhesive crease
   ctx.fillStyle = 'rgba(255, 255, 255, 0.28)';
@@ -620,17 +636,20 @@ export function createAnnouncementTexture(): THREE.CanvasTexture {
   ctx.font = '800 38px "Outfit", sans-serif';
   ctx.fillText('+ Share Feedback & Rating', 512, 795);
 
+  ctx.restore();
+
   const texture = new THREE.CanvasTexture(canvas);
   texture.minFilter = THREE.LinearMipmapLinearFilter;
   texture.magFilter = THREE.LinearFilter;
   texture.generateMipmaps = true;
   texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = 16;
+  texture.anisotropy = isMobile ? 4 : 16;
   texture.needsUpdate = true;
 
   textureCache.set(cacheKey, texture);
   return texture;
 }
+
 
 /**
  * Clears texture cache on unmount to prevent memory leaks.

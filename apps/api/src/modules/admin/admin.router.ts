@@ -23,6 +23,7 @@ import {
 } from '../../realtime/socket.server.js';
 import { logger } from '../../utils/logger.js';
 import { adminEventRouter } from '../event/event.router.js';
+import { invalidateFeedbackCache } from '../../cache/invalidator.js';
 
 export const adminRouter = Router();
 
@@ -207,6 +208,9 @@ adminRouter.post(
       // Broadcast stats
       FeedbackRepository.getPublicStats().then(broadcastStatsUpdated).catch(() => {});
 
+      // Invalidate SWR read cache
+      await invalidateFeedbackCache();
+
       res.json({
         success: true,
         data: updated,
@@ -253,6 +257,9 @@ adminRouter.post(
       // Broadcast stats
       FeedbackRepository.getPublicStats().then(broadcastStatsUpdated).catch(() => {});
 
+      // Invalidate SWR read cache
+      await invalidateFeedbackCache();
+
       res.json({
         success: true,
         data: updated,
@@ -297,6 +304,9 @@ adminRouter.post(
 
       // Broadcast stats
       FeedbackRepository.getPublicStats().then(broadcastStatsUpdated).catch(() => {});
+
+      // Invalidate SWR read cache
+      await invalidateFeedbackCache();
 
       res.json({
         success: true,
@@ -345,6 +355,9 @@ adminRouter.post(
 
       // Broadcast stats
       FeedbackRepository.getPublicStats().then(broadcastStatsUpdated).catch(() => {});
+
+      // Invalidate SWR read cache
+      await invalidateFeedbackCache();
 
       res.json({
         success: true,

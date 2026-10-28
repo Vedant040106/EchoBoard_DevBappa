@@ -1,8 +1,10 @@
 import type { Server as HttpServer } from 'http';
 import { Server as SocketIOServer, type Socket } from 'socket.io';
+import pg from 'pg';
 import { config } from '../config/index.js';
 import { logger } from '../utils/logger.js';
 import { AdminRepository } from '../db/repositories/admin.repository.js';
+import { pool } from '../db/index.js';
 import {
   REALTIME_EVENTS,
   type PublicFeedbackNote,
@@ -10,8 +12,13 @@ import {
   type CanvasNoteLayout,
   type PublicEvent,
 } from '@devbappa/shared';
+import {
+  queueCoalescedStatsBroadcast,
+  handleCrossInstanceRealtimeMessage,
+} from './batch-emitter.js';
 
 let io: SocketIOServer | null = null;
+let listenClient: pg.Client | null = null;
 
 export function initSocketServer(httpServer: HttpServer): SocketIOServer {
   io = new SocketIOServer(httpServer, {
@@ -45,11 +52,74 @@ export function initSocketServer(httpServer: HttpServer): SocketIOServer {
     });
   });
 
+  // Setup cross-instance / cluster synchronization via PostgreSQL LISTEN on direct connection
+  initPgListener().catch((err) => {
+    logger.debug({ err }, 'PG LISTEN initialization skipped or running single-instance mode');
+  });
+
   return io;
+}
+
+async function initPgListener(): Promise<void> {
+  const isNeonOrCloud =
+    config.databaseUrlUnpooled.includes('neon.tech') ||
+    config.databaseUrlUnpooled.includes('sslmode=require') ||
+    config.isProduction;
+
+  listenClient = new pg.Client({
+    connectionString: config.databaseUrlUnpooled,
+    ssl: isNeonOrCloud ? { rejectUnauthorized: false } : undefined,
+    keepAlive: true,
+  });
+
+  try {
+    await listenClient.connect();
+    await listenClient.query('LISTEN devbappa_realtime');
+    await listenClient.query('LISTEN devbappa_cache_invalidation');
+
+    listenClient.on('notification', (msg) => {
+      if (msg.channel && msg.payload) {
+        handleCrossInstanceRealtimeMessage(msg.channel, msg.payload);
+      }
+    });
+
+    listenClient.on('error', (err) => {
+      logger.debug({ err }, 'PG LISTEN connection encountered error');
+    });
+
+    logger.info('Cross-instance PostgreSQL LISTEN/NOTIFY synchronization established');
+  } catch (err) {
+    logger.debug({ err }, 'Could not initialize cross-instance LISTEN client; continuing in standalone mode');
+    listenClient = null;
+  }
+}
+
+async function publishRealtimeEvent(type: string, data: unknown): Promise<void> {
+  try {
+    const payload = JSON.stringify({ type, data });
+    await pool.query('SELECT pg_notify($1, $2)', ['devbappa_realtime', payload]);
+  } catch {
+    // Non-fatal if DB is single instance or in test
+  }
 }
 
 export function getSocketServer(): SocketIOServer | null {
   return io;
+}
+
+export async function closeSocketServer(): Promise<void> {
+  if (listenClient) {
+    try {
+      await listenClient.end();
+    } catch {
+      // Ignored
+    }
+    listenClient = null;
+  }
+  if (io) {
+    io.close();
+    io = null;
+  }
 }
 
 /**
@@ -58,7 +128,6 @@ export function getSocketServer(): SocketIOServer | null {
  */
 export function broadcastNewFeedback(note: PublicFeedbackNote): void {
   if (!io) return;
-  // Ensure private fields (like full_name) are never present in public payload
   const publicPayload: PublicFeedbackNote = {
     id: note.id,
     publicDisplayName: note.publicDisplayName,
@@ -78,6 +147,7 @@ export function broadcastNewFeedback(note: PublicFeedbackNote): void {
     layout: note.layout,
   };
   io.emit(REALTIME_EVENTS.FEEDBACK_NEW, publicPayload);
+  publishRealtimeEvent(REALTIME_EVENTS.FEEDBACK_NEW, publicPayload).catch(() => {});
 }
 
 export function broadcastAdminAutoHeld(item: unknown): void {
@@ -88,29 +158,35 @@ export function broadcastAdminAutoHeld(item: unknown): void {
 export function broadcastFeedbackHidden(id: string): void {
   if (!io) return;
   io.emit(REALTIME_EVENTS.FEEDBACK_HIDDEN, { id });
+  publishRealtimeEvent(REALTIME_EVENTS.FEEDBACK_HIDDEN, { id }).catch(() => {});
 }
 
 export function broadcastFeedbackRestored(note: PublicFeedbackNote): void {
   if (!io) return;
   io.emit(REALTIME_EVENTS.FEEDBACK_RESTORED, note);
+  publishRealtimeEvent(REALTIME_EVENTS.FEEDBACK_RESTORED, note).catch(() => {});
 }
 
 export function broadcastFeedbackDeleted(id: string): void {
   if (!io) return;
   io.emit(REALTIME_EVENTS.FEEDBACK_DELETED, { id });
+  publishRealtimeEvent(REALTIME_EVENTS.FEEDBACK_DELETED, { id }).catch(() => {});
 }
 
 export function broadcastStatsUpdated(stats: PublicStats): void {
   if (!io) return;
-  io.emit(REALTIME_EVENTS.STATS_UPDATED, stats);
+  queueCoalescedStatsBroadcast(stats);
+  publishRealtimeEvent(REALTIME_EVENTS.STATS_UPDATED, stats).catch(() => {});
 }
 
 export function broadcastLayoutUpdated(feedbackId: string, layout: CanvasNoteLayout): void {
   if (!io) return;
   io.emit(REALTIME_EVENTS.LAYOUT_UPDATED, { feedbackId, layout });
+  publishRealtimeEvent(REALTIME_EVENTS.LAYOUT_UPDATED, { feedbackId, layout }).catch(() => {});
 }
 
 export function broadcastWallEventsUpdated(wallEvents: PublicEvent[]): void {
   if (!io) return;
   io.emit(REALTIME_EVENTS.WALL_EVENTS_UPDATED, { wallEvents });
+  publishRealtimeEvent(REALTIME_EVENTS.WALL_EVENTS_UPDATED, { wallEvents }).catch(() => {});
 }

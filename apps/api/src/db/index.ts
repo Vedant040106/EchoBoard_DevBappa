@@ -19,7 +19,9 @@ export const pool = new Pool({
     : undefined,
   max: 20,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 20000,
+  connectionTimeoutMillis: 10000,
+  keepAlive: true,
+  keepAliveInitialDelayMillis: 10000,
 });
 
 pool.on('error', (err) => {
@@ -31,6 +33,14 @@ export async function query<T extends pg.QueryResultRow = pg.QueryResultRow>(
   params?: unknown[]
 ): Promise<pg.QueryResult<T>> {
   return pool.query<T>(text, params);
+}
+
+export async function preparedQuery<T extends pg.QueryResultRow = pg.QueryResultRow>(
+  name: string,
+  text: string,
+  params?: unknown[]
+): Promise<pg.QueryResult<T>> {
+  return pool.query<T>({ name, text, values: params });
 }
 
 export async function withTransaction<T>(

@@ -12,12 +12,24 @@ import { canvasRouter } from './modules/canvas/canvas.router.js';
 import { adminRouter } from './modules/admin/admin.router.js';
 import { publicEventRouter } from './modules/event/event.router.js';
 import { errorHandler } from './middleware/error.middleware.js';
+import compression from 'compression';
 import { API_ERROR_CODES } from '@devbappa/shared';
 
 export const app = express();
 
 // Trust reverse proxy (critical for Render + Vercel HTTPS cookies and rate limiting)
 app.set('trust proxy', 1);
+
+// HTTP response compression for high-throughput responses
+app.use(
+  compression({
+    threshold: 1024,
+    filter: (req, res) => {
+      if (req.headers['x-no-compression']) return false;
+      return compression.filter(req, res);
+    },
+  })
+);
 
 // Security headers
 app.use(

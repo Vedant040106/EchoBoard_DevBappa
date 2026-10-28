@@ -1,16 +1,48 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import type { PublicFeedbackNote, PublicStats, CanvasNoteLayout, PublicEvent } from '@devbappa/shared';
 import { api } from './services/api.js';
 import { useSocket } from './hooks/useSocket.js';
 import { useOfflineQueue } from './hooks/useOfflineQueue.js';
 import { Header } from './components/layout/Header.js';
-import { WallPage } from './pages/WallPage.js';
-import { FeedbackForm } from './features/submission/FeedbackForm.js';
-import { PublicHistory } from './features/history/PublicHistory.js';
-import { AdminLogin } from './features/admin/AdminLogin.js';
-import { AdminDashboard } from './features/admin/AdminDashboard.js';
-import { NotFoundPage } from './pages/NotFoundPage.js';
+
+const WallPage = lazy(() => import('./pages/WallPage.js').then((m) => ({ default: m.WallPage })));
+const FeedbackForm = lazy(() => import('./features/submission/FeedbackForm.js').then((m) => ({ default: m.FeedbackForm })));
+const PublicHistory = lazy(() => import('./features/history/PublicHistory.js').then((m) => ({ default: m.PublicHistory })));
+const AdminLogin = lazy(() => import('./features/admin/AdminLogin.js').then((m) => ({ default: m.AdminLogin })));
+const AdminDashboard = lazy(() => import('./features/admin/AdminDashboard.js').then((m) => ({ default: m.AdminDashboard })));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage.js').then((m) => ({ default: m.NotFoundPage })));
+
+const RouteLoadingSpinner: React.FC = () => (
+  <div
+    role="status"
+    aria-label="Loading page"
+    style={{
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '16px',
+      color: '#94a3b8',
+      fontSize: 'var(--text-body-sm, 14px)',
+      fontWeight: 500,
+      minHeight: '280px',
+    }}
+  >
+    <div
+      style={{
+        width: '36px',
+        height: '36px',
+        border: '3px solid rgba(249, 115, 22, 0.2)',
+        borderTopColor: '#f97316',
+        borderRadius: '50%',
+        animation: 'spin 0.8s linear infinite',
+      }}
+    />
+    <span>Loading...</span>
+  </div>
+);
 
 export const App: React.FC = () => {
   const [notes, setNotes] = useState<PublicFeedbackNote[]>([]);
@@ -160,23 +192,25 @@ export const App: React.FC = () => {
         </div>
       )}
       <div style={{ flex: 1, position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <WallPage
-                notes={notes}
-                newNoteId={newNoteId}
-                onRefreshNotes={refreshData}
-              />
-            }
-          />
-          <Route path="/submit" element={<FeedbackForm />} />
-          <Route path="/history" element={<PublicHistory />} />
-          <Route path="/admin" element={<AdminLogin />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
+        <Suspense fallback={<RouteLoadingSpinner />}>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <WallPage
+                  notes={notes}
+                  newNoteId={newNoteId}
+                  onRefreshNotes={refreshData}
+                />
+              }
+            />
+            <Route path="/submit" element={<FeedbackForm />} />
+            <Route path="/history" element={<PublicHistory />} />
+            <Route path="/admin" element={<AdminLogin />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </Suspense>
       </div>
     </div>
   );

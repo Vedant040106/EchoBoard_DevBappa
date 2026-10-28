@@ -17,21 +17,21 @@ import {
   broadcastAdminAutoHeld,
 } from '../../realtime/socket.server.js';
 import { logger } from '../../utils/logger.js';
+import { swrRoute } from '../../cache/swr-cache.js';
+import { invalidateFeedbackCache } from '../../cache/invalidator.js';
 
 export const feedbackRouter = Router();
 
-// GET /api/v1/feedback - List all public active notes on the wall
-feedbackRouter.get('/', async (_req: Request, res: Response, next: NextFunction) => {
-  try {
-    const notes = await FeedbackRepository.getPublicNotes();
-    res.json({
-      success: true,
-      data: notes,
-    });
-  } catch (err) {
-    next(err);
-  }
-});
+// GET /api/v1/feedback - List all public active notes on the wall (TTL: 3s, SWR: 10s)
+feedbackRouter.get(
+  '/',
+  swrRoute(
+    () => 'feedback:public',
+    3,
+    10,
+    async () => FeedbackRepository.getPublicNotes()
+  )
+);
 
 // GET /api/v1/feedback/:id - Get specific public note detail
 feedbackRouter.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
@@ -186,6 +186,9 @@ feedbackRouter.post(
             .then((stats) => broadcastStatsUpdated(stats))
             .catch((err) => logger.warn({ err }, 'Failed to broadcast stats after submission'));
         }
+
+        // Invalidate cached feedback, stats, and canvas layouts immediately
+        await invalidateFeedbackCache();
       }
 
       res.status(isDuplicate ? 200 : 201).json({
