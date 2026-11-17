@@ -1,6 +1,6 @@
-# DevBappa Solutions Live Feedback Wall — Architecture
+# EchoBoard | DevBappa Solutions — Architecture
 
-This document describes the high-level architecture, subsystem boundaries, data flow, real-time lifecycle, and resilience guarantees of the DevBappa Solutions Live Feedback Wall built for college Tech Expos.
+This document describes the high-level architecture, subsystem boundaries, data flow, real-time lifecycle, and resilience guarantees of the EchoBoard | DevBappa Solutions platform built for college Tech Expos.
 
 ## 1. System Overview
 

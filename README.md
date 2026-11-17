@@ -1,6 +1,6 @@
-# DevBappa Solutions Live Feedback Wall
+# EchoBoard | DevBappa Solutions
 
-An interactive, real-time, physical pinboard-styled sticky note feedback wall built for **DevBappa Solutions** for college Tech Expos.
+An interactive, real-time, physical pinboard-styled sticky note feedback wall built by **DevBappa Solutions** for college Tech Expos.
 
 Visitors at the tech expo scan an external QR code on their mobile phones to submit authentic thoughts, feedback, and questions. Submissions persist in a PostgreSQL database and animate dynamically onto an enormous continuous pinboard canvas in real time.
 

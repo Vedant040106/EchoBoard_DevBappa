@@ -133,7 +133,7 @@ export const PublicHistory: React.FC = () => {
                 boxShadow: '0 0 8px #f04328',
               }}
             />
-            <span>DevBappa Solutions • Multi-Event Live Feedback Wall</span>
+            <span>EchoBoard | DevBappa Solutions</span>
           </div>
           <h1
             style={{

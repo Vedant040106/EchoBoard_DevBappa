@@ -42,9 +42,11 @@ describe('Frontend Chunk Splitting & Mobile Texture Scaling Verification', () =>
     const config = viteConfigModule.default;
     assert.ok(config.build, 'build section must exist in vite.config');
     assert.ok(config.build.rollupOptions, 'rollupOptions must exist');
-    assert.ok(config.build.rollupOptions.output, 'rollupOptions.output must exist');
+    const rawOutput = config.build.rollupOptions.output;
+    assert.ok(rawOutput, 'rollupOptions.output must exist');
+    const output = Array.isArray(rawOutput) ? rawOutput[0] : rawOutput;
     
-    const manualChunks = config.build.rollupOptions.output.manualChunks;
+    const manualChunks = output.manualChunks as Record<string, string[]>;
     assert.ok(manualChunks, 'manualChunks must be defined');
     assert.deepEqual(manualChunks['vendor-react'], ['react', 'react-dom', 'react-router-dom']);
     assert.deepEqual(manualChunks['vendor-three'], ['three', '@react-three/fiber', '@react-three/drei']);

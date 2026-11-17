@@ -30,7 +30,7 @@ initSocketServer(server);
 
 export async function startServer(): Promise<http.Server> {
   try {
-    logger.info('Initializing DevBappa Live Feedback Wall API worker...');
+    logger.info('Initializing EchoBoard API worker...');
 
     // Run database migrations on startup if database is accessible
     try {
@@ -52,7 +52,7 @@ export async function startServer(): Promise<http.Server> {
             env: config.env,
             origins: config.corsOrigins,
           },
-          `[DevBappa Live Feedback Wall API] Server listening on http://0.0.0.0:${config.port} (PID ${process.pid})`
+          `[EchoBoard API] Server listening on http://0.0.0.0:${config.port} (PID ${process.pid})`
         );
         resolve(server);
       });

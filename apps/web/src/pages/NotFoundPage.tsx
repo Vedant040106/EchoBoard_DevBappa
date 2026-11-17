@@ -61,7 +61,7 @@ export const NotFoundPage: React.FC = () => {
             marginBottom: '28px',
           }}
         >
-          The page you are looking for does not exist on the DevBappa Live Feedback Wall.
+          The page you are looking for does not exist on EchoBoard.
         </p>
         <Link
           to="/"

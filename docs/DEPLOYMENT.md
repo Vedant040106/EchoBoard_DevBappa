@@ -1,4 +1,4 @@
-# DevBappa Solutions Live Feedback Wall — Deployment Guide
+# EchoBoard | DevBappa Solutions — Deployment Guide
 
 This guide covers step-by-step production deployment to **Vercel** (Frontend), **Render** (Backend), and **Neon** (PostgreSQL).
 

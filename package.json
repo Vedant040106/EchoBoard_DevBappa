@@ -2,7 +2,7 @@
   "name": "devbappa-live-feedback-wall-monorepo",
   "version": "1.0.0",
   "private": true,
-  "description": "DevBappa Solutions Live Feedback Wall for College Tech Expo",
+  "description": "EchoBoard | DevBappa Solutions - Live Feedback Wall for College Tech Expo",
   "workspaces": [
     "packages/*",
     "apps/*"

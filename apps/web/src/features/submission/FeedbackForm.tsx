@@ -24,7 +24,7 @@ const DEFAULT_TECH_EXPO: PublicEvent = {
   slug: 'tech-expo-2026-10-23',
   eventDate: '2026-10-23',
   venue: 'VPPCOE&VA, Sion',
-  description: 'DevBappa Solutions Live Feedback Wall at Tech Expo — VPPCOE&VA, Sion',
+  description: 'EchoBoard | DevBappa Solutions at Tech Expo — VPPCOE&VA, Sion',
 };
 
 export const DOODLE_OPTIONS: Array<{ type: DoodleType; label: string; icon: React.ReactNode }> = [
@@ -234,7 +234,7 @@ export const FeedbackForm: React.FC = () => {
       slug: 'tech-expo-2026-10-23',
       eventDate: '2026-10-23',
       venue: 'VPPCOE&VA, Sion',
-      description: 'DevBappa Solutions Live Feedback Wall at Tech Expo',
+      description: 'EchoBoard | DevBappa Solutions at Tech Expo',
     };
 
   // Compute suggested public display name

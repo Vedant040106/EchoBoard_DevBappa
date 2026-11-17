@@ -1,4 +1,4 @@
-# DevBappa Solutions Live Feedback Wall — Database Specification
+# EchoBoard | DevBappa Solutions — Database Specification
 
 This document details the relational schema, constraints, migrations, indexing strategy, and Neon PostgreSQL setup.
 

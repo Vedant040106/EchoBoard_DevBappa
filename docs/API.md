@@ -1,4 +1,4 @@
-# DevBappa Solutions Live Feedback Wall — API Specification
+# EchoBoard | DevBappa Solutions — API Specification
 
 Base prefix: `/api/v1`
 

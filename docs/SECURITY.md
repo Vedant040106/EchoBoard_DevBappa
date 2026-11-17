@@ -1,4 +1,4 @@
-# DevBappa Solutions Live Feedback Wall — Security & Abuse Prevention
+# EchoBoard | DevBappa Solutions — Security & Abuse Prevention
 
 This document specifies the security controls, data privacy policies, authentication architecture, and threat mitigation measures implemented in the application.
 

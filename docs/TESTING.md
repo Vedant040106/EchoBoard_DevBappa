@@ -1,4 +1,4 @@
-# DevBappa Solutions Live Feedback Wall — Testing Guide
+# EchoBoard | DevBappa Solutions — Testing Guide
 
 This document describes the automated test suites, quality gates, and integration test coverage.
 

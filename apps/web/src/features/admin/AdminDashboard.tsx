@@ -616,7 +616,7 @@ export const AdminDashboard: React.FC = () => {
   </div>
 
   <div style="margin-top: 36px; padding-top: 14px; border-top: 1px solid #e2e8f0; font-size: 11px; color: #94a3b8; display: flex; justify-content: space-between;">
-    <span>DevBappa Solutions — EchoBoard Platform</span>
+    <span>EchoBoard | DevBappa Solutions</span>
     <span>Confidential Operator Report</span>
   </div>
 
