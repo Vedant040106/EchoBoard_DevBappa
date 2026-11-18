@@ -53,7 +53,7 @@ export const WallPage: React.FC<WallPageProps> = ({ notes, newNoteId, onRefreshN
 
       {/* Mobile Floating Action Button (FAB) for fast feedback submission */}
       <div
-        className="visible-on-mobile-flex"
+        className="visible-on-mobile-flex pegboard-fab"
         style={{
           position: 'absolute',
           bottom: '24px',

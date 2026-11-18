@@ -216,7 +216,6 @@ export const StickyNoteMesh: React.FC<StickyNoteMeshProps> = ({
         onPointerOver={(e) => {
           e.stopPropagation();
           setHovered(true);
-          document.body.style.cursor = 'pointer';
         }}
         onPointerMove={(e) => {
           e.stopPropagation();
@@ -230,7 +229,6 @@ export const StickyNoteMesh: React.FC<StickyNoteMeshProps> = ({
         onPointerOut={(e) => {
           e.stopPropagation();
           setHovered(false);
-          document.body.style.cursor = 'default';
           hoverTilt.current = { x: 0, y: 0 };
         }}
         onPointerDown={(e) => {

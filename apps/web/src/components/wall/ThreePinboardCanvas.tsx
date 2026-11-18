@@ -368,6 +368,7 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
 
   return (
     <div
+      className="pegboard-container"
       style={{
         position: 'relative',
         width: '100%',
@@ -379,6 +380,7 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
     >
       {/* Three.js Canvas Scene */}
       <Canvas
+        className="pegboard-canvas"
         orthographic
         camera={{ position: [0, 2, 20], zoom: 34 }}
         dpr={typeof window !== 'undefined' ? [1, Math.min(window.devicePixelRatio, 2)] : 1}
@@ -430,6 +432,7 @@ export const ThreePinboardCanvas: React.FC<ThreePinboardCanvasProps> = ({
 
       {/* Floating Canvas Navigation HUD Pill (Bottom-Center Positioned, Frosted Glass) */}
       <div
+        className="pegboard-hud"
         style={{
           position: 'absolute',
           bottom: '24px',

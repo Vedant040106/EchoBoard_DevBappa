@@ -63,6 +63,7 @@ export const NoteDetailModal: React.FC<NoteDetailModalProps> = ({ note, onClose 
 
   return (
     <div
+      className="modal-overlay note-detail-modal"
       role="dialog"
       aria-modal="true"
       aria-labelledby="note-modal-title"

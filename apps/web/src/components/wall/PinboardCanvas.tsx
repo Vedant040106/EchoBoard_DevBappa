@@ -245,7 +245,6 @@ export const PinboardCanvas: React.FC<PinboardCanvasProps> = ({
         width: '100%',
         height: 'calc(100vh - 60px)',
         overflow: 'hidden',
-        cursor: isDraggingRef.current ? 'grabbing' : 'grab',
         touchAction: 'none',
       }}
       onWheel={handleWheel}
@@ -393,6 +392,7 @@ export const PinboardCanvas: React.FC<PinboardCanvasProps> = ({
 
       {/* Navigation Controls: Reset View and Latest */}
       <div
+        className="pegboard-hud"
         style={{
           position: 'absolute',
           bottom: '24px',

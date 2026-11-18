@@ -147,12 +147,6 @@ const TopLeftStudioShelf: React.FC<TopLeftStudioShelfProps> = ({
           e.stopPropagation();
           onToggleSpotlight?.();
         }}
-        onPointerOver={() => {
-          document.body.style.cursor = 'pointer';
-        }}
-        onPointerOut={() => {
-          document.body.style.cursor = 'default';
-        }}
       >
         {/* Heavy Circular Base */}
         <mesh position={[0, 0.15, 0]} castShadow receiveShadow>
@@ -467,12 +461,6 @@ export const PinboardEnvironment: React.FC<PinboardEnvironmentProps> = ({
             onClick={(e) => {
               e.stopPropagation();
               onAnnouncementClick?.();
-            }}
-            onPointerOver={() => {
-              document.body.style.cursor = 'pointer';
-            }}
-            onPointerOut={() => {
-              document.body.style.cursor = 'default';
             }}
           >
             <planeGeometry args={[4.4, 4.4]} />

@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+  <defs>
+    <!-- Tight Contact Shadow when pressed in -->
+    <radialGradient id="pinShadowActive" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Metallic Needle Gradient -->
+    <linearGradient id="needleGradActive" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="30%" stop-color="#e2e8f0"/>
+      <stop offset="65%" stop-color="#94a3b8"/>
+      <stop offset="100%" stop-color="#475569"/>
+    </linearGradient>
+
+    <!-- Head 3D Dome Radial Gradient -->
+    <radialGradient id="pinDomeActive" cx="36%" cy="34%" r="62%">
+      <stop offset="0%" stop-color="#ff937d"/>
+      <stop offset="22%" stop-color="#f04328"/>
+      <stop offset="65%" stop-color="#c22415"/>
+      <stop offset="92%" stop-color="#780e07"/>
+      <stop offset="100%" stop-color="#4d0502"/>
+    </radialGradient>
+
+    <!-- Flange Bevel Gradient -->
+    <linearGradient id="pinFlangeActive" x1="20%" y1="20%" x2="80%" y2="80%">
+      <stop offset="0%" stop-color="#ffa28f"/>
+      <stop offset="45%" stop-color="#eb3b20"/>
+      <stop offset="100%" stop-color="#7a0f07"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 1. Tight Contact Shadow (Pin pushed flush against surface) -->
+  <ellipse cx="16" cy="19" rx="6.5" ry="3.5" transform="rotate(35 16 19)" fill="url(#pinShadowActive)"/>
+
+  <!-- 2. Needle tip embedded deep at (1, 1) -->
+  <path d="M1 1 L7.5 5.5 L5.5 7.5 Z" fill="url(#needleGradActive)" stroke="#334155" stroke-width="0.5" stroke-linejoin="round"/>
+  <path d="M1.5 1.5 L6.5 6.5" stroke="#ffffff" stroke-width="0.75" stroke-linecap="round"/>
+
+  <!-- 3. Lower Beveled Pin Flange Pressed Closer -->
+  <ellipse cx="9" cy="9" rx="4.2" ry="2.2" transform="rotate(-45 9 9)" fill="url(#pinFlangeActive)" stroke="#630a05" stroke-width="0.6"/>
+
+  <!-- 4. Sculpted Waist Body -->
+  <path d="M7 11 C7.8 10.2 8.8 9.4 10 8.8 L12.2 11 C11.6 12.2 10.8 13.2 10 14 Z" fill="url(#pinDomeActive)"/>
+  <ellipse cx="12.5" cy="12.5" rx="3.2" ry="1.7" transform="rotate(-45 12.5 12.5)" fill="url(#pinFlangeActive)" stroke="#630a05" stroke-width="0.5"/>
+
+  <!-- 5. 3D Spherical Head / Dome -->
+  <circle cx="18" cy="18" r="6.6" fill="url(#pinDomeActive)" stroke="#520502" stroke-width="0.65"/>
+
+  <!-- 6. Primary Specular Gloss Reflection -->
+  <ellipse cx="16" cy="16" rx="3" ry="1.7" transform="rotate(-40 16 16)" fill="#ffffff" opacity="0.82"/>
+  <circle cx="14.8" cy="14.8" r="1.0" fill="#ffffff" opacity="0.95"/>
+</svg>
